@@ -1,0 +1,16 @@
+Next useful data after attempting a LineageOS 22.2 build/boot:
+
+BUILD-TIME
+- first complete Soong/ninja error (do not truncate the failing command)
+- generated vendor/red/hydrogenone/Android.bp if check_elf fails
+
+BOOT-TIME (once image reaches init/ADB)
+- adb shell getprop
+- adb shell dmesg
+- adb logcat -b all -d
+- adb shell lshal
+- adb shell cat /sys/fs/pstore/console-ramoops* after a kernel crash, if present
+
+OPTIONAL BEFORE BUILD
+- rawprogram*.xml / GPT partition list to identify every A/B partition and exact boot size from GPT
+- stock SELinux file_contexts / sepolicy blobs if not already present in vendor/etc/selinux

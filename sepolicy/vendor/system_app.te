@@ -1,0 +1,9 @@
+allow system_app ota_package_file:dir create_dir_perms;
+allow system_app ota_package_file:file create_file_perms;
+allow system_app proc_vmallocinfo:file r_file_perms;
+allow system_app usb_serial_device:chr_file rw_file_perms;
+binder_call(system_app, hal_vibrator_default)
+binder_call(system_app, hal_wifi_supplicant_default)
+binder_call(system_app, update_engine)
+r_dir_file(system_app, proc_pagetypeinfo)
+r_dir_file(system_app, sysfs_zram)

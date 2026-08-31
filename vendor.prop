@@ -1,15 +1,31 @@
-# H1A1000 stock-vendor compatibility props
-ro.product.first_api_level=27
+# RED Hydrogen One H1A1000 - stock-derived compatibility properties
+# Graphics
+ro.hardware.egl=adreno
+ro.hardware.vulkan=adreno
+ro.opengles.version=196610
+
+# Bluetooth - stock Cherokee controller; Oreo Qualcomm libbt-vendor reads the legacy key
+qcom.bluetooth.soc=cherokee
+vendor.bluetooth.soc=cherokee
+
+# RIL - stock .109 Qualcomm QMI RIL
+vendor.rild.libpath=/vendor/lib64/libril-qc-qmi-1.so
+
+# NFC
 ro.hardware.nfc_nci=nqx.default
+
+# Camera values present in RED stock vendor
 persist.camera.expose.aux=1
 persist.camera.sat.enable=1
 persist.camera.halpp=1
 persist.camera.dualfov.jpegnum=3
 persist.camera.preview.ubwc=0
 persist.camera.is.buffer_delay=10
+
+# Display
 vendor.display.enable_default_color_mode=true
-# Preserve stock vendor identity expected by proprietary H1A1000 components.
+
+# Vendor identity used by RED proprietary components
 ro.vendor.product.model=H1A1000
 ro.vendor.product.name=HydrogenONE
 ro.vendor.product.device=HydrogenONE
-

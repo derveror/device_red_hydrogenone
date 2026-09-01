@@ -72,6 +72,12 @@ TARGET_OTA_ASSERT_DEVICE := hydrogenone,HydrogenONE,H1A1000
 BOARD_SUPPRESS_SECURE_ERASE := true
 TARGET_RECOVERY_QCOM_RTC_FIX := true
 
+# USB
+# The stock H1A1000 4.4.78 kernel uses ConfigFS. Without this flag TWRP
+# installs its legacy /sys/class/android_usb/android0 init script and ADB never
+# enumerates during early recovery bring-up.
+TW_EXCLUDE_DEFAULT_USB_INIT := true
+
 # UI / input
 TARGET_RECOVERY_PIXEL_FORMAT := "RGBX_8888"
 TW_THEME := portrait_hdpi

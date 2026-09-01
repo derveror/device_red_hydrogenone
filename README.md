@@ -17,9 +17,16 @@ repo sync -c -j2
 source build/envsetup.sh
 lunch twrp_hydrogenone-eng
 m bootimage -j2
+python3 device/red/hydrogenone/tools/validate_built_boot.py out/target/product/hydrogenone/boot.img
 ```
 
 First test with `fastboot boot out/target/product/hydrogenone/boot.img`.
 Do not use `fastboot flash recovery`: this device has no standalone recovery partition.
 
 TWRP 12.1 upstream does not support legacy stock FDE decryption. The tree is aimed first at boot/UI/ADB/storage and modern ROM use; stock encrypted `/data` may require formatting or a legacy recovery/decryption path.
+
+## H1A1000 USB requirement
+
+The stock `.109` kernel uses USB ConfigFS on `a800000.dwc3`. The tree therefore
+excludes TWRP's legacy `android_usb` init and supplies `init.recovery.usb.rc`.
+See `docs-BOOT-DEBUG.md` for the first-boot test sequence.

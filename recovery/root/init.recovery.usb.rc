@@ -1,0 +1,7 @@
+# RED Hydrogen One H1A1000 recovery USB bring-up.
+# Stock .109 uses ConfigFS on the a800000.dwc3 controller.
+# TWRP's generic init resets sys.usb.configfs to 0 during early-init,
+# so restore the device-specific value during init before the fs trigger.
+on init
+    setprop sys.usb.controller a800000.dwc3
+    setprop sys.usb.configfs 1

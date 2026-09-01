@@ -1,0 +1,12 @@
+# RED Hydrogen One recovery bring-up
+on early-init
+    wait /dev/block/platform/soc/1da4000.ufshc
+    symlink /dev/block/platform/soc/1da4000.ufshc /dev/block/bootdevice
+    symlink /dev/block/platform/soc/1da4000.ufshc/by-name /dev/block/by-name
+
+on init
+    mkdir /mnt/vendor 0755 root root
+    mkdir /mnt/vendor/persist 0755 root root
+    mkdir /vendor/firmware_mnt 0755 root root
+    mkdir /vendor/bt_firmware 0755 root root
+    mkdir /vendor/dsp 0755 root root

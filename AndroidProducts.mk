@@ -1,7 +1,5 @@
-PRODUCT_MAKEFILES += \
-    $(LOCAL_DIR)/lineage_hydrogenone.mk
+PRODUCT_MAKEFILES := \
+    $(LOCAL_DIR)/twrp_hydrogenone.mk
 
-COMMON_LUNCH_CHOICES += \
-    lineage_hydrogenone-user \
-    lineage_hydrogenone-userdebug \
-    lineage_hydrogenone-eng
+COMMON_LUNCH_CHOICES := \
+    twrp_hydrogenone-eng

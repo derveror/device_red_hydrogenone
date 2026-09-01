@@ -1,12 +1,14 @@
-# RED Hydrogen One recovery bring-up
+# RED Hydrogen One recovery initialization
 on early-init
-    wait /dev/block/platform/soc/1da4000.ufshc
-    symlink /dev/block/platform/soc/1da4000.ufshc /dev/block/bootdevice
-    symlink /dev/block/platform/soc/1da4000.ufshc/by-name /dev/block/by-name
+    mkdir /firmware 0771 system system
+    mkdir /bt_firmware 0771 system system
+    mkdir /dsp 0771 system system
+    mkdir /persist 0771 system system
 
 on init
-    mkdir /mnt/vendor 0755 root root
-    mkdir /mnt/vendor/persist 0755 root root
-    mkdir /vendor/firmware_mnt 0755 root root
-    mkdir /vendor/bt_firmware 0755 root root
-    mkdir /vendor/dsp 0755 root root
+    write /sys/class/backlight/panel0-backlight/brightness 200
+
+on fs
+    wait /dev/block/platform/soc/1da4000.ufshc
+    symlink /dev/block/platform/soc/1da4000.ufshc /dev/block/bootdevice
+    export ANDROID_ROOT /system_root

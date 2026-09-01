@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<manifest version="1.0" type="device" target-level="5">
-    <!-- Proprietary RED .109 HAL instances are emitted by vendor/red/hydrogenone.
-         Source HAL modules selected in device.mk carry their own VINTF fragments. -->
-</manifest>

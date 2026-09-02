@@ -6,6 +6,7 @@
     "vendor_commit": "d30ac19025b348ca61535afaaecb23b95347b2f4"
   },
   "copy_destination_collisions": [],
+  "copy_vs_vendor_soong_collisions": [],
   "device_copy_destinations": {
     "recovery/root/first_stage_ramdisk/fstab.qcom": [
       "device.mk"
@@ -401,9 +402,15 @@
       "device.mk"
     ]
   },
+  "device_copy_vs_vendor_soong_collisions": [],
   "device_root": "device-tree",
-  "schema_version": 2,
-  "status": "zero_expanded_copy_destination_collisions",
+  "install_destination_collisions": [],
+  "schema_version": 3,
+  "status": "zero_make_and_soong_install_collisions",
+  "summary": {
+    "aggregate_install_collisions": 0,
+    "vendor_soong_install_outputs": 451
+  },
   "vendor_copy_destinations": {
     "vendor/bin/init.qcom.sensors.sh": [
       "hydrogenone-vendor.mk"
@@ -550,5 +557,1362 @@
       "hydrogenone-vendor.mk"
     ]
   },
-  "vendor_root": "vendor-tree"
+  "vendor_copy_vs_vendor_soong_collisions": [],
+  "vendor_root": "vendor-tree",
+  "vendor_soong_install_outputs": {
+    "vendor/bin/adsprpcd": [
+      "adsprpcd@Android.bp"
+    ],
+    "vendor/bin/energy-awareness": [
+      "energy-awareness@Android.bp"
+    ],
+    "vendor/bin/hvdcp_opti": [
+      "hvdcp_opti@Android.bp"
+    ],
+    "vendor/bin/hw/android.hardware.biometrics.fingerprint@2.1-service": [
+      "android.hardware.biometrics.fingerprint@2.1-service@Android.bp"
+    ],
+    "vendor/bin/hw/android.hardware.bluetooth@1.0-service-qti": [
+      "android.hardware.bluetooth@1.0-service-qti@Android.bp"
+    ],
+    "vendor/bin/hw/android.hardware.media.omx@1.0-service": [
+      "android.hardware.media.omx@1.0-service@Android.bp"
+    ],
+    "vendor/bin/hw/qcrild": [
+      "qcrild@Android.bp"
+    ],
+    "vendor/bin/hw/rild": [
+      "rild@Android.bp"
+    ],
+    "vendor/bin/hw/vendor.cm.hardware.thermal3d@1.0-service.cm": [
+      "vendor.cm.hardware.thermal3d@1.0-service.cm@Android.bp"
+    ],
+    "vendor/bin/hw/vendor.leia.hardware.leiadisp@1.0-service": [
+      "vendor.leia.hardware.leiadisp@1.0-service@Android.bp"
+    ],
+    "vendor/bin/hw/vendor.qti.esepowermanager@1.0-service": [
+      "vendor.qti.esepowermanager@1.0-service@Android.bp"
+    ],
+    "vendor/bin/ims_rtp_daemon": [
+      "ims_rtp_daemon@Android.bp"
+    ],
+    "vendor/bin/imsdatadaemon": [
+      "imsdatadaemon@Android.bp"
+    ],
+    "vendor/bin/imsqmidaemon": [
+      "imsqmidaemon@Android.bp"
+    ],
+    "vendor/bin/imsrcsd": [
+      "imsrcsd@Android.bp"
+    ],
+    "vendor/bin/irsc_util": [
+      "irsc_util@Android.bp"
+    ],
+    "vendor/bin/netmgrd": [
+      "netmgrd@Android.bp"
+    ],
+    "vendor/bin/nqnfcinfo": [
+      "nqnfcinfo@Android.bp"
+    ],
+    "vendor/bin/pd-mapper": [
+      "pd-mapper@Android.bp"
+    ],
+    "vendor/bin/pm-proxy": [
+      "pm-proxy@Android.bp"
+    ],
+    "vendor/bin/pm-service": [
+      "pm-service@Android.bp"
+    ],
+    "vendor/bin/qseecomd": [
+      "qseecomd@Android.bp"
+    ],
+    "vendor/bin/rmt_storage": [
+      "rmt_storage@Android.bp"
+    ],
+    "vendor/bin/sensors.qti": [
+      "sensors.qti@Android.bp"
+    ],
+    "vendor/bin/spdaemon": [
+      "spdaemon@Android.bp"
+    ],
+    "vendor/bin/thermal-engine": [
+      "thermal-engine@Android.bp"
+    ],
+    "vendor/bin/wcnss_filter": [
+      "wcnss_filter@Android.bp"
+    ],
+    "vendor/bin/wifidisplayhalservice": [
+      "wifidisplayhalservice@Android.bp"
+    ],
+    "vendor/bin/xtwifi-client": [
+      "xtwifi-client@Android.bp"
+    ],
+    "vendor/bin/xtwifi-inet-agent": [
+      "xtwifi-inet-agent@Android.bp"
+    ],
+    "vendor/lib/android.hidl.base@1.0.so": [
+      "android.hidl.base@1.0@Android.bp"
+    ],
+    "vendor/lib/camera.device@1.0-impl.so": [
+      "camera.device@1.0-impl@Android.bp"
+    ],
+    "vendor/lib/camera.device@3.2-impl.so": [
+      "camera.device@3.2-impl@Android.bp"
+    ],
+    "vendor/lib/camera.device@3.3-impl.so": [
+      "camera.device@3.3-impl@Android.bp"
+    ],
+    "vendor/lib/camera.device@3.4-external-impl.so": [
+      "camera.device@3.4-external-impl@Android.bp"
+    ],
+    "vendor/lib/camera.device@3.4-impl.so": [
+      "camera.device@3.4-impl@Android.bp"
+    ],
+    "vendor/lib/com.qualcomm.qti.bluetooth_audio@1.0.so": [
+      "com.qualcomm.qti.bluetooth_audio@1.0@Android.bp"
+    ],
+    "vendor/lib/com.qualcomm.qti.imscmservice@1.0.so": [
+      "com.qualcomm.qti.imscmservice@1.0@Android.bp"
+    ],
+    "vendor/lib/com.qualcomm.qti.imscmservice@2.0.so": [
+      "com.qualcomm.qti.imscmservice@2.0@Android.bp"
+    ],
+    "vendor/lib/com.qualcomm.qti.imscmservice@2.1.so": [
+      "com.qualcomm.qti.imscmservice@2.1@Android.bp"
+    ],
+    "vendor/lib/com.qualcomm.qti.uceservice@2.0.so": [
+      "com.qualcomm.qti.uceservice@2.0@Android.bp"
+    ],
+    "vendor/lib/com.qualcomm.qti.wifidisplayhal@1.0-halimpl.so": [
+      "com.qualcomm.qti.wifidisplayhal@1.0-halimpl@Android.bp"
+    ],
+    "vendor/lib/com.qualcomm.qti.wifidisplayhal@1.0.so": [
+      "com.qualcomm.qti.wifidisplayhal@1.0@Android.bp"
+    ],
+    "vendor/lib/egl/eglSubDriverAndroid.so": [
+      "eglSubDriverAndroid@Android.bp"
+    ],
+    "vendor/lib/egl/libEGL_adreno.so": [
+      "libEGL_adreno@Android.bp"
+    ],
+    "vendor/lib/egl/libGLESv1_CM_adreno.so": [
+      "libGLESv1_CM_adreno@Android.bp"
+    ],
+    "vendor/lib/egl/libGLESv2_adreno.so": [
+      "libGLESv2_adreno@Android.bp"
+    ],
+    "vendor/lib/egl/libQTapGLES.so": [
+      "libQTapGLES@Android.bp"
+    ],
+    "vendor/lib/egl/libq3dtools_adreno.so": [
+      "libq3dtools_adreno@Android.bp"
+    ],
+    "vendor/lib/egl/libq3dtools_esx.so": [
+      "libq3dtools_esx@Android.bp"
+    ],
+    "vendor/lib/hw/android.hardware.bluetooth@1.0-impl-qti.so": [
+      "android.hardware.bluetooth@1.0-impl-qti@Android.bp"
+    ],
+    "vendor/lib/hw/audio.primary.default.so": [
+      "audio.primary.default@Android.bp"
+    ],
+    "vendor/lib/hw/camera.msm8998.so": [
+      "camera.msm8998@Android.bp"
+    ],
+    "vendor/lib/hw/com.qualcomm.qti.bluetooth_audio@1.0-impl.so": [
+      "com.qualcomm.qti.bluetooth_audio@1.0-impl@Android.bp"
+    ],
+    "vendor/lib/hw/gatekeeper.msm8998.so": [
+      "gatekeeper.msm8998@Android.bp"
+    ],
+    "vendor/lib/hw/keystore.msm8998.so": [
+      "keystore.msm8998@Android.bp"
+    ],
+    "vendor/lib/hw/nfc_nci.nqx.default.so": [
+      "nfc_nci.nqx.default@Android.bp"
+    ],
+    "vendor/lib/hw/vendor.qti.esepowermanager@1.0-impl.so": [
+      "vendor.qti.esepowermanager@1.0-impl@Android.bp"
+    ],
+    "vendor/lib/hw/vendor.qti.gnss@1.0-impl.so": [
+      "vendor.qti.gnss@1.0-impl@Android.bp"
+    ],
+    "vendor/lib/lib-imscmservice.so": [
+      "lib-imscmservice@Android.bp"
+    ],
+    "vendor/lib/lib-imsdpl.so": [
+      "lib-imsdpl@Android.bp"
+    ],
+    "vendor/lib/lib-imsqimf.so": [
+      "lib-imsqimf@Android.bp"
+    ],
+    "vendor/lib/lib-imsrcs-v2.so": [
+      "lib-imsrcs-v2@Android.bp"
+    ],
+    "vendor/lib/lib-imsrcsbaseimpl.so": [
+      "lib-imsrcsbaseimpl@Android.bp"
+    ],
+    "vendor/lib/lib-imsxml.so": [
+      "lib-imsxml@Android.bp"
+    ],
+    "vendor/lib/lib-siputility.so": [
+      "lib-siputility@Android.bp"
+    ],
+    "vendor/lib/libC2D2.so": [
+      "libC2D2@Android.bp"
+    ],
+    "vendor/lib/libCB.so": [
+      "libCB@Android.bp"
+    ],
+    "vendor/lib/libDRPlugin.so": [
+      "libDRPlugin@Android.bp"
+    ],
+    "vendor/lib/libOpenCL.so": [
+      "libOpenCL@Android.bp"
+    ],
+    "vendor/lib/libQSEEComAPI.so": [
+      "libQSEEComAPI@Android.bp"
+    ],
+    "vendor/lib/libadreno_utils.so": [
+      "libadreno_utils@Android.bp"
+    ],
+    "vendor/lib/libadsprpc.so": [
+      "libadsprpc@Android.bp"
+    ],
+    "vendor/lib/libalsautils.so": [
+      "libalsautils@Android.bp"
+    ],
+    "vendor/lib/libarcsoft_antishaking.so": [
+      "libarcsoft_antishaking@Android.bp"
+    ],
+    "vendor/lib/libarcsoft_beautyshot.so": [
+      "libarcsoft_beautyshot@Android.bp"
+    ],
+    "vendor/lib/libarcsoft_dualcam_refocus.so": [
+      "libarcsoft_dualcam_refocus@Android.bp"
+    ],
+    "vendor/lib/libarcsoft_high_dynamic_range.so": [
+      "libarcsoft_high_dynamic_range@Android.bp"
+    ],
+    "vendor/lib/libarcsoft_low_light_shot.so": [
+      "libarcsoft_low_light_shot@Android.bp"
+    ],
+    "vendor/lib/libaudio_log_utils.so": [
+      "libaudio_log_utils@Android.bp"
+    ],
+    "vendor/lib/libavservices_minijail_vendor.so": [
+      "libavservices_minijail_vendor@Android.bp"
+    ],
+    "vendor/lib/libc2d30_bltlib.so": [
+      "libc2d30_bltlib@Android.bp"
+    ],
+    "vendor/lib/libconfigdb.so": [
+      "libconfigdb@Android.bp"
+    ],
+    "vendor/lib/libdataitems.so": [
+      "libdataitems@Android.bp"
+    ],
+    "vendor/lib/libdepthmapwrapper.so": [
+      "libdepthmapwrapper@Android.bp"
+    ],
+    "vendor/lib/libdiag.so": [
+      "libdiag@Android.bp"
+    ],
+    "vendor/lib/libdrplugin_client.so": [
+      "libdrplugin_client@Android.bp"
+    ],
+    "vendor/lib/libdsi_netctrl.so": [
+      "libdsi_netctrl@Android.bp"
+    ],
+    "vendor/lib/libdsutils.so": [
+      "libdsutils@Android.bp"
+    ],
+    "vendor/lib/libeffects.so": [
+      "libeffects@Android.bp"
+    ],
+    "vendor/lib/libeffectsconfig.so": [
+      "libeffectsconfig@Android.bp"
+    ],
+    "vendor/lib/libevent_observer.so": [
+      "libevent_observer@Android.bp"
+    ],
+    "vendor/lib/libfastcvopt.so": [
+      "libfastcvopt@Android.bp"
+    ],
+    "vendor/lib/libflp.so": [
+      "libflp@Android.bp"
+    ],
+    "vendor/lib/libgeofence.so": [
+      "libgeofence@Android.bp"
+    ],
+    "vendor/lib/libgps.utils.so": [
+      "libgps.utils@Android.bp"
+    ],
+    "vendor/lib/libgsl.so": [
+      "libgsl@Android.bp"
+    ],
+    "vendor/lib/libgui_vendor.so": [
+      "libgui_vendor@Android.bp"
+    ],
+    "vendor/lib/libhal_dbg.so": [
+      "libhal_dbg@Android.bp"
+    ],
+    "vendor/lib/libidl.so": [
+      "libidl@Android.bp"
+    ],
+    "vendor/lib/libizat_client_api.so": [
+      "libizat_client_api@Android.bp"
+    ],
+    "vendor/lib/libizat_core.so": [
+      "libizat_core@Android.bp"
+    ],
+    "vendor/lib/liblbs_core.so": [
+      "liblbs_core@Android.bp"
+    ],
+    "vendor/lib/libllvm-glnext.so": [
+      "libllvm-glnext@Android.bp"
+    ],
+    "vendor/lib/libllvm-qcom.so": [
+      "libllvm-qcom@Android.bp"
+    ],
+    "vendor/lib/libloc_api_v02.so": [
+      "libloc_api_v02@Android.bp"
+    ],
+    "vendor/lib/libloc_core.so": [
+      "libloc_core@Android.bp"
+    ],
+    "vendor/lib/liblocation_api.so": [
+      "liblocation_api@Android.bp"
+    ],
+    "vendor/lib/liblocationservice.so": [
+      "liblocationservice@Android.bp"
+    ],
+    "vendor/lib/liblocationservice_glue.so": [
+      "liblocationservice_glue@Android.bp"
+    ],
+    "vendor/lib/liblowi_client.so": [
+      "liblowi_client@Android.bp"
+    ],
+    "vendor/lib/libmdmdetect.so": [
+      "libmdmdetect@Android.bp"
+    ],
+    "vendor/lib/libmmcamera2_c2d_module.so": [
+      "libmmcamera2_c2d_module@Android.bp"
+    ],
+    "vendor/lib/libmmcamera2_cpp_module.so": [
+      "libmmcamera2_cpp_module@Android.bp"
+    ],
+    "vendor/lib/libmmcamera2_frame_algorithm.so": [
+      "libmmcamera2_frame_algorithm@Android.bp"
+    ],
+    "vendor/lib/libmmcamera2_iface_modules.so": [
+      "libmmcamera2_iface_modules@Android.bp"
+    ],
+    "vendor/lib/libmmcamera2_imglib_modules.so": [
+      "libmmcamera2_imglib_modules@Android.bp"
+    ],
+    "vendor/lib/libmmcamera2_is.so": [
+      "libmmcamera2_is@Android.bp"
+    ],
+    "vendor/lib/libmmcamera2_isp_modules.so": [
+      "libmmcamera2_isp_modules@Android.bp"
+    ],
+    "vendor/lib/libmmcamera2_mct.so": [
+      "libmmcamera2_mct@Android.bp"
+    ],
+    "vendor/lib/libmmcamera2_mct_shimlayer.so": [
+      "libmmcamera2_mct_shimlayer@Android.bp"
+    ],
+    "vendor/lib/libmmcamera2_pp_buf_mgr.so": [
+      "libmmcamera2_pp_buf_mgr@Android.bp"
+    ],
+    "vendor/lib/libmmcamera2_pproc_modules.so": [
+      "libmmcamera2_pproc_modules@Android.bp"
+    ],
+    "vendor/lib/libmmcamera2_q3a_core.so": [
+      "libmmcamera2_q3a_core@Android.bp"
+    ],
+    "vendor/lib/libmmcamera2_sensor_modules.so": [
+      "libmmcamera2_sensor_modules@Android.bp"
+    ],
+    "vendor/lib/libmmcamera2_stats_algorithm.so": [
+      "libmmcamera2_stats_algorithm@Android.bp"
+    ],
+    "vendor/lib/libmmcamera2_stats_lib.so": [
+      "libmmcamera2_stats_lib@Android.bp"
+    ],
+    "vendor/lib/libmmcamera2_stats_modules.so": [
+      "libmmcamera2_stats_modules@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_arcsoftbokeh_lib.so": [
+      "libmmcamera_arcsoftbokeh_lib@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_arcsoftlls.so": [
+      "libmmcamera_arcsoftlls@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_atmel_at24c32e_eeprom.so": [
+      "libmmcamera_atmel_at24c32e_eeprom@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_blackwhite.so": [
+      "libmmcamera_blackwhite@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_bokeh.so": [
+      "libmmcamera_bokeh@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_csidtg.so": [
+      "libmmcamera_csidtg@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_dbg.so": [
+      "libmmcamera_dbg@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_depth_map.so": [
+      "libmmcamera_depth_map@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_dummyalgo.so": [
+      "libmmcamera_dummyalgo@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_dw9761b_2d_eeprom.so": [
+      "libmmcamera_dw9761b_2d_eeprom@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_eebinparse.so": [
+      "libmmcamera_eebinparse@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_eeprom_util.so": [
+      "libmmcamera_eeprom_util@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_eztune_module.so": [
+      "libmmcamera_eztune_module@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_facedetection_lib.so": [
+      "libmmcamera_facedetection_lib@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_faceproc.so": [
+      "libmmcamera_faceproc@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_faceproc2.so": [
+      "libmmcamera_faceproc2@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_gt24p64b_main_eeprom.so": [
+      "libmmcamera_gt24p64b_main_eeprom@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_gt24p64b_sub_eeprom.so": [
+      "libmmcamera_gt24p64b_sub_eeprom@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_hdr_gb_lib.so": [
+      "libmmcamera_hdr_gb_lib@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_hdrgreyscale.so": [
+      "libmmcamera_hdrgreyscale@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_highcontrast.so": [
+      "libmmcamera_highcontrast@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_hvx_add_constant.so": [
+      "libmmcamera_hvx_add_constant@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_hvx_grid_sum.so": [
+      "libmmcamera_hvx_grid_sum@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_imglib.so": [
+      "libmmcamera_imglib@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_imglib_faceproc_adspstub.so": [
+      "libmmcamera_imglib_faceproc_adspstub@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_imx214.so": [
+      "libmmcamera_imx214@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_imx230.so": [
+      "libmmcamera_imx230@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_imx258.so": [
+      "libmmcamera_imx258@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_imx258_gt24c16_eeprom.so": [
+      "libmmcamera_imx258_gt24c16_eeprom@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_imx258_gt24c32_eeprom.so": [
+      "libmmcamera_imx258_gt24c32_eeprom@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_imx258_mono.so": [
+      "libmmcamera_imx258_mono@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_imx258_mono_gt24c32_eeprom.so": [
+      "libmmcamera_imx258_mono_gt24c32_eeprom@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_imx268_main.so": [
+      "libmmcamera_imx268_main@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_imx268_sub.so": [
+      "libmmcamera_imx268_sub@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_imx298.so": [
+      "libmmcamera_imx298@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_imx318.so": [
+      "libmmcamera_imx318@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_imx362.so": [
+      "libmmcamera_imx362@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_imx362_gt24c64a.so": [
+      "libmmcamera_imx362_gt24c64a@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_imx376.so": [
+      "libmmcamera_imx376@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_imx378.so": [
+      "libmmcamera_imx378@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_imx380_main.so": [
+      "libmmcamera_imx380_main@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_imx380_sub.so": [
+      "libmmcamera_imx380_sub@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_interface.so": [
+      "libmmcamera_interface@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_irs1645.so": [
+      "libmmcamera_irs1645@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_isp_abf48.so": [
+      "libmmcamera_isp_abf48@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_isp_aec_bg_stats47.so": [
+      "libmmcamera_isp_aec_bg_stats47@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_isp_bf_stats47.so": [
+      "libmmcamera_isp_bf_stats47@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_isp_bg_stats46.so": [
+      "libmmcamera_isp_bg_stats46@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_isp_bhist_stats44.so": [
+      "libmmcamera_isp_bhist_stats44@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_isp_black_level48.so": [
+      "libmmcamera_isp_black_level48@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_isp_sub_module.so": [
+      "libmmcamera_isp_sub_module@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_pdaf.so": [
+      "libmmcamera_pdaf@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_pdafcamif.so": [
+      "libmmcamera_pdafcamif@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_ppbase_module.so": [
+      "libmmcamera_ppbase_module@Android.bp"
+    ],
+    "vendor/lib/libmmcamera_thread_services.so": [
+      "libmmcamera_thread_services@Android.bp"
+    ],
+    "vendor/lib/libmmjpeg_interface.so": [
+      "libmmjpeg_interface@Android.bp"
+    ],
+    "vendor/lib/libmmlib2d_interface.so": [
+      "libmmlib2d_interface@Android.bp"
+    ],
+    "vendor/lib/libmmosal_proprietary.so": [
+      "libmmosal_proprietary@Android.bp"
+    ],
+    "vendor/lib/libmpbase.so": [
+      "libmpbase@Android.bp"
+    ],
+    "vendor/lib/libnbaio_mono.so": [
+      "libnbaio_mono@Android.bp"
+    ],
+    "vendor/lib/libnetmgr.so": [
+      "libnetmgr@Android.bp"
+    ],
+    "vendor/lib/libperipheral_client.so": [
+      "libperipheral_client@Android.bp"
+    ],
+    "vendor/lib/libqcrilFramework.so": [
+      "libqcrilFramework@Android.bp"
+    ],
+    "vendor/lib/libqdMetaData.so": [
+      "libqdMetaData@Android.bp"
+    ],
+    "vendor/lib/libqdi.so": [
+      "libqdi@Android.bp"
+    ],
+    "vendor/lib/libqmi.so": [
+      "libqmi@Android.bp"
+    ],
+    "vendor/lib/libqmi_cci.so": [
+      "libqmi_cci@Android.bp"
+    ],
+    "vendor/lib/libqmi_client_helper.so": [
+      "libqmi_client_helper@Android.bp"
+    ],
+    "vendor/lib/libqmi_client_qmux.so": [
+      "libqmi_client_qmux@Android.bp"
+    ],
+    "vendor/lib/libqmi_common_so.so": [
+      "libqmi_common_so@Android.bp"
+    ],
+    "vendor/lib/libqmi_encdec.so": [
+      "libqmi_encdec@Android.bp"
+    ],
+    "vendor/lib/libqmiservices.so": [
+      "libqmiservices@Android.bp"
+    ],
+    "vendor/lib/libqomx_core.so": [
+      "libqomx_core@Android.bp"
+    ],
+    "vendor/lib/libqservice.so": [
+      "libqservice@Android.bp"
+    ],
+    "vendor/lib/libril-qcril-hook-oem.so": [
+      "libril-qcril-hook-oem@Android.bp"
+    ],
+    "vendor/lib/libril.so": [
+      "libril@Android.bp"
+    ],
+    "vendor/lib/librilutils.so": [
+      "librilutils@Android.bp"
+    ],
+    "vendor/lib/librpmb.so": [
+      "librpmb@Android.bp"
+    ],
+    "vendor/lib/libsdm-disp-apis.so": [
+      "libsdm-disp-apis@Android.bp"
+    ],
+    "vendor/lib/libsdm-disp-vndapis.so": [
+      "libsdm-disp-vndapis@Android.bp"
+    ],
+    "vendor/lib/libsdmutils.so": [
+      "libsdmutils@Android.bp"
+    ],
+    "vendor/lib/libsensor1.so": [
+      "libsensor1@Android.bp"
+    ],
+    "vendor/lib/libsettings.so": [
+      "libsettings@Android.bp"
+    ],
+    "vendor/lib/libthermalclient.so": [
+      "libthermalclient@Android.bp"
+    ],
+    "vendor/lib/libtime_genoff.so": [
+      "libtime_genoff@Android.bp"
+    ],
+    "vendor/lib/libtinycompress_vendor.so": [
+      "libtinycompress_vendor@Android.bp"
+    ],
+    "vendor/lib/libulp2.so": [
+      "libulp2@Android.bp"
+    ],
+    "vendor/lib/libwfdcommonutils_proprietary.so": [
+      "libwfdcommonutils_proprietary@Android.bp"
+    ],
+    "vendor/lib/libwfdhaldsmanager.so": [
+      "libwfdhaldsmanager@Android.bp"
+    ],
+    "vendor/lib/libwfdhdcpcp.so": [
+      "libwfdhdcpcp@Android.bp"
+    ],
+    "vendor/lib/libwfdmmservice.so": [
+      "libwfdmmservice@Android.bp"
+    ],
+    "vendor/lib/libwfdmodulehdcpsession.so": [
+      "libwfdmodulehdcpsession@Android.bp"
+    ],
+    "vendor/lib/libxml.so": [
+      "libxml@Android.bp"
+    ],
+    "vendor/lib/libxtadapter.so": [
+      "libxtadapter@Android.bp"
+    ],
+    "vendor/lib/nfc_nci.nqx.default.hw.so": [
+      "nfc_nci.nqx.default.hw@Android.bp"
+    ],
+    "vendor/lib/qcrild_librilutils.so": [
+      "qcrild_librilutils@Android.bp"
+    ],
+    "vendor/lib/vendor.cm.hardware.thermal3d@1.0.so": [
+      "vendor.cm.hardware.thermal3d@1.0@Android.bp"
+    ],
+    "vendor/lib/vendor.leia.hardware.leiadisp@1.0.so": [
+      "vendor.leia.hardware.leiadisp@1.0@Android.bp"
+    ],
+    "vendor/lib/vendor.qti.esepowermanager@1.0.so": [
+      "vendor.qti.esepowermanager@1.0@Android.bp"
+    ],
+    "vendor/lib/vendor.qti.gnss@1.0.so": [
+      "vendor.qti.gnss@1.0@Android.bp"
+    ],
+    "vendor/lib/vendor.qti.hardware.camera.device@1.0.so": [
+      "vendor.qti.hardware.camera.device@1.0@Android.bp"
+    ],
+    "vendor/lib/vendor.qti.hardware.radio.qcrilhook@1.0.so": [
+      "vendor.qti.hardware.radio.qcrilhook@1.0@Android.bp"
+    ],
+    "vendor/lib/vendor.qti.ims.callinfo@1.0.so": [
+      "vendor.qti.ims.callinfo@1.0@Android.bp"
+    ],
+    "vendor/lib/vndk/libstagefright_foundation.so": [
+      "libstagefright_foundation@Android.bp"
+    ],
+    "vendor/lib/vndk/libstagefright_omx.so": [
+      "libstagefright_omx@Android.bp"
+    ],
+    "vendor/lib64/camera.device@1.0-impl.so": [
+      "camera.device@1.0-impl@Android.bp"
+    ],
+    "vendor/lib64/camera.device@3.2-impl.so": [
+      "camera.device@3.2-impl@Android.bp"
+    ],
+    "vendor/lib64/camera.device@3.3-impl.so": [
+      "camera.device@3.3-impl@Android.bp"
+    ],
+    "vendor/lib64/camera.device@3.4-external-impl.so": [
+      "camera.device@3.4-external-impl@Android.bp"
+    ],
+    "vendor/lib64/camera.device@3.4-impl.so": [
+      "camera.device@3.4-impl@Android.bp"
+    ],
+    "vendor/lib64/com.fingerprints.extension@1.0.so": [
+      "com.fingerprints.extension@1.0@Android.bp"
+    ],
+    "vendor/lib64/com.qualcomm.qti.ant@1.0.so": [
+      "com.qualcomm.qti.ant@1.0@Android.bp"
+    ],
+    "vendor/lib64/com.qualcomm.qti.bluetooth_audio@1.0.so": [
+      "com.qualcomm.qti.bluetooth_audio@1.0@Android.bp"
+    ],
+    "vendor/lib64/com.qualcomm.qti.imscmservice@1.0.so": [
+      "com.qualcomm.qti.imscmservice@1.0@Android.bp"
+    ],
+    "vendor/lib64/com.qualcomm.qti.imscmservice@2.0.so": [
+      "com.qualcomm.qti.imscmservice@2.0@Android.bp"
+    ],
+    "vendor/lib64/com.qualcomm.qti.imscmservice@2.1.so": [
+      "com.qualcomm.qti.imscmservice@2.1@Android.bp"
+    ],
+    "vendor/lib64/com.qualcomm.qti.uceservice@2.0.so": [
+      "com.qualcomm.qti.uceservice@2.0@Android.bp"
+    ],
+    "vendor/lib64/com.quicinc.cne.api@1.0.so": [
+      "com.quicinc.cne.api@1.0@Android.bp"
+    ],
+    "vendor/lib64/com.quicinc.cne.api@1.1.so": [
+      "com.quicinc.cne.api@1.1@Android.bp"
+    ],
+    "vendor/lib64/com.quicinc.cne.constants@1.0.so": [
+      "com.quicinc.cne.constants@1.0@Android.bp"
+    ],
+    "vendor/lib64/com.quicinc.cne.constants@2.0.so": [
+      "com.quicinc.cne.constants@2.0@Android.bp"
+    ],
+    "vendor/lib64/com.quicinc.cne.constants@2.1.so": [
+      "com.quicinc.cne.constants@2.1@Android.bp"
+    ],
+    "vendor/lib64/com.quicinc.cne.server@2.0.so": [
+      "com.quicinc.cne.server@2.0@Android.bp"
+    ],
+    "vendor/lib64/com.quicinc.cne.server@2.1.so": [
+      "com.quicinc.cne.server@2.1@Android.bp"
+    ],
+    "vendor/lib64/com.quicinc.cne.server@2.2.so": [
+      "com.quicinc.cne.server@2.2@Android.bp"
+    ],
+    "vendor/lib64/com.quicinc.cne.server@2.3.so": [
+      "com.quicinc.cne.server@2.3@Android.bp"
+    ],
+    "vendor/lib64/egl/eglSubDriverAndroid.so": [
+      "eglSubDriverAndroid@Android.bp"
+    ],
+    "vendor/lib64/egl/libEGL_adreno.so": [
+      "libEGL_adreno@Android.bp"
+    ],
+    "vendor/lib64/egl/libGLESv1_CM_adreno.so": [
+      "libGLESv1_CM_adreno@Android.bp"
+    ],
+    "vendor/lib64/egl/libGLESv2_adreno.so": [
+      "libGLESv2_adreno@Android.bp"
+    ],
+    "vendor/lib64/egl/libQTapGLES.so": [
+      "libQTapGLES@Android.bp"
+    ],
+    "vendor/lib64/egl/libq3dtools_adreno.so": [
+      "libq3dtools_adreno@Android.bp"
+    ],
+    "vendor/lib64/egl/libq3dtools_esx.so": [
+      "libq3dtools_esx@Android.bp"
+    ],
+    "vendor/lib64/hw/android.hardware.bluetooth@1.0-impl-qti.so": [
+      "android.hardware.bluetooth@1.0-impl-qti@Android.bp"
+    ],
+    "vendor/lib64/hw/audio.primary.default.so": [
+      "audio.primary.default@Android.bp"
+    ],
+    "vendor/lib64/hw/com.qualcomm.qti.bluetooth_audio@1.0-impl.so": [
+      "com.qualcomm.qti.bluetooth_audio@1.0-impl@Android.bp"
+    ],
+    "vendor/lib64/hw/gatekeeper.msm8998.so": [
+      "gatekeeper.msm8998@Android.bp"
+    ],
+    "vendor/lib64/hw/keystore.msm8998.so": [
+      "keystore.msm8998@Android.bp"
+    ],
+    "vendor/lib64/hw/nfc_nci.nqx.default.so": [
+      "nfc_nci.nqx.default@Android.bp"
+    ],
+    "vendor/lib64/hw/vendor.cm.hardware.thermal3d@1.0-impl.so": [
+      "vendor.cm.hardware.thermal3d@1.0-impl@Android.bp"
+    ],
+    "vendor/lib64/hw/vendor.leia.hardware.leiadisp@1.0-impl.so": [
+      "vendor.leia.hardware.leiadisp@1.0-impl@Android.bp"
+    ],
+    "vendor/lib64/hw/vendor.qti.esepowermanager@1.0-impl.so": [
+      "vendor.qti.esepowermanager@1.0-impl@Android.bp"
+    ],
+    "vendor/lib64/hw/vendor.qti.gnss@1.0-impl.so": [
+      "vendor.qti.gnss@1.0-impl@Android.bp"
+    ],
+    "vendor/lib64/hw/vulkan.msm8998.so": [
+      "vulkan.msm8998@Android.bp"
+    ],
+    "vendor/lib64/lib-dplmedia.so": [
+      "lib-dplmedia@Android.bp"
+    ],
+    "vendor/lib64/lib-imscmservice.so": [
+      "lib-imscmservice@Android.bp"
+    ],
+    "vendor/lib64/lib-imsdpl.so": [
+      "lib-imsdpl@Android.bp"
+    ],
+    "vendor/lib64/lib-imsqimf.so": [
+      "lib-imsqimf@Android.bp"
+    ],
+    "vendor/lib64/lib-imsrcs-v2.so": [
+      "lib-imsrcs-v2@Android.bp"
+    ],
+    "vendor/lib64/lib-imsrcsbaseimpl.so": [
+      "lib-imsrcsbaseimpl@Android.bp"
+    ],
+    "vendor/lib64/lib-imsxml.so": [
+      "lib-imsxml@Android.bp"
+    ],
+    "vendor/lib64/lib-rtpcommon.so": [
+      "lib-rtpcommon@Android.bp"
+    ],
+    "vendor/lib64/lib-rtpcore.so": [
+      "lib-rtpcore@Android.bp"
+    ],
+    "vendor/lib64/lib-rtpdaemoninterface.so": [
+      "lib-rtpdaemoninterface@Android.bp"
+    ],
+    "vendor/lib64/lib-rtpsl.so": [
+      "lib-rtpsl@Android.bp"
+    ],
+    "vendor/lib64/lib-siputility.so": [
+      "lib-siputility@Android.bp"
+    ],
+    "vendor/lib64/libC2D2.so": [
+      "libC2D2@Android.bp"
+    ],
+    "vendor/lib64/libCB.so": [
+      "libCB@Android.bp"
+    ],
+    "vendor/lib64/libDRPlugin.so": [
+      "libDRPlugin@Android.bp"
+    ],
+    "vendor/lib64/libFlacSwDec.so": [
+      "libFlacSwDec@Android.bp"
+    ],
+    "vendor/lib64/libOmxAacDec.so": [
+      "libOmxAacDec@Android.bp"
+    ],
+    "vendor/lib64/libOmxAacEnc.so": [
+      "libOmxAacEnc@Android.bp"
+    ],
+    "vendor/lib64/libOmxAmrDec.so": [
+      "libOmxAmrDec@Android.bp"
+    ],
+    "vendor/lib64/libOmxAmrEnc.so": [
+      "libOmxAmrEnc@Android.bp"
+    ],
+    "vendor/lib64/libOmxAmrwbplusDec.so": [
+      "libOmxAmrwbplusDec@Android.bp"
+    ],
+    "vendor/lib64/libOmxEvrcEnc.so": [
+      "libOmxEvrcEnc@Android.bp"
+    ],
+    "vendor/lib64/libOmxQcelp13Enc.so": [
+      "libOmxQcelp13Enc@Android.bp"
+    ],
+    "vendor/lib64/libOmxWmaDec.so": [
+      "libOmxWmaDec@Android.bp"
+    ],
+    "vendor/lib64/libOpenCL.so": [
+      "libOpenCL@Android.bp"
+    ],
+    "vendor/lib64/libQSEEComAPI.so": [
+      "libQSEEComAPI@Android.bp"
+    ],
+    "vendor/lib64/libadreno_utils.so": [
+      "libadreno_utils@Android.bp"
+    ],
+    "vendor/lib64/libadsp_default_listener.so": [
+      "libadsp_default_listener@Android.bp"
+    ],
+    "vendor/lib64/libadsprpc.so": [
+      "libadsprpc@Android.bp"
+    ],
+    "vendor/lib64/libalsautils.so": [
+      "libalsautils@Android.bp"
+    ],
+    "vendor/lib64/libaudio_log_utils.so": [
+      "libaudio_log_utils@Android.bp"
+    ],
+    "vendor/lib64/libaudioalsa.so": [
+      "libaudioalsa@Android.bp"
+    ],
+    "vendor/lib64/libbtnv.so": [
+      "libbtnv@Android.bp"
+    ],
+    "vendor/lib64/libc2d30_bltlib.so": [
+      "libc2d30_bltlib@Android.bp"
+    ],
+    "vendor/lib64/libcld80211.so": [
+      "libcld80211@Android.bp"
+    ],
+    "vendor/lib64/libcneapiclient.so": [
+      "libcneapiclient@Android.bp"
+    ],
+    "vendor/lib64/libconfigdb.so": [
+      "libconfigdb@Android.bp"
+    ],
+    "vendor/lib64/libdataitems.so": [
+      "libdataitems@Android.bp"
+    ],
+    "vendor/lib64/libdiag.so": [
+      "libdiag@Android.bp"
+    ],
+    "vendor/lib64/libdrm.so": [
+      "libdrm@Android.bp"
+    ],
+    "vendor/lib64/libdrmfs.so": [
+      "libdrmfs@Android.bp"
+    ],
+    "vendor/lib64/libdrmutils.so": [
+      "libdrmutils@Android.bp"
+    ],
+    "vendor/lib64/libdrplugin_client.so": [
+      "libdrplugin_client@Android.bp"
+    ],
+    "vendor/lib64/libdsi_netctrl.so": [
+      "libdsi_netctrl@Android.bp"
+    ],
+    "vendor/lib64/libdsutils.so": [
+      "libdsutils@Android.bp"
+    ],
+    "vendor/lib64/libeffects.so": [
+      "libeffects@Android.bp"
+    ],
+    "vendor/lib64/libeffectsconfig.so": [
+      "libeffectsconfig@Android.bp"
+    ],
+    "vendor/lib64/libevent_observer.so": [
+      "libevent_observer@Android.bp"
+    ],
+    "vendor/lib64/libflp.so": [
+      "libflp@Android.bp"
+    ],
+    "vendor/lib64/libgdtap.so": [
+      "libgdtap@Android.bp"
+    ],
+    "vendor/lib64/libgeofence.so": [
+      "libgeofence@Android.bp"
+    ],
+    "vendor/lib64/libgps.utils.so": [
+      "libgps.utils@Android.bp"
+    ],
+    "vendor/lib64/libgpustats.so": [
+      "libgpustats@Android.bp"
+    ],
+    "vendor/lib64/libgsl.so": [
+      "libgsl@Android.bp"
+    ],
+    "vendor/lib64/libhdr_tm.so": [
+      "libhdr_tm@Android.bp"
+    ],
+    "vendor/lib64/libidl.so": [
+      "libidl@Android.bp"
+    ],
+    "vendor/lib64/libizat_client_api.so": [
+      "libizat_client_api@Android.bp"
+    ],
+    "vendor/lib64/libizat_core.so": [
+      "libizat_core@Android.bp"
+    ],
+    "vendor/lib64/libjson.so": [
+      "libjson@Android.bp"
+    ],
+    "vendor/lib64/libkeystore-engine-wifi-hidl.so": [
+      "libkeystore-engine-wifi-hidl@Android.bp"
+    ],
+    "vendor/lib64/libkeystore-wifi-hidl.so": [
+      "libkeystore-wifi-hidl@Android.bp"
+    ],
+    "vendor/lib64/liblbs_core.so": [
+      "liblbs_core@Android.bp"
+    ],
+    "vendor/lib64/libllvm-glnext.so": [
+      "libllvm-glnext@Android.bp"
+    ],
+    "vendor/lib64/libllvm-qcom.so": [
+      "libllvm-qcom@Android.bp"
+    ],
+    "vendor/lib64/libloc_api_v02.so": [
+      "libloc_api_v02@Android.bp"
+    ],
+    "vendor/lib64/libloc_core.so": [
+      "libloc_core@Android.bp"
+    ],
+    "vendor/lib64/liblocation_api.so": [
+      "liblocation_api@Android.bp"
+    ],
+    "vendor/lib64/liblocationservice.so": [
+      "liblocationservice@Android.bp"
+    ],
+    "vendor/lib64/liblocationservice_glue.so": [
+      "liblocationservice_glue@Android.bp"
+    ],
+    "vendor/lib64/liblowi_client.so": [
+      "liblowi_client@Android.bp"
+    ],
+    "vendor/lib64/liblowi_wifihal.so": [
+      "liblowi_wifihal@Android.bp"
+    ],
+    "vendor/lib64/liblqe.so": [
+      "liblqe@Android.bp"
+    ],
+    "vendor/lib64/libmdmdetect.so": [
+      "libmdmdetect@Android.bp"
+    ],
+    "vendor/lib64/libmm-omxcore.so": [
+      "libmm-omxcore@Android.bp"
+    ],
+    "vendor/lib64/libmmcamera2_frame_algorithm.so": [
+      "libmmcamera2_frame_algorithm@Android.bp"
+    ],
+    "vendor/lib64/libmmcamera2_is.so": [
+      "libmmcamera2_is@Android.bp"
+    ],
+    "vendor/lib64/libmmcamera2_q3a_core.so": [
+      "libmmcamera2_q3a_core@Android.bp"
+    ],
+    "vendor/lib64/libmmcamera2_stats_algorithm.so": [
+      "libmmcamera2_stats_algorithm@Android.bp"
+    ],
+    "vendor/lib64/libmmcamera2_stats_lib.so": [
+      "libmmcamera2_stats_lib@Android.bp"
+    ],
+    "vendor/lib64/libmmcamera_dbg.so": [
+      "libmmcamera_dbg@Android.bp"
+    ],
+    "vendor/lib64/libmmcamera_faceproc.so": [
+      "libmmcamera_faceproc@Android.bp"
+    ],
+    "vendor/lib64/libmmcamera_faceproc2.so": [
+      "libmmcamera_faceproc2@Android.bp"
+    ],
+    "vendor/lib64/libmmcamera_tintless_algo.so": [
+      "libmmcamera_tintless_algo@Android.bp"
+    ],
+    "vendor/lib64/libmmcamera_tintless_bg_pca_algo.so": [
+      "libmmcamera_tintless_bg_pca_algo@Android.bp"
+    ],
+    "vendor/lib64/libnbaio_mono.so": [
+      "libnbaio_mono@Android.bp"
+    ],
+    "vendor/lib64/libnetmgr.so": [
+      "libnetmgr@Android.bp"
+    ],
+    "vendor/lib64/libnetmgr_common.so": [
+      "libnetmgr_common@Android.bp"
+    ],
+    "vendor/lib64/libnlnetmgr.so": [
+      "libnlnetmgr@Android.bp"
+    ],
+    "vendor/lib64/libpdmapper.so": [
+      "libpdmapper@Android.bp"
+    ],
+    "vendor/lib64/libpdnotifier.so": [
+      "libpdnotifier@Android.bp"
+    ],
+    "vendor/lib64/libperipheral_client.so": [
+      "libperipheral_client@Android.bp"
+    ],
+    "vendor/lib64/libqcci_legacy.so": [
+      "libqcci_legacy@Android.bp"
+    ],
+    "vendor/lib64/libqcrilFramework.so": [
+      "libqcrilFramework@Android.bp"
+    ],
+    "vendor/lib64/libqdi.so": [
+      "libqdi@Android.bp"
+    ],
+    "vendor/lib64/libqdp.so": [
+      "libqdp@Android.bp"
+    ],
+    "vendor/lib64/libqmi.so": [
+      "libqmi@Android.bp"
+    ],
+    "vendor/lib64/libqmi_cci.so": [
+      "libqmi_cci@Android.bp"
+    ],
+    "vendor/lib64/libqmi_client_helper.so": [
+      "libqmi_client_helper@Android.bp"
+    ],
+    "vendor/lib64/libqmi_client_qmux.so": [
+      "libqmi_client_qmux@Android.bp"
+    ],
+    "vendor/lib64/libqmi_common_so.so": [
+      "libqmi_common_so@Android.bp"
+    ],
+    "vendor/lib64/libqmi_csi.so": [
+      "libqmi_csi@Android.bp"
+    ],
+    "vendor/lib64/libqmi_encdec.so": [
+      "libqmi_encdec@Android.bp"
+    ],
+    "vendor/lib64/libqmiservices.so": [
+      "libqmiservices@Android.bp"
+    ],
+    "vendor/lib64/libqseed3.so": [
+      "libqseed3@Android.bp"
+    ],
+    "vendor/lib64/libqservice.so": [
+      "libqservice@Android.bp"
+    ],
+    "vendor/lib64/libril-qc-hal-qmi.so": [
+      "libril-qc-hal-qmi@Android.bp"
+    ],
+    "vendor/lib64/libril-qc-ltedirectdisc.so": [
+      "libril-qc-ltedirectdisc@Android.bp"
+    ],
+    "vendor/lib64/libril-qc-radioconfig.so": [
+      "libril-qc-radioconfig@Android.bp"
+    ],
+    "vendor/lib64/libril-qcril-hook-oem.so": [
+      "libril-qcril-hook-oem@Android.bp"
+    ],
+    "vendor/lib64/libril.so": [
+      "libril@Android.bp"
+    ],
+    "vendor/lib64/librilqmiservices.so": [
+      "librilqmiservices@Android.bp"
+    ],
+    "vendor/lib64/librilutils.so": [
+      "librilutils@Android.bp"
+    ],
+    "vendor/lib64/librmnetctl.so": [
+      "librmnetctl@Android.bp"
+    ],
+    "vendor/lib64/librpmb.so": [
+      "librpmb@Android.bp"
+    ],
+    "vendor/lib64/libsdedrm.so": [
+      "libsdedrm@Android.bp"
+    ],
+    "vendor/lib64/libsdm-color.so": [
+      "libsdm-color@Android.bp"
+    ],
+    "vendor/lib64/libsdm-diag.so": [
+      "libsdm-diag@Android.bp"
+    ],
+    "vendor/lib64/libsdm-disp-apis.so": [
+      "libsdm-disp-apis@Android.bp"
+    ],
+    "vendor/lib64/libsdm-disp-vndapis.so": [
+      "libsdm-disp-vndapis@Android.bp"
+    ],
+    "vendor/lib64/libsdmextension.so": [
+      "libsdmextension@Android.bp"
+    ],
+    "vendor/lib64/libsdmutils.so": [
+      "libsdmutils@Android.bp"
+    ],
+    "vendor/lib64/libsensor1.so": [
+      "libsensor1@Android.bp"
+    ],
+    "vendor/lib64/libsettings.so": [
+      "libsettings@Android.bp"
+    ],
+    "vendor/lib64/libspcom.so": [
+      "libspcom@Android.bp"
+    ],
+    "vendor/lib64/libsystem_health_mon.so": [
+      "libsystem_health_mon@Android.bp"
+    ],
+    "vendor/lib64/libthermalclient.so": [
+      "libthermalclient@Android.bp"
+    ],
+    "vendor/lib64/libthermalioctl.so": [
+      "libthermalioctl@Android.bp"
+    ],
+    "vendor/lib64/libtime_genoff.so": [
+      "libtime_genoff@Android.bp"
+    ],
+    "vendor/lib64/libtinycompress_vendor.so": [
+      "libtinycompress_vendor@Android.bp"
+    ],
+    "vendor/lib64/libtinyxml2_1.so": [
+      "libtinyxml2_1@Android.bp"
+    ],
+    "vendor/lib64/libulp2.so": [
+      "libulp2@Android.bp"
+    ],
+    "vendor/lib64/libwebrtc_audio_preprocessing.so": [
+      "libwebrtc_audio_preprocessing@Android.bp"
+    ],
+    "vendor/lib64/libwifi-hal.so": [
+      "libwifi-hal@Android.bp"
+    ],
+    "vendor/lib64/libxml.so": [
+      "libxml@Android.bp"
+    ],
+    "vendor/lib64/libxtadapter.so": [
+      "libxtadapter@Android.bp"
+    ],
+    "vendor/lib64/libxtwifi_ulp_adaptor.so": [
+      "libxtwifi_ulp_adaptor@Android.bp"
+    ],
+    "vendor/lib64/nfc_nci.nqx.default.hw.so": [
+      "nfc_nci.nqx.default.hw@Android.bp"
+    ],
+    "vendor/lib64/qcrild_librilutils.so": [
+      "qcrild_librilutils@Android.bp"
+    ],
+    "vendor/lib64/soundfx/libaudiopreprocessing.so": [
+      "libaudiopreprocessing@Android.bp"
+    ],
+    "vendor/lib64/vendor.cm.hardware.thermal3d@1.0.so": [
+      "vendor.cm.hardware.thermal3d@1.0@Android.bp"
+    ],
+    "vendor/lib64/vendor.leia.hardware.leiadisp@1.0.so": [
+      "vendor.leia.hardware.leiadisp@1.0@Android.bp"
+    ],
+    "vendor/lib64/vendor.nxp.hardware.nfc@1.0.so": [
+      "vendor.nxp.hardware.nfc@1.0@Android.bp"
+    ],
+    "vendor/lib64/vendor.qti.data.factory@1.0.so": [
+      "vendor.qti.data.factory@1.0@Android.bp"
+    ],
+    "vendor/lib64/vendor.qti.data.factory@1.1.so": [
+      "vendor.qti.data.factory@1.1@Android.bp"
+    ],
+    "vendor/lib64/vendor.qti.esepowermanager@1.0.so": [
+      "vendor.qti.esepowermanager@1.0@Android.bp"
+    ],
+    "vendor/lib64/vendor.qti.gnss@1.0.so": [
+      "vendor.qti.gnss@1.0@Android.bp"
+    ],
+    "vendor/lib64/vendor.qti.gnss@1.1.so": [
+      "vendor.qti.gnss@1.1@Android.bp"
+    ],
+    "vendor/lib64/vendor.qti.gnss@1.2.so": [
+      "vendor.qti.gnss@1.2@Android.bp"
+    ],
+    "vendor/lib64/vendor.qti.gnss@2.0.so": [
+      "vendor.qti.gnss@2.0@Android.bp"
+    ],
+    "vendor/lib64/vendor.qti.gnss@2.1.so": [
+      "vendor.qti.gnss@2.1@Android.bp"
+    ],
+    "vendor/lib64/vendor.qti.hardware.camera.device@1.0.so": [
+      "vendor.qti.hardware.camera.device@1.0@Android.bp"
+    ],
+    "vendor/lib64/vendor.qti.hardware.data.connection@1.0.so": [
+      "vendor.qti.hardware.data.connection@1.0@Android.bp"
+    ],
+    "vendor/lib64/vendor.qti.hardware.data.dynamicdds@1.0.so": [
+      "vendor.qti.hardware.data.dynamicdds@1.0@Android.bp"
+    ],
+    "vendor/lib64/vendor.qti.hardware.data.qmi@1.0.so": [
+      "vendor.qti.hardware.data.qmi@1.0@Android.bp"
+    ],
+    "vendor/lib64/vendor.qti.hardware.fingerprint@1.0.so": [
+      "vendor.qti.hardware.fingerprint@1.0@Android.bp"
+    ],
+    "vendor/lib64/vendor.qti.hardware.fm@1.0.so": [
+      "vendor.qti.hardware.fm@1.0@Android.bp"
+    ],
+    "vendor/lib64/vendor.qti.hardware.radio.am@1.0.so": [
+      "vendor.qti.hardware.radio.am@1.0@Android.bp"
+    ],
+    "vendor/lib64/vendor.qti.hardware.radio.atcmdfwd@1.0.so": [
+      "vendor.qti.hardware.radio.atcmdfwd@1.0@Android.bp"
+    ],
+    "vendor/lib64/vendor.qti.hardware.radio.ims@1.0.so": [
+      "vendor.qti.hardware.radio.ims@1.0@Android.bp"
+    ],
+    "vendor/lib64/vendor.qti.hardware.radio.ims@1.1.so": [
+      "vendor.qti.hardware.radio.ims@1.1@Android.bp"
+    ],
+    "vendor/lib64/vendor.qti.hardware.radio.ims@1.2.so": [
+      "vendor.qti.hardware.radio.ims@1.2@Android.bp"
+    ],
+    "vendor/lib64/vendor.qti.hardware.radio.ims@1.3.so": [
+      "vendor.qti.hardware.radio.ims@1.3@Android.bp"
+    ],
+    "vendor/lib64/vendor.qti.hardware.radio.ims@1.4.so": [
+      "vendor.qti.hardware.radio.ims@1.4@Android.bp"
+    ],
+    "vendor/lib64/vendor.qti.hardware.radio.lpa@1.0.so": [
+      "vendor.qti.hardware.radio.lpa@1.0@Android.bp"
+    ],
+    "vendor/lib64/vendor.qti.hardware.radio.qcrilhook@1.0.so": [
+      "vendor.qti.hardware.radio.qcrilhook@1.0@Android.bp"
+    ],
+    "vendor/lib64/vendor.qti.hardware.radio.qtiradio@1.0.so": [
+      "vendor.qti.hardware.radio.qtiradio@1.0@Android.bp"
+    ],
+    "vendor/lib64/vendor.qti.hardware.radio.qtiradio@2.0.so": [
+      "vendor.qti.hardware.radio.qtiradio@2.0@Android.bp"
+    ],
+    "vendor/lib64/vendor.qti.hardware.radio.qtiradio@2.1.so": [
+      "vendor.qti.hardware.radio.qtiradio@2.1@Android.bp"
+    ],
+    "vendor/lib64/vendor.qti.hardware.radio.uim@1.0.so": [
+      "vendor.qti.hardware.radio.uim@1.0@Android.bp"
+    ],
+    "vendor/lib64/vendor.qti.hardware.radio.uim@1.1.so": [
+      "vendor.qti.hardware.radio.uim@1.1@Android.bp"
+    ],
+    "vendor/lib64/vendor.qti.hardware.radio.uim_remote_client@1.0.so": [
+      "vendor.qti.hardware.radio.uim_remote_client@1.0@Android.bp"
+    ],
+    "vendor/lib64/vendor.qti.hardware.radio.uim_remote_server@1.0.so": [
+      "vendor.qti.hardware.radio.uim_remote_server@1.0@Android.bp"
+    ],
+    "vendor/lib64/vendor.qti.hardware.wifi.hostapd@1.0.so": [
+      "vendor.qti.hardware.wifi.hostapd@1.0@Android.bp"
+    ],
+    "vendor/lib64/vendor.qti.hardware.wifi.supplicant@2.0.so": [
+      "vendor.qti.hardware.wifi.supplicant@2.0@Android.bp"
+    ],
+    "vendor/lib64/vendor.qti.ims.callinfo@1.0.so": [
+      "vendor.qti.ims.callinfo@1.0@Android.bp"
+    ],
+    "vendor/lib64/vendor.qti.ims.rcsconfig@1.0.so": [
+      "vendor.qti.ims.rcsconfig@1.0@Android.bp"
+    ],
+    "vendor/lib64/vendor.qti.imsrtpservice@1.0-service-Impl.so": [
+      "vendor.qti.imsrtpservice@1.0-service-Impl@Android.bp"
+    ],
+    "vendor/lib64/vendor.qti.imsrtpservice@1.0.so": [
+      "vendor.qti.imsrtpservice@1.0@Android.bp"
+    ],
+    "vendor/lib64/vendor.qti.latency@2.0.so": [
+      "vendor.qti.latency@2.0@Android.bp"
+    ]
+  },
+  "vendor_soong_output_collisions": []
 }

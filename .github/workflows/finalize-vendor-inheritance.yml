@@ -39,7 +39,18 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          PYTHONPATH="$PWD/tests:$PWD" python3 -m unittest discover -s tests -p 'test_*.py' -v
+          PYTHONPATH="$PWD/tests:$PWD" python3 - <<'PY'
+          import pathlib
+          import unittest
+          loader=unittest.defaultTestLoader
+          suite=unittest.TestSuite()
+          for path in sorted(pathlib.Path('tests').glob('test_*.py')):
+              if path.name == 'test_full_tree.py':
+                  continue
+              suite.addTests(loader.loadTestsFromName(f'tests.{path.stem}'))
+          result=unittest.TextTestRunner(verbosity=2).run(suite)
+          raise SystemExit(0 if result.wasSuccessful() else 1)
+          PY
           python3 tests/test_full_tree.py
           python3 -m json.tool docs/stock/h1a1000-r118/cross-tree-copy-contract.json >/dev/null
           git diff --check

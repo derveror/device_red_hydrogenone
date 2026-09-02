@@ -10,10 +10,17 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 TOOL = ROOT / "tools" / "analysis" / "cross_tree_contract.py"
 DEVICE_MK = ROOT / "device.mk"
+SAVED_CONTRACT = ROOT / "docs" / "stock" / "h1a1000-r118" / "cross-tree-copy-contract.json"
+CURRENT_VENDOR_COMMIT = "d30ac19025b348ca61535afaaecb23b95347b2f4"
 
 VENDOR_OWNED_RED118_CONFIGS = {
     "configs/nfc/libnfc-nci.conf": "$(TARGET_COPY_OUT_VENDOR)/etc/libnfc-nci.conf",
     "configs/thermal-engine.conf": "$(TARGET_COPY_OUT_VENDOR)/etc/thermal-engine.conf",
+}
+
+SOURCE_OWNED_AOSP_FEATURES = {
+    "vendor/etc/permissions/android.hardware.nfc.hce.xml",
+    "vendor/etc/permissions/android.hardware.nfc.xml",
 }
 
 
@@ -74,6 +81,25 @@ class CrossTreeContractTest(unittest.TestCase):
         for source, destination in sorted(VENDOR_OWNED_RED118_CONFIGS.items()):
             self.assertNotIn(f"$(LOCAL_PATH)/{source}:{destination}", text, source)
             self.assertFalse((ROOT / source).exists(), source)
+
+    def test_saved_cross_tree_evidence_is_current_and_green(self) -> None:
+        contract = json.loads(SAVED_CONTRACT.read_text(encoding="utf-8"))
+        self.assertEqual(contract["authority"]["vendor_commit"], CURRENT_VENDOR_COMMIT)
+        self.assertEqual(contract["copy_destination_collisions"], [])
+
+        device_destinations = contract["device_copy_destinations"]
+        vendor_destinations = contract["vendor_copy_destinations"]
+
+        for destination in (
+            "vendor/etc/libnfc-nci.conf",
+            "vendor/etc/thermal-engine.conf",
+        ):
+            self.assertNotIn(destination, device_destinations)
+            self.assertIn(destination, vendor_destinations)
+
+        for destination in SOURCE_OWNED_AOSP_FEATURES:
+            self.assertIn(destination, device_destinations)
+            self.assertNotIn(destination, vendor_destinations)
 
 
 if __name__ == "__main__":

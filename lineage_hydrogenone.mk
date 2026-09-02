@@ -13,7 +13,7 @@ $(call inherit-product, device/red/hydrogenone/device.mk)
 PRODUCT_NAME := lineage_hydrogenone
 PRODUCT_DEVICE := hydrogenone
 PRODUCT_BRAND := RED
-PRODUCT_MODEL := Hydrogen One
+PRODUCT_MODEL := H1A1000
 PRODUCT_MANUFACTURER := RED
 PRODUCT_RELEASE_NAME := hydrogenone
 
@@ -21,8 +21,7 @@ PRODUCT_ACTIONABLE_COMPATIBLE_PROPERTY_DISABLE := true
 PRODUCT_COMPATIBLE_PROPERTY_OVERRIDE := true
 PRODUCT_CHARACTERISTICS := nosdcard
 
-# Stock identity for proprietary compatibility and complete partition fingerprints.
+# Canonical RED .118 identity used for proprietary compatibility.
 PRODUCT_BUILD_PROP_OVERRIDES += \
-    BuildDesc="hamberger_verizon-user 8.1.0 H1A1000.010ho.01.01.01r.109 109 release-keys" \
-    BuildFingerprint=RED/HydrogenONE/HydrogenONE:8.1.0/H1A1000.010ho.01.01.01r.109/109:user/release-keys \
+    BuildFingerprint=RED/HydrogenONE/HydrogenONE:9/PKQ1.190118.001/118:userdebug/release-keys \
     DeviceName=HydrogenONE

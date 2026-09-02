@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any, Iterable
 
 RADIO_KEY_RE = re.compile(r"(?:radio|ril|ims|multisim|dsds|dsda|phone_count|sim_count|telephony)", re.I)
-RADIO_INIT_RE = re.compile(r"(?:qcril|rild|radio|ims)", re.I)
+RADIO_INIT_RE = re.compile(r"(?:qcril|rild|ril-daemon|radio|ims)", re.I)
 PROPERTY_NAMES = {"build.prop", "default.prop", "vendor.prop"}
 ACTIVATION_VERBS = {"start", "enable", "restart", "ctl.start"}
 

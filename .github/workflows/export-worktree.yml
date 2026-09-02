@@ -21,21 +21,23 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          git rev-parse HEAD > WORKTREE_COMMIT
+          git rev-parse HEAD > "$RUNNER_TEMP/WORKTREE_COMMIT"
           tar \
             --exclude=.git \
-            --exclude=worktree.tar.zst \
             -I 'zstd -19 -T0' \
-            -cf worktree.tar.zst .
-          sha256sum worktree.tar.zst > worktree.tar.zst.sha256
+            -cf "$RUNNER_TEMP/worktree.tar.zst" .
+          (
+            cd "$RUNNER_TEMP"
+            sha256sum worktree.tar.zst > worktree.tar.zst.sha256
+          )
 
       - name: Upload snapshot
         uses: actions/upload-artifact@v4
         with:
           name: hydrogenone-device-worktree
           path: |
-            worktree.tar.zst
-            worktree.tar.zst.sha256
-            WORKTREE_COMMIT
+            ${{ runner.temp }}/worktree.tar.zst
+            ${{ runner.temp }}/worktree.tar.zst.sha256
+            ${{ runner.temp }}/WORKTREE_COMMIT
           if-no-files-found: error
           retention-days: 1

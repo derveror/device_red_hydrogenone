@@ -18,8 +18,8 @@ required_files = [
     'rootdir/etc/fstab.qcom','rootdir/etc/init/hw/init.qcom.rc','rootdir/etc/init/hw/init.qcom.usb.rc','rootdir/etc/init.recovery.qcom.rc','rootdir/etc/ueventd.rc',
     'audio/audio_policy_configuration.xml','audio/audio_platform_info.xml','audio/default_volume_tables.xml','audio/mixer_paths_tasha.xml',
     'media/media_codecs.xml','media/media_profiles_V1_0.xml',
-    'configs/msm_irqbalance.conf','configs/thermal-engine.conf','configs/public.libraries.txt',
-    'configs/camera/camera_config.xml','configs/nfc/libnfc-nci.conf','configs/nfc/libnfc-nxp.conf',
+    'configs/msm_irqbalance.conf','configs/public.libraries.txt',
+    'configs/camera/camera_config.xml','configs/nfc/libnfc-nxp.conf',
     'gps/etc/gps.conf','gps/etc/flp.conf','gps/izat.conf','wifi/WCNSS_qcom_cfg.ini','wifi/wpa_supplicant_overlay.conf',
     'seccomp/mediacodec.policy','prebuilt/Image.gz-dtb','vendor.prop'
 ]
@@ -105,11 +105,10 @@ for part in ('system','vendor','userdata','modem','bluetooth','dsp','persist'):
     if expected not in fstab:
         errors.append('fstab does not use real UFS path for '+part)
 
-# Full subsystem wiring: RED camera tuning and NXP NFC configs must be installed.
+# Full subsystem wiring: RED camera tuning and the device-owned NXP HAL config must be installed.
 device=(ROOT/'device.mk').read_text(errors='ignore') if (ROOT/'device.mk').exists() else ''
 for needle in (
     'configs/camera/camera_config.xml:$(TARGET_COPY_OUT_VENDOR)/etc/camera/camera_config.xml',
-    'configs/nfc/libnfc-nci.conf:$(TARGET_COPY_OUT_VENDOR)/etc/libnfc-nci.conf',
     'configs/nfc/libnfc-nxp.conf:$(TARGET_COPY_OUT_VENDOR)/etc/libnfc-nxp.conf',
     'android.hardware.nfc@1.2-service',
     'vendor_bt_firmware_mountpoint',

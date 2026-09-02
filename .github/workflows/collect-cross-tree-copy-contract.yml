@@ -1,0 +1,78 @@
+name: Collect device/vendor copy ownership contract
+
+on:
+  push:
+    branches:
+      - lineage-22.2-stock118-rework
+    paths:
+      - .github/workflows/collect-cross-tree-copy-contract.yml
+
+permissions:
+  contents: write
+
+jobs:
+  collect:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout device tree
+        uses: actions/checkout@v4
+        with:
+          path: device-tree
+          fetch-depth: 0
+
+      - name: Checkout pinned vendor tree
+        uses: actions/checkout@v4
+        with:
+          repository: derveror/proprietary_vendor_red_hydrogenone
+          ref: 4a29d09d23299ba5eea6ac6bfa4fee24ba9a2b27
+          path: vendor-tree
+          fetch-depth: 1
+
+      - name: Audit PRODUCT_COPY_FILES ownership across repositories
+        shell: bash
+        run: |
+          set -euo pipefail
+          out=device-tree/docs/stock/h1a1000-r118/cross-tree-copy-contract.json
+          set +e
+          python3 device-tree/tools/analysis/cross_tree_contract.py \
+            --device-root device-tree \
+            --vendor-root vendor-tree \
+            --json > "$out"
+          rc=$?
+          set -e
+          test "$rc" -eq 1
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('device-tree/docs/stock/h1a1000-r118/cross-tree-copy-contract.json')
+          data = json.loads(p.read_text())
+          collisions = data.get('copy_destination_collisions', [])
+          if not collisions:
+              raise SystemExit('expected at least one real cross-tree collision')
+          data['authority'] = {
+              'stock_build': 'H1A1000.082ho.01.00.10r.118',
+              'stock_archive_sha256': '7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e',
+              'device_branch': 'lineage-22.2-stock118-rework',
+              'vendor_commit': '4a29d09d23299ba5eea6ac6bfa4fee24ba9a2b27',
+          }
+          p.write_text(json.dumps(data, indent=2, sort_keys=True) + '\n')
+          print('collisions:', len(collisions))
+          for item in collisions:
+              print('-', item)
+          PY
+          python3 -m json.tool "$out" >/dev/null
+
+      - name: Commit evidence and remove one-shot collector
+        shell: bash
+        working-directory: device-tree
+        run: |
+          set -euo pipefail
+          rm .github/workflows/collect-cross-tree-copy-contract.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/stock/h1a1000-r118/cross-tree-copy-contract.json .github/workflows/collect-cross-tree-copy-contract.yml
+          git diff --cached --check
+          git commit -m 'docs: record device/vendor copy ownership collisions'
+          git fetch origin lineage-22.2-stock118-rework
+          git rebase origin/lineage-22.2-stock118-rework
+          git push origin HEAD:lineage-22.2-stock118-rework

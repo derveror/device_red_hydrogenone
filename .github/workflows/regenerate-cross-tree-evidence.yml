@@ -27,17 +27,22 @@ jobs:
           ref: 6fef3d7c6333602d7114aefa0284a03f5aadb454
           path: vendor-tree
 
-      - name: Diagnose and regenerate evidence from exact pinned trees
+      - name: Move vendor outside device scan root
         shell: bash
         run: |
           set -euo pipefail
-          set +e
+          rm -rf "$RUNNER_TEMP/vendor-tree"
+          mv vendor-tree "$RUNNER_TEMP/vendor-tree"
+          test "$(git -C "$RUNNER_TEMP/vendor-tree" rev-parse HEAD)" = '6fef3d7c6333602d7114aefa0284a03f5aadb454'
+
+      - name: Regenerate evidence from exact isolated trees
+        shell: bash
+        run: |
+          set -euo pipefail
           python3 tools/analysis/cross_tree_contract.py \
             --device-root . \
-            --vendor-root vendor-tree \
+            --vendor-root "$RUNNER_TEMP/vendor-tree" \
             --json > "$RUNNER_TEMP/cross-tree-live.json"
-          tool_rc=$?
-          set -e
           python3 - <<'PY'
           import json
           import os
@@ -48,27 +53,14 @@ jobs:
           out_path = Path('docs/stock/h1a1000-r118/cross-tree-copy-contract.json')
           lock = json.loads(lock_path.read_text())
           live = json.loads(Path(os.environ['RUNNER_TEMP'], 'cross-tree-live.json').read_text())
-          vendor_head = subprocess.check_output(['git', '-C', 'vendor-tree', 'rev-parse', 'HEAD'], text=True).strip()
+          vendor_root = Path(os.environ['RUNNER_TEMP'], 'vendor-tree')
+          vendor_head = subprocess.check_output(['git', '-C', str(vendor_root), 'rev-parse', 'HEAD'], text=True).strip()
 
           collisions = live.get('copy_destination_collisions', [])
           print('LIVE_COPY_DESTINATION_COLLISIONS=' + json.dumps(collisions, sort_keys=True))
-          for destination in collisions:
-              print(
-                  'COLLISION_OWNER '
-                  + destination
-                  + ' DEVICE='
-                  + json.dumps(live['device_copy_destinations'].get(destination, []), sort_keys=True)
-                  + ' VENDOR='
-                  + json.dumps(live['vendor_copy_destinations'].get(destination, []), sort_keys=True)
-              )
-          print('LIVE_SCHEMA=' + str(live.get('schema_version')))
-          print('PINNED_VENDOR=' + lock['vendor_commit'])
-          print('CHECKED_VENDOR=' + vendor_head)
-
           assert vendor_head == lock['vendor_commit'], (vendor_head, lock['vendor_commit'])
           assert live['schema_version'] == 2, live
-          if collisions:
-              raise SystemExit(2)
+          assert collisions == [], collisions
 
           live['authority'] = {
               'device_branch': lock['device_branch'],
@@ -76,9 +68,9 @@ jobs:
               'stock_build': lock['stock_build'],
               'vendor_commit': lock['vendor_commit'],
           }
+          live['status'] = 'zero_expanded_copy_destination_collisions'
           out_path.write_text(json.dumps(live, indent=2, sort_keys=True) + '\n')
           PY
-          test "$tool_rc" -eq 0
 
       - name: Verify regenerated lock and evidence
         shell: bash

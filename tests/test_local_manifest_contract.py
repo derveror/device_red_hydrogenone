@@ -5,6 +5,7 @@ import unittest
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
+# Clean-checkout contract for the active LineageOS 22.2 bring-up.
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / "docs" / "manifests" / "hydrogenone-lineage-22.2.xml"
 LOCK = ROOT / "docs" / "reference" / "cross-tree-lock.json"

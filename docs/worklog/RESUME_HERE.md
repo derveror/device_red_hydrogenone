@@ -2,8 +2,8 @@
 
 > **READ THIS FILE FIRST AFTER ANY INTERRUPTION.**
 
-**Marker version:** 5  
-**Last completed action file:** `docs/worklog/2026-09-02/0006-cross-tree-live-collision-diagnostic.md`  
+**Marker version:** 6  
+**Last completed action file:** `docs/worklog/2026-09-02/0007-cross-tree-collisions-proven-false-positive.md`  
 **Logging protocol active:** YES
 
 ## Current repository checkpoints
@@ -12,10 +12,9 @@
 - Repository: `derveror/device_red_hydrogenone`.
 - Branch: `lineage-22.2-stock118-rework`.
 - Cross-tree lock points to vendor `6fef3d7c6333602d7114aefa0284a03f5aadb454`.
-- Permanent cross-tree checkout has been updated to the same vendor commit.
-- Published `cross-tree-copy-contract.json` is stale and still belongs to the earlier zero-collision state.
-- Live diagnostic against the current device tree + vendor `6fef3d7c...` found 49 duplicate install destinations; exact list is preserved in Action 0006.
-- Do NOT declare cross-tree GREEN and do NOT merely rewrite the evidence authority until these ownership collisions are resolved.
+- Permanent cross-tree checkout uses the same vendor commit.
+- Published `cross-tree-copy-contract.json` still has stale authority from the prior vendor pin and must be regenerated.
+- The previously reported 49 live collisions are **proven diagnostic false positives**: every device-side owner was `vendor-tree/hydrogenone-vendor.mk`, because the one-shot workflow nested the vendor checkout inside the device scan root. No runtime file pruning is required from that list.
 
 ### Vendor
 - Repository: `derveror/proprietary_vendor_red_hydrogenone`.
@@ -45,15 +44,13 @@ LineageOS 22.2 roomservice resolves ordinary `lineage.dependencies` GitHub entri
 
 ## Immediate next action — DO THIS FIRST
 
-Inspect device/vendor producers for the 49 destinations listed in Action 0006. Classify each group as device/source-owned or vendor/proprietary-owned. Add ownership regression tests first, confirm RED, then prune the losing side. Pay special attention to `init.msm.usb.configfs.rc` and standard NFC permission XMLs, which may be source-owned rather than vendor-owned.
+Fix only the one-shot regeneration workflow so the vendor checkout is outside the device scan root (for example move it to `$RUNNER_TEMP/vendor-tree` before invoking `cross_tree_contract.py`). Rerun the exact live audit. If zero collisions, regenerate `cross-tree-copy-contract.json` with vendor authority `6fef3d7c...`, self-delete the one-shot workflow, and verify permanent device CI GREEN.
 
-## After collision cleanup
+## After cross-tree GREEN
 
-1. Regenerate `cross-tree-copy-contract.json` from the exact current trees.
-2. Remove the one-shot `regenerate-cross-tree-evidence.yml`.
-3. Restore permanent device CI and cross-tree job to GREEN.
-4. Create/test reproducible local-manifest template and explicit kernel dependency branch.
-5. Move to actual clean LineageOS workspace `lunch lineage_hydrogenone-userdebug` + `m nothing`.
+1. Create/test reproducible local-manifest template.
+2. Make the kernel branch explicit in `lineage.dependencies`.
+3. Move to actual clean LineageOS workspace `lunch lineage_hydrogenone-userdebug` + `m nothing`.
 
 ## Recovery rule
 

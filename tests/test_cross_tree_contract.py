@@ -81,7 +81,7 @@ class CrossTreeContractTest(unittest.TestCase):
     def test_expands_simple_foreach_wildcard_copy_destinations(self) -> None:
         proc = self.run_tool(
             "$(foreach f,$(wildcard $(LOCAL_PATH)/rootdir/etc/init/hw/*.rc),\\\n"
-            "    $(eval PRODUCT_COPY_FILES += $(f):$(TARGET_COPY_OUT_VENDOR)/etc/init/hw/$(notdir $(f))))\n",
+            "    $(eval PRODUCT_COPY_FILES += $(f):$(TARGET_COPY_OUT_VENDOR)/etc/init/hw/$(notdir $f)))\n",
             "PRODUCT_COPY_FILES += \\\n"
             "    vendor/red/hydrogenone/proprietary/vendor/etc/init/hw/init.alpha.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/hw/init.alpha.rc\n",
             device_files={

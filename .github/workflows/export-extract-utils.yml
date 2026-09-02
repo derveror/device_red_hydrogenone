@@ -1,0 +1,42 @@
+name: Export LineageOS 22.2 extract-utils
+
+on:
+  push:
+    branches:
+      - tmp-extract-utils-export
+    paths:
+      - .github/workflows/export-extract-utils.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout extract-utils
+        uses: actions/checkout@v4
+        with:
+          repository: LineageOS/android_tools_extract-utils
+          ref: lineage-22.2
+          path: extract-utils
+
+      - name: Record source identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C extract-utils rev-parse HEAD > EXTRACT_UTILS_COMMIT
+          tar -C extract-utils --exclude=.git -czf extract-utils-lineage-22.2.tar.gz .
+          sha256sum extract-utils-lineage-22.2.tar.gz > extract-utils-lineage-22.2.tar.gz.sha256
+
+      - name: Upload source snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: lineage-22.2-extract-utils
+          path: |
+            extract-utils-lineage-22.2.tar.gz
+            extract-utils-lineage-22.2.tar.gz.sha256
+            EXTRACT_UTILS_COMMIT
+          if-no-files-found: error
+          retention-days: 1

@@ -82,7 +82,6 @@ jobs:
         run: |
           set -euo pipefail
           rm .github/workflows/collect-radio-evidence.yml
-          find . -type d -name __pycache__ -prune -exec rm -rf {} +
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add docs/stock/h1a1000-r118/radio-init-evidence.json \

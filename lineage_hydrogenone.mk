@@ -4,8 +4,8 @@ $(call inherit-product, vendor/lineage/config/common_full_phone.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base_telephony.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/product_launched_with_o_mr1.mk)
 
-# Proprietary output is optional during the source-only compile stage.
-$(call inherit-product-if-exists, vendor/red/hydrogenone/hydrogenone-vendor.mk)
+# Verified RED .118 proprietary vendor output is required for a real build.
+$(call inherit-product, vendor/red/hydrogenone/hydrogenone-vendor.mk)
 
 # Device definition is inherited last, matching maintained Lineage device trees.
 $(call inherit-product, device/red/hydrogenone/device.mk)

@@ -128,13 +128,30 @@ special_mode_mask values:
       <A3Preview>imx380_sub_4k_preview_lc898122</A3Preview>
       <A3Video>imx380_sub_4k_video_lc898122</A3Video>
     </ChromatixName>
-    <ChromatixName sensor_resolution_index="1" special_mode_mask = "ARC_3D_MODE">
+    <ChromatixName sensor_resolution_index="1" special_mode_mask = "CM_3D_VIDEO_MODE">
       <ISPPreview>imx380_sub_preview</ISPPreview>
       <ISPSnapshot>imx380_sub_preview</ISPSnapshot>
       <ISPVideo>imx380_sub_default_video</ISPVideo>
       <CPPVideo>imx380_sub_cpp_video</CPPVideo>
       <A3Preview>imx380_sub_zsl_preview_lc898122_3dmode</A3Preview>
       <A3Video>imx380_sub_zsl_video_lc898122</A3Video>
+    </ChromatixName>
+    <ChromatixName sensor_resolution_index="1" special_mode_mask = "CM_3D_SNAPSHOT_MODE">
+      <ISPPreview>imx380_sub_preview</ISPPreview>
+      <ISPSnapshot>imx380_sub_preview</ISPSnapshot>
+      <ISPVideo>imx380_sub_default_video</ISPVideo>
+      <CPPSnapshot>imx380_sub_cpp_4k_3d_snapshot</CPPSnapshot>
+      <CPPVideo>imx380_sub_cpp_video</CPPVideo>
+      <A3Preview>imx380_sub_4k_3d_snapshot_lc898122</A3Preview>
+      <A3Video>imx380_sub_zsl_video_lc898122</A3Video>
+    </ChromatixName>
+    <ChromatixName sensor_resolution_index="1" special_mode_mask = "CM_PANORAMA_MODE">
+      <ISPPreview>imx380_sub_preview</ISPPreview>
+      <ISPSnapshot>imx380_sub_preview</ISPSnapshot>
+      <ISPVideo>imx380_sub_default_video</ISPVideo>
+      <CPPVideo>imx380_sub_cpp_video</CPPVideo>
+      <A3Preview>imx380_sub_4k_panorama_lc898122</A3Preview>
+      <A3Video>imx380_sub_4k_video_lc898122</A3Video>
     </ChromatixName>
     <ChromatixName sensor_resolution_index="2">
       <ISPPreview>imx380_sub_qhd_hfr_60</ISPPreview>
@@ -184,6 +201,8 @@ special_mode_mask values:
       <ISPPreview>imx380_sub_snapshot</ISPPreview>
       <ISPSnapshot>imx380_sub_snapshot</ISPSnapshot>
       <ISPVideo>imx380_sub_default_video</ISPVideo>
+      <CPPPreview>imx380_sub_cpp_1080p_3d_video</CPPPreview>
+      <CPPSnapshot>imx380_sub_cpp_1080p_3d_video</CPPSnapshot>
       <CPPVideo>imx380_sub_cpp_video</CPPVideo>
       <A3Preview>imx380_sub_1080p_3d_video_lc898122</A3Preview>
       <A3Video>imx380_sub_zsl_video_lc898122</A3Video>

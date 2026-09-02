@@ -2,8 +2,8 @@
 
 > **READ THIS FILE FIRST AFTER ANY INTERRUPTION.**
 
-**Marker version:** 7  
-**Last completed action file:** `docs/worklog/2026-09-02/0008-cross-tree-evidence-regenerated-green.md`  
+**Marker version:** 8  
+**Last completed action file:** `docs/worklog/2026-09-02/0011-clean-checkout-manifest-green.md`  
 **Logging protocol active:** YES
 
 ## Current repository checkpoints
@@ -12,15 +12,15 @@
 - Repository: `derveror/device_red_hydrogenone`.
 - Branch: `lineage-22.2-stock118-rework`.
 - Cross-tree lock pins vendor `6fef3d7c6333602d7114aefa0284a03f5aadb454`.
-- Fresh zero-collision cross-tree evidence was regenerated against that exact vendor commit.
-- One-shot regeneration workflow self-deleted successfully.
-- Regeneration commit: `e01f8d83fb20aa90abf1c790fbb0e9ea8871f892`.
-- Action 0008 records the successful isolated-root audit.
+- Fresh zero-collision cross-tree evidence is pinned to that vendor commit.
+- Permanent run `33686679780` after promoting the clean-checkout manifest contract passed `verify=success` and `cross_tree=success`.
+- Production local-manifest template: `docs/manifests/hydrogenone-lineage-22.2.xml`.
+- Local-manifest regression test: `tests/test_local_manifest_contract.py`.
 
 ### Vendor
 - Repository: `derveror/proprietary_vendor_red_hydrogenone`.
 - Branch: `lineage-22.2-android15-contract`.
-- Current GREEN head: `6fef3d7c6333602d7114aefa0284a03f5aadb454`.
+- Current GREEN head and device pin: `6fef3d7c6333602d7114aefa0284a03f5aadb454`.
 
 ## Canonical stock authority
 
@@ -29,9 +29,16 @@
 - Archive SHA-256: `7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e`.
 - Exact `.118` boot/kernel, product identity, vendor patch, DSDS/qcrild, fstab migration, camera topology/tuning and major Android 15 ownership contracts are pinned.
 
-## Build-readiness finding already established
+## Clean-checkout manifest contract
 
-LineageOS 22.2 roomservice resolves ordinary `lineage.dependencies` GitHub entries as `LineageOS/<repository>`. The custom `derveror/proprietary_vendor_red_hydrogenone` therefore needs a local-manifest strategy; do not add it as a normal LineageOS dependency entry.
+The template pins:
+
+1. `device/red/hydrogenone` -> `derveror/device_red_hydrogenone`, branch `lineage-22.2-stock118-rework`;
+2. `vendor/red/hydrogenone` -> `derveror/proprietary_vendor_red_hydrogenone`, exact commit `6fef3d7c...`;
+3. `kernel/essential/msm8998` -> `LineageOS/android_kernel_essential_msm8998`, branch `lineage-22.2`;
+4. `device/qcom/sepolicy-legacy-um` -> `LineageOS/android_device_qcom_sepolicy_vndr`, branch `lineage-22.2-legacy-um`.
+
+The custom RED vendor is intentionally not placed in `lineage.dependencies`; LineageOS roomservice would otherwise resolve it under the `LineageOS/` organization. The kernel dependency remains branch-less in `lineage.dependencies`, which is a supported roomservice contract: current LineageOS 22.2 `roomservice.py` resolves missing GitHub dependency branches via `get_default_or_fallback_revision()`. The local manifest provides the explicit deterministic kernel pin for clean checkout.
 
 ## Hard architecture constraints
 
@@ -44,15 +51,15 @@ LineageOS 22.2 roomservice resolves ordinary `lineage.dependencies` GitHub entri
 
 ## Immediate next action — DO THIS FIRST
 
-Confirm permanent device `verify-analysis.yml` on the current post-regeneration branch head. Both `verify` and `cross_tree` jobs must be GREEN. If GREEN, record it as the next action and proceed to the reproducible local-manifest/dependency gate.
+Verify that all four repository/revision pairs from `docs/manifests/hydrogenone-lineage-22.2.xml` are live/reachable on GitHub, including the exact vendor SHA. Record the result as the next numbered worklog action.
 
-## After permanent CI GREEN
+## After live revision verification
 
-1. Create/test a local-manifest template for device/vendor + required Lineage dependencies.
-2. Make kernel branch explicit in `lineage.dependencies`.
-3. Validate manifest XML and path/branch pins statically.
-4. Move to actual clean LineageOS workspace `lunch lineage_hydrogenone-userdebug` + `m nothing`.
+1. Create a minimal clean-workspace bootstrap/build-log capture path.
+2. Establish the exact commands for `repo init`, local-manifest installation and `repo sync`.
+3. Move to the first real complete LineageOS 22.2 workspace gate: `source build/envsetup.sh`, `lunch lineage_hydrogenone-userdebug`, `m nothing`.
+4. Fix only errors emitted by that actual build.
 
 ## Recovery rule
 
-After interruption, do **not** infer state from chat prose. Read this marker, then the last numbered action file, then verify both branch heads and active workflows from GitHub before continuing.
+After interruption, do **not** infer state from chat prose. Read this marker, then the last numbered action file, then verify both branch heads and any active workflows from GitHub before continuing.

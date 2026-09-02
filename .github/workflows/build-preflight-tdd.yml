@@ -1,0 +1,20 @@
+name: Build preflight TDD
+
+on:
+  push:
+    branches:
+      - build-preflight-tdd
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run m nothing preflight contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          PYTHONPATH="$PWD/tests:$PWD" python3 -m unittest tests.test_build_preflight_contract -v

@@ -15,6 +15,15 @@ on late-fs
 
 on post-fs-data
     restorecon_recursive /mnt/vendor/persist
+
+    # RED .118 secure/QCOM state previously addressed through /persist. Keep the
+    # same hardware-owned directories under the Treble vendor persist mount.
+    mkdir /mnt/vendor/persist/data 0700 system system
+    mkdir /mnt/vendor/persist/data/tz 0700 system system
+    mkdir /mnt/vendor/persist/data/app_g 0700 system system
+    mkdir /mnt/vendor/persist/hvdcp_opti 0770 root system
+    mkdir /mnt/vendor/persist/time 0770 system system
+
     mkdir /data/vendor 0771 root root
     mkdir /data/vendor/tombstones 0771 root root
     mkdir /data/vendor/qvr 0770 system system

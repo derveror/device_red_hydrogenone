@@ -1,0 +1,226 @@
+name: Regenerate RED .118 config audit on current main
+
+on:
+  push:
+    branches:
+      - stock-config-audit-final
+    paths:
+      - .github/workflows/regenerate-stock-config-audit.yml
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Reconstruct canonical RED .118 vendor image
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/r118/parts" "$RUNNER_TEMP/r118/archive" "$RUNNER_TEMP/r118/stock-vendor" "$RUNNER_TEMP/7zip"
+          ids=(
+            1_B7suPmaiZsibKtmSg_IfIcgGaPz4nvt
+            1AV1tt-lmg5z0MMn7aNKArS7bFfK8VHCp
+            1wxs2du2Ml_--JrOwGlyDb49QMlrPxVMB
+            1OMvS4diiiOCiX-yCKHH7HZKv77QaUCFn
+            18czKWOxP9Xiw5g6ljCHI1Gt68Ynzxfi4
+            19bMHqds6-PsYPtrs18okJ8XgdF85Z84L
+            1xKaDVx16zH11ozeSeOjSlldi1-xrHcuj
+            1XF4fPiTXBzVsVQU5I3VZGxw4Xm_T_DUe
+          )
+          sizes=(251658240 251658240 251658240 251658240 251658240 251658240 251658240 89063443)
+          for i in "${!ids[@]}"; do
+            out="$RUNNER_TEMP/r118/parts/part.$i"
+            curl --fail --location --retry 5 --retry-delay 2 --retry-all-errors \
+              "https://drive.usercontent.google.com/download?id=${ids[$i]}&export=download&confirm=t" \
+              --output "$out"
+            test "$(stat -c %s "$out")" = "${sizes[$i]}"
+          done
+          cat "$RUNNER_TEMP"/r118/parts/part.* > "$RUNNER_TEMP/r118/stock.rar"
+          rm -rf "$RUNNER_TEMP/r118/parts"
+          echo '7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e  '"$RUNNER_TEMP/r118/stock.rar" | sha256sum -c -
+
+          curl --fail --location --retry 5 \
+            https://github.com/ip7z/7zip/releases/download/26.02/7z2602-linux-x64.tar.xz \
+            --output "$RUNNER_TEMP/7zip.tar.xz"
+          tar -xJf "$RUNNER_TEMP/7zip.tar.xz" -C "$RUNNER_TEMP/7zip"
+          chmod +x "$RUNNER_TEMP/7zip/7zz"
+          seven="$RUNNER_TEMP/7zip/7zz"
+          base='H1A1000.082ho.01.00.10r.118_userdebug_fastboot/fastboot'
+          "$seven" e -y -o"$RUNNER_TEMP/r118/archive" "$RUNNER_TEMP/r118/stock.rar" "$base/vendor.img"
+          test "$(stat -c %s "$RUNNER_TEMP/r118/archive/vendor.img")" = 593264872
+          rm -f "$RUNNER_TEMP/r118/stock.rar"
+          "$seven" x -y -o"$RUNNER_TEMP/r118/stock-vendor" "$RUNNER_TEMP/r118/archive/vendor.img"
+          test -d "$RUNNER_TEMP/r118/stock-vendor/etc"
+
+      - name: Generate SHA audit and semantic diffs
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/analysis/device_stock_config_audit.py \
+            --device-root . \
+            --stock-vendor-root "$RUNNER_TEMP/r118/stock-vendor" \
+            --json > "$RUNNER_TEMP/audit.raw.json"
+          python3 - <<'PY'
+          from __future__ import annotations
+
+          import difflib
+          import hashlib
+          import json
+          import os
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+
+          stock_sha='7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e'
+          stock_root=Path(os.environ['RUNNER_TEMP'])/'r118'/'stock-vendor'
+          report=json.loads((Path(os.environ['RUNNER_TEMP'])/'audit.raw.json').read_text())
+          assert report['summary']['missing_device_source'] == 0, report['summary']
+          report['authority']={
+              'device_branch':'lineage-22.2-stock118-rework',
+              'stock_build':'H1A1000.082ho.01.00.10r.118',
+              'stock_archive_sha256':stock_sha,
+              'stock_vendor_image_size':593264872,
+          }
+          report['device_root']='device-tree'
+          report['stock_vendor_root']='stock-.118-vendor'
+          Path('docs/stock/h1a1000-r118/device-vs-stock-config-audit.json').write_text(json.dumps(report,indent=2,sort_keys=True)+'\n')
+
+          s=report['summary']
+          audit_md=[
+              '# RED .118 device-owned vendor config audit','',
+              f'Canonical stock: `H1A1000.082ho.01.00.10r.118` / `{stock_sha}`.','',
+              'This report compares every `LOCAL_PATH`-owned file copied into `/vendor` with the same destination in canonical RED `.118` `vendor.img`.','',
+              '## Summary','',
+              f"- local vendor-copy mappings: **{s['total']}**",
+              f"- byte-identical to stock: **{s['identical']}**",
+              f"- different from stock: **{s['different']}**",
+              f"- no stock counterpart: **{s['missing_in_stock']}**",
+              f"- missing device source: **{s['missing_device_source']}**",'',
+              'A byte difference is evidence for review, not an automatic error: modern Lineage source-owned policy/config may intentionally differ from Android 9 stock.','',
+              '## Different from stock','',
+          ]
+          different=[r for r in report['rows'] if r['status']=='different']
+          audit_md.extend([
+              f"- `{r['source']}` → `{r['destination']}` — device `{r['device_sha256']}`, stock `{r['stock_sha256']}`"
+              for r in different
+          ] or ['- None.'])
+          audit_md += ['', '## No stock counterpart', '']
+          missing=[r for r in report['rows'] if r['status']=='missing_in_stock']
+          audit_md.extend([f"- `{r['source']}` → `{r['destination']}`" for r in missing] or ['- None.'])
+          audit_md.append('')
+          Path('docs/stock/h1a1000-r118/DEVICE_VS_STOCK_CONFIG_AUDIT.md').write_text('\n'.join(x.rstrip() for x in audit_md),encoding='utf-8')
+
+          def normalized_xml_digest(data: bytes):
+              try:
+                  root=ET.fromstring(data)
+              except ET.ParseError:
+                  return None
+              def clean(elem):
+                  if elem.text is not None:
+                      elem.text=elem.text.strip() or None
+                  elem.tail=None
+                  for child in list(elem):
+                      clean(child)
+              clean(root)
+              return hashlib.sha256(ET.tostring(root,encoding='utf-8')).hexdigest()
+
+          entries=[]
+          for row in different:
+              device_path=Path(row['source'])
+              stock_path=stock_root/row['stock_relative_path']
+              device_data=device_path.read_bytes()
+              stock_data=stock_path.read_bytes()
+              diff=list(difflib.unified_diff(
+                  stock_data.decode('utf-8',errors='replace').splitlines(),
+                  device_data.decode('utf-8',errors='replace').splitlines(),
+                  fromfile='stock-.118/'+row['stock_relative_path'],
+                  tofile='device/'+row['source'],
+                  lineterm='',n=3,
+              ))
+              stock_xml=normalized_xml_digest(stock_data) if device_path.suffix.lower()=='.xml' else None
+              device_xml=normalized_xml_digest(device_data) if device_path.suffix.lower()=='.xml' else None
+              entries.append({
+                  'source':row['source'],
+                  'destination':row['destination'],
+                  'device_sha256':row['device_sha256'],
+                  'stock_sha256':row['stock_sha256'],
+                  'device_size':row['device_size'],
+                  'stock_size':row['stock_size'],
+                  'xml_semantically_identical':(stock_xml==device_xml) if stock_xml and device_xml else None,
+                  'stock_xml_normalized_sha256':stock_xml,
+                  'device_xml_normalized_sha256':device_xml,
+                  'added_line_count':sum(1 for x in diff if x.startswith('+') and not x.startswith('+++')),
+                  'removed_line_count':sum(1 for x in diff if x.startswith('-') and not x.startswith('---')),
+                  'unified_diff':diff,
+              })
+
+          diffs={
+              'schema_version':1,
+              'authority':report['authority'],
+              'summary':{
+                  'different_files':len(entries),
+                  'xml_semantically_identical':sum(1 for e in entries if e['xml_semantically_identical'] is True),
+                  'xml_semantically_different':sum(1 for e in entries if e['xml_semantically_identical'] is False),
+              },
+              'entries':entries,
+          }
+          Path('docs/stock/h1a1000-r118/device-vs-stock-config-diffs.json').write_text(json.dumps(diffs,indent=2,sort_keys=True)+'\n')
+          diff_md=['# RED .118 device config semantic differences','',f"Different files: **{len(entries)}**.",'']
+          for e in entries:
+              diff_md += [
+                  f"## `{e['source']}`",'',
+                  f"Destination: `{e['destination']}`.",
+                  f"XML semantically identical after whitespace normalization: `{e['xml_semantically_identical']}`.",
+                  f"Changed lines: +{e['added_line_count']} / -{e['removed_line_count']}.",'','```diff',
+              ]
+              diff_md += [x.rstrip() for x in e['unified_diff'][:240]]
+              if len(e['unified_diff'])>240:
+                  diff_md.append(f"... diff truncated; total lines {len(e['unified_diff'])}")
+              diff_md += ['```','']
+          Path('docs/stock/h1a1000-r118/DEVICE_VS_STOCK_CONFIG_DIFFS.md').write_text('\n'.join(x.rstrip() for x in diff_md),encoding='utf-8')
+          PY
+          python3 -m json.tool docs/stock/h1a1000-r118/device-vs-stock-config-audit.json >/dev/null
+          python3 -m json.tool docs/stock/h1a1000-r118/device-vs-stock-config-diffs.json >/dev/null
+          git diff --check
+
+      - name: Verify current full tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          PYTHONPATH="$PWD/tests:$PWD" python3 - <<'PY'
+          import pathlib
+          import unittest
+          loader=unittest.defaultTestLoader
+          suite=unittest.TestSuite()
+          for path in sorted(pathlib.Path('tests').glob('test_*.py')):
+              if path.name == 'test_full_tree.py':
+                  continue
+              suite.addTests(loader.loadTestsFromName(f'tests.{path.stem}'))
+          result=unittest.TextTestRunner(verbosity=1).run(suite)
+          raise SystemExit(0 if result.wasSuccessful() else 1)
+          PY
+          python3 tests/test_full_tree.py
+
+      - name: Commit permanent audit and remove one-shot workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm .github/workflows/regenerate-stock-config-audit.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add tools/analysis/device_stock_config_audit.py tests/test_device_stock_config_audit.py \
+            docs/stock/h1a1000-r118/device-vs-stock-config-audit.json \
+            docs/stock/h1a1000-r118/DEVICE_VS_STOCK_CONFIG_AUDIT.md \
+            docs/stock/h1a1000-r118/device-vs-stock-config-diffs.json \
+            docs/stock/h1a1000-r118/DEVICE_VS_STOCK_CONFIG_DIFFS.md \
+            .github/workflows/regenerate-stock-config-audit.yml
+          git diff --cached --check
+          git commit -m 'analysis: pin device vendor configs against RED .118'
+          git fetch origin stock-config-audit-final
+          git rebase origin/stock-config-audit-final
+          git push origin HEAD:stock-config-audit-final

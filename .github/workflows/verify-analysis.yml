@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - lineage-22.2-stock118-rework
+      - manifest-readiness-tdd
   workflow_dispatch:
 
 permissions:

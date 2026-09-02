@@ -1,0 +1,24 @@
+name: Cross-tree copy ownership audit TDD
+
+on:
+  push:
+    branches:
+      - lineage-22.2-stock118-rework
+    paths:
+      - .github/workflows/cross-tree-copy-audit-tdd.yml
+      - tools/analysis/cross_tree_contract.py
+      - tests/test_cross_tree_contract.py
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run cross-tree parser unit tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          PYTHONPATH="$PWD/tests:$PWD" python3 -m unittest tests.test_cross_tree_contract -v

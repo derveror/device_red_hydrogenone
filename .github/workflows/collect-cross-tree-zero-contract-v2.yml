@@ -10,6 +10,7 @@ on:
 permissions:
   contents: write
 
+# Re-run after adding support for the production $(notdir $f) form.
 jobs:
   collect:
     runs-on: ubuntu-24.04

@@ -1,0 +1,21 @@
+name: Stock118 build contract verify
+
+on:
+  push:
+    branches:
+      - stock118-build-contract-tdd
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run canonical RED .118 build contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          PYTHONPATH="$PWD/tests:$PWD" python3 -m unittest tests.test_stock118_build_contract -v
+          git diff --check

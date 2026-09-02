@@ -182,12 +182,31 @@ if kernel_source_match:
     if kernel_dep not in deps:
         errors.append('missing MSM8998 kernel-source dependency used for header generation')
 
-# Exact stock kernel hash from verified .109 analysis.
-k=ROOT/'prebuilt/Image.gz-dtb'
-if k.exists():
-    h=hashlib.sha256(k.read_bytes()).hexdigest()
-    if h!='6cf3a70ece8b32dcd6bccf9db1a22c1da29b9b37fe67cc0e4ec9b4f87fec2426':
-        errors.append('stock kernel hash mismatch: '+h)
+# Exact bring-up kernel identity comes from the canonical RED .118 boot contract.
+# Cross-check the boot contract against the independently generated stock inventory
+# so changing the prebuilt and its expected hash together cannot silently weaken this audit.
+boot_contract_path=ROOT/'docs/stock/h1a1000-r118/boot-image-contract.json'
+stock_inventory_path=ROOT/'docs/stock/h1a1000-r118/inventory-summary.json'
+try:
+    boot_contract=json.loads(boot_contract_path.read_text(encoding='utf-8'))
+    stock_inventory=json.loads(stock_inventory_path.read_text(encoding='utf-8'))
+    contract_stock_sha=boot_contract.get('authority',{}).get('stock_archive_sha256')
+    inventory_stock_sha=stock_inventory.get('canonical_archive',{}).get('sha256')
+    if not contract_stock_sha or contract_stock_sha != inventory_stock_sha:
+        errors.append('boot contract stock authority does not match canonical inventory')
+    expected_kernel=boot_contract.get('kernel',{})
+    expected_kernel_sha=expected_kernel.get('sha256')
+    expected_kernel_size=expected_kernel.get('size')
+    k=ROOT/'prebuilt/Image.gz-dtb'
+    if k.exists():
+        data=k.read_bytes()
+        h=hashlib.sha256(data).hexdigest()
+        if h != expected_kernel_sha:
+            errors.append('stock kernel hash mismatch: '+h)
+        if len(data) != expected_kernel_size:
+            errors.append(f'stock kernel size mismatch: {len(data)} != {expected_kernel_size}')
+except Exception as e:
+    errors.append(f'cannot validate canonical RED .118 kernel contract: {e}')
 
 # A file owned by device.mk must not also be extracted at the same vendor destination.
 copy_dest_list=[
@@ -337,8 +356,15 @@ if common_pos < 0 or device_pos < 0 or common_pos > device_pos:
     errors.append('lineage_hydrogenone.mk inherits device before common_full_phone')
 
 
-if 'BuildFingerprint=RED/HydrogenONE/HydrogenONE:8.1.0/H1A1000.010ho.01.01.01r.109/109:user/release-keys' not in prod:
-    errors.append('missing exact stock BuildFingerprint override')
+try:
+    fingerprint_contract=json.loads((ROOT/'docs/stock/h1a1000-r118/boot-image-contract.json').read_text(encoding='utf-8'))
+    expected_fingerprint=fingerprint_contract.get('build_properties',{}).get('ro.build.fingerprint')
+    if not expected_fingerprint:
+        errors.append('canonical RED .118 boot contract lacks stock fingerprint')
+    elif f'BuildFingerprint={expected_fingerprint}' not in prod:
+        errors.append('missing exact canonical RED .118 BuildFingerprint override')
+except Exception as e:
+    errors.append(f'cannot validate canonical RED .118 BuildFingerprint: {e}')
 
 
 if 'rootdir/etc/init.recovery.qcom.rc:$(TARGET_COPY_OUT_RECOVERY)/root/init.recovery.qcom.rc' not in device:

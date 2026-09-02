@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any, Iterable
 
 RADIO_KEY_RE = re.compile(r"(?:radio|ril|ims|multisim|dsds|dsda|phone_count|sim_count|telephony)", re.I)
-RADIO_INIT_RE = re.compile(r"(?:qcril|rild|radio|ims)", re.I)
+RADIO_INIT_RE = re.compile(r"(?:qcril|rild|ril-daemon|radio|ims)", re.I)
 PROPERTY_NAMES = {"build.prop", "default.prop", "vendor.prop"}
 ACTIVATION_VERBS = {"start", "enable", "restart", "ctl.start"}
 
@@ -151,6 +151,55 @@ def scan_init_files(root: Path) -> dict[str, list[dict[str, Any]]]:
     controls.sort(key=lambda row: (row["target"], row["verb"], row["path"], row["line"]))
     imports.sort(key=lambda row: (row["path"], row["line"]))
     return {"services": services, "starts": starts, "stops": stops, "controls": controls, "imports": imports}
+
+
+def scan_shell_files(root: Path, context_lines: int = 8) -> list[dict[str, Any]]:
+    """Record radio service controls in stock shell scripts without interpreting shell conditions."""
+    rows: list[dict[str, Any]] = []
+    if not root.exists():
+        return rows
+
+    for path in sorted(root.rglob("*.sh")):
+        rel = path.relative_to(root).as_posix()
+        try:
+            lines = _read_text(path).splitlines()
+        except (OSError, UnicodeError):
+            continue
+        history: list[str] = []
+        for line_no, raw in enumerate(lines, 1):
+            stripped = raw.strip()
+            if not stripped or stripped.startswith("#"):
+                continue
+
+            verb: str | None = None
+            target: str | None = None
+            for prefix, parsed_verb in (("start ", "start"), ("stop ", "stop"), ("restart ", "restart")):
+                if stripped.startswith(prefix):
+                    parts = stripped[len(prefix) :].strip().split()
+                    if parts:
+                        verb = parsed_verb
+                        target = parts[0]
+                    break
+            if stripped.startswith("setprop ctl.start ") or stripped.startswith("setprop ctl.stop "):
+                parts = stripped.split()
+                if len(parts) >= 3:
+                    verb = parts[1]
+                    target = parts[2]
+
+            if verb and target and RADIO_INIT_RE.search(target):
+                rows.append(
+                    {
+                        "path": rel,
+                        "line": line_no,
+                        "verb": verb,
+                        "target": target,
+                        "context": history[-context_lines:],
+                    }
+                )
+            history.append(stripped)
+
+    rows.sort(key=lambda row: (row["target"], row["verb"], row["path"], row["line"]))
+    return rows
 
 
 def derive_summary(evidence: dict[str, Any]) -> dict[str, Any]:

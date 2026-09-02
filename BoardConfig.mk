@@ -139,5 +139,6 @@ WIFI_DRIVER_FW_PATH_P2P := "p2p"
 WIFI_HIDL_FEATURE_DUAL_INTERFACE := true
 WIFI_HIDL_UNIFIED_SUPPLICANT_SERVICE_RC_ENTRY := true
 
-# Generated from canonical RED .118 proprietary blobs
--include vendor/red/hydrogenone/BoardConfigVendor.mk
+# Generated from canonical RED .118 proprietary blobs; fail fast if the
+# verified vendor tree is not present in the build checkout.
+include vendor/red/hydrogenone/BoardConfigVendor.mk

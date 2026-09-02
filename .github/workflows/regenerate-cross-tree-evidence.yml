@@ -27,14 +27,17 @@ jobs:
           ref: 6fef3d7c6333602d7114aefa0284a03f5aadb454
           path: vendor-tree
 
-      - name: Regenerate evidence from exact pinned trees
+      - name: Diagnose and regenerate evidence from exact pinned trees
         shell: bash
         run: |
           set -euo pipefail
+          set +e
           python3 tools/analysis/cross_tree_contract.py \
             --device-root . \
             --vendor-root vendor-tree \
             --json > "$RUNNER_TEMP/cross-tree-live.json"
+          tool_rc=$?
+          set -e
           python3 - <<'PY'
           import json
           import os
@@ -47,9 +50,15 @@ jobs:
           live = json.loads(Path(os.environ['RUNNER_TEMP'], 'cross-tree-live.json').read_text())
           vendor_head = subprocess.check_output(['git', '-C', 'vendor-tree', 'rev-parse', 'HEAD'], text=True).strip()
 
+          print('LIVE_COPY_DESTINATION_COLLISIONS=' + json.dumps(live.get('copy_destination_collisions', []), sort_keys=True))
+          print('LIVE_SCHEMA=' + str(live.get('schema_version')))
+          print('PINNED_VENDOR=' + lock['vendor_commit'])
+          print('CHECKED_VENDOR=' + vendor_head)
+
           assert vendor_head == lock['vendor_commit'], (vendor_head, lock['vendor_commit'])
           assert live['schema_version'] == 2, live
-          assert live['copy_destination_collisions'] == [], live['copy_destination_collisions']
+          if live['copy_destination_collisions']:
+              raise SystemExit(2)
 
           live['authority'] = {
               'device_branch': lock['device_branch'],
@@ -59,6 +68,7 @@ jobs:
           }
           out_path.write_text(json.dumps(live, indent=2, sort_keys=True) + '\n')
           PY
+          test "$tool_rc" -eq 0
 
       - name: Verify regenerated lock and evidence
         shell: bash

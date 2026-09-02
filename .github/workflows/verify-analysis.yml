@@ -104,7 +104,7 @@ jobs:
           ref: d30ac19025b348ca61535afaaecb23b95347b2f4
           path: vendor-tree
 
-      - name: Verify pinned cross-tree ownership contract
+      - name: Verify pinned cross-tree Make and Soong ownership contract
         shell: bash
         run: |
           set -euo pipefail
@@ -116,25 +116,45 @@ jobs:
             --json > "$RUNNER_TEMP/cross-tree-live.json"
           python3 - <<'PY'
           import json
+          import os
           import subprocess
           from pathlib import Path
 
           lock = json.loads(Path('device-tree/docs/reference/cross-tree-lock.json').read_text())
           evidence = json.loads(Path('device-tree/docs/stock/h1a1000-r118/cross-tree-copy-contract.json').read_text())
-          live = json.loads(Path(Path.home().parent / 'not-used').read_text()) if False else json.loads(Path(__import__('os').environ['RUNNER_TEMP'], 'cross-tree-live.json').read_text())
+          live = json.loads((Path(os.environ['RUNNER_TEMP']) / 'cross-tree-live.json').read_text())
 
           vendor_head = subprocess.check_output(
               ['git', '-C', 'vendor-tree', 'rev-parse', 'HEAD'], text=True
           ).strip()
           assert lock['vendor_repository'] == 'derveror/proprietary_vendor_red_hydrogenone', lock
           assert vendor_head == lock['vendor_commit'], (vendor_head, lock['vendor_commit'])
-          assert live['schema_version'] == 2, live['schema_version']
-          assert live['copy_destination_collisions'] == [], live['copy_destination_collisions']
+          assert live['schema_version'] == 3, live['schema_version']
+          assert evidence['schema_version'] == 3, evidence['schema_version']
           assert evidence['authority']['vendor_commit'] == lock['vendor_commit'], evidence['authority']
           assert evidence['authority']['stock_build'] == lock['stock_build'], evidence['authority']
           assert evidence['authority']['stock_archive_sha256'] == lock['stock_archive_sha256'], evidence['authority']
-          assert evidence['status'] == 'zero_expanded_copy_destination_collisions', evidence.get('status')
+          assert evidence['status'] == 'zero_make_and_soong_install_collisions', evidence.get('status')
+          assert evidence['summary']['vendor_soong_install_outputs'] == 451, evidence.get('summary')
+          assert evidence['summary']['aggregate_install_collisions'] == 0, evidence.get('summary')
 
-          for key in ('device_copy_destinations', 'vendor_copy_destinations', 'copy_destination_collisions'):
+          collision_keys = (
+              'copy_destination_collisions',
+              'device_copy_vs_vendor_soong_collisions',
+              'vendor_copy_vs_vendor_soong_collisions',
+              'copy_vs_vendor_soong_collisions',
+              'vendor_soong_output_collisions',
+              'install_destination_collisions',
+          )
+          for key in collision_keys:
+              assert live[key] == [], (key, live[key])
+              assert evidence[key] == [], (key, evidence[key])
+
+          for key in (
+              'device_copy_destinations',
+              'vendor_copy_destinations',
+              'vendor_soong_install_outputs',
+              *collision_keys,
+          ):
               assert live[key] == evidence[key], f'stale cross-tree evidence field: {key}'
           PY

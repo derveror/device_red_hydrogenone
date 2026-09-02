@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from pathlib import Path
-import hashlib, re, sys, xml.etree.ElementTree as ET
+import hashlib, json, re, sys, xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
 if len(sys.argv) == 2 and not sys.argv[1].startswith('-'):
@@ -24,6 +24,55 @@ required_files = [
     'seccomp/mediacodec.policy','prebuilt/Image.gz-dtb','vendor.prop'
 ]
 errors=[]
+
+# Approved analysis contract for the stock .118 / Android 15 rework.
+required_analysis_files = [
+    'docs/superpowers/specs/2026-09-02-hydrogenone-lineage22.2-design.md',
+    'docs/reference/SUPPLIED_SOURCES.md',
+    'docs/reference/source-lock.json',
+    'docs/reference/archive-inventory.json',
+    'docs/reference/archive-comparisons.json',
+    'docs/reference/full-artifacts.sha256',
+    'docs/reference/README.md',
+    'docs/stock/h1a1000-r118/README.md',
+]
+for analysis_file in required_analysis_files:
+    if not (ROOT/analysis_file).is_file():
+        errors.append('missing analysis contract file: '+analysis_file)
+
+source_lock_path = ROOT/'docs/reference/source-lock.json'
+if source_lock_path.is_file():
+    try:
+        source_lock = json.loads(source_lock_path.read_text(encoding='utf-8'))
+        target = source_lock.get('target_platform', {})
+        expected_target = {
+            'lineage_branch': 'lineage-22.2',
+            'android_release': '15',
+            'android_api_level': 35,
+        }
+        if target != expected_target:
+            errors.append('source-lock target_platform is not LineageOS 22.2 / Android 15 API 35')
+    except Exception as e:
+        errors.append(f'cannot validate source-lock target: {e}')
+
+for forbidden_dir in ('device/red/msm8998-common', 'vendor/red/msm8998-common'):
+    if (ROOT/forbidden_dir).exists():
+        errors.append('forbidden RED common tree exists: '+forbidden_dir)
+
+forbidden_common_paths = ('device/red/msm8998-common', 'vendor/red/msm8998-common')
+build_inputs = set(ROOT.rglob('*.mk')) | set(ROOT.rglob('Android.bp'))
+for relative in ('lineage.dependencies', 'extract-files.py', 'setup-makefiles.py'):
+    candidate = ROOT/relative
+    if candidate.is_file():
+        build_inputs.add(candidate)
+for candidate in sorted(build_inputs):
+    relative = str(candidate.relative_to(ROOT))
+    if relative.startswith(('docs/', 'tests/', 'tools/')):
+        continue
+    content = candidate.read_text(errors='ignore')
+    for forbidden in forbidden_common_paths:
+        if forbidden in content:
+            errors.append(f'forbidden RED common-tree reference in {relative}: {forbidden}')
 for d in required_dirs:
     if not (ROOT/d).is_dir(): errors.append('missing directory: '+d)
 for f in required_files:
@@ -38,12 +87,15 @@ for x in ROOT.rglob('*.json'):
 # No donor device identity/runtime paths.
 for x in ROOT.rglob('*'):
     if x.is_file() and x.suffix.lower() not in {'.dtb','.img','.so','.jar','.apk'} and x.stat().st_size < 2_000_000:
+        relative = str(x.relative_to(ROOT))
+        if relative.startswith(('docs/', 'reference/', 'tests/', 'tools/')):
+            continue
         try: t=x.read_text(errors='ignore')
         except: continue
         if re.search(r'device/(essential/mata|oneplus/dumpling|nubia/nx563j)', t):
-            errors.append(f'donor runtime path in {x.relative_to(ROOT)}')
-        if not str(x.relative_to(ROOT)).startswith(('reference/','tests/')) and re.search(r'(?i)(sidecar_essential|hal_sidecar|neko_device|sysfs_sidecar|essential_camera|hal_fingerprint_essential)', t):
-            errors.append(f'donor-specific source in {x.relative_to(ROOT)}')
+            errors.append(f'donor runtime path in {relative}')
+        if re.search(r'(?i)(sidecar_essential|hal_sidecar|neko_device|sysfs_sidecar|essential_camera|hal_fingerprint_essential)', t):
+            errors.append(f'donor-specific source in {relative}')
 
 
 # First-stage fstab must use the real UFS path; /dev/block/bootdevice is a later compatibility symlink.
@@ -77,7 +129,6 @@ if 'inherit-product-if-exists, vendor/red/hydrogenone/hydrogenone-vendor.mk' not
     errors.append('missing optional vendor product hook')
 
 # MSM8998 generic policy is a real LineageOS dependency, pinned to its 22.2 legacy-um branch.
-import json
 deps=json.loads((ROOT/'lineage.dependencies').read_text()) if (ROOT/'lineage.dependencies').exists() else []
 want={'repository':'android_device_qcom_sepolicy_vndr','target_path':'device/qcom/sepolicy-legacy-um','branch':'lineage-22.2-legacy-um'}
 if want not in deps:

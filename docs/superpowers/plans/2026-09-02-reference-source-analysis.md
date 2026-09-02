@@ -10,6 +10,15 @@
 
 **Spec:** `docs/superpowers/specs/2026-09-02-hydrogenone-lineage22.2-design.md`
 
+## Execution amendment: full reports and compact repository summaries
+
+The connected GitHub write interface accepts UTF-8 text but cannot ingest local generated files by path. To preserve the complete analysis without embedding almost one megabyte of generated path arrays in connector calls, the implementation produces two deterministic forms:
+
+- compact checked-in `archive-inventory.json` and `archive-comparisons.json` summaries containing archive hashes and exact counts;
+- full per-file/path reports bundled as `hydrogenone-reference-analysis-2026-09-02.tar.xz` in the connected Google Drive, pinned by `docs/reference/full-artifacts.sha256`.
+
+Both forms are generated from the same tools. `--summary-only` removes only per-file or per-path arrays; it does not change hashes or counts. The full bundle contains metadata and hashes, not proprietary file contents.
+
 ## Global Constraints
 
 - Target LineageOS branch is exactly `lineage-22.2`, Android 15 / API 35.
@@ -32,7 +41,8 @@
 - Create `tests/test_source_lock.py` — source-lock generation and validation tests.
 - Create `tests/test_reconstruct_stock.py` — split reconstruction, corruption, ordering, and atomicity tests.
 - Create `docs/reference/archive-inventory.json` — generated compact metadata for all supplied ZIP archives.
-- Create `docs/reference/archive-comparisons.json` — generated comparison facts.
+- Create `docs/reference/archive-comparisons.json` — generated compact comparison facts.
+- Create `docs/reference/full-artifacts.sha256` — hashes and Drive location for complete path-level reports.
 - Create `docs/reference/README.md` — commands and interpretation rules.
 - Create `docs/stock/h1a1000-r118/README.md` — exact stock-part naming, manifest, reconstruction, and verification contract.
 

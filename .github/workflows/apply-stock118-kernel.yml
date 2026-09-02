@@ -1,0 +1,111 @@
+name: Apply canonical RED .118 prebuilt kernel
+
+on:
+  push:
+    branches:
+      - stock118-build-contract-tdd
+    paths:
+      - .github/workflows/apply-stock118-kernel.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Reconstruct canonical RED .118 and extract boot kernel
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/r118/parts" "$RUNNER_TEMP/r118/archive" "$RUNNER_TEMP/7zip"
+          ids=(
+            1_B7suPmaiZsibKtmSg_IfIcgGaPz4nvt
+            1AV1tt-lmg5z0MMn7aNKArS7bFfK8VHCp
+            1wxs2du2Ml_--JrOwGlyDb49QMlrPxVMB
+            1OMvS4diiiOCiX-yCKHH7HZKv77QaUCFn
+            18czKWOxP9Xiw5g6ljCHI1Gt68Ynzxfi4
+            19bMHqds6-PsYPtrs18okJ8XgdF85Z84L
+            1xKaDVx16zH11ozeSeOjSlldi1-xrHcuj
+            1XF4fPiTXBzVsVQU5I3VZGxw4Xm_T_DUe
+          )
+          sizes=(251658240 251658240 251658240 251658240 251658240 251658240 251658240 89063443)
+          for i in "${!ids[@]}"; do
+            out="$RUNNER_TEMP/r118/parts/part.$i"
+            curl --fail --location --retry 5 --retry-delay 2 --retry-all-errors \
+              "https://drive.usercontent.google.com/download?id=${ids[$i]}&export=download&confirm=t" \
+              --output "$out"
+            test "$(stat -c %s "$out")" = "${sizes[$i]}"
+          done
+          cat "$RUNNER_TEMP"/r118/parts/part.* > "$RUNNER_TEMP/r118/stock.rar"
+          rm -rf "$RUNNER_TEMP/r118/parts"
+          echo '7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e  '"$RUNNER_TEMP/r118/stock.rar" | sha256sum -c -
+
+          curl --fail --location --retry 5 \
+            https://github.com/ip7z/7zip/releases/download/26.02/7z2602-linux-x64.tar.xz \
+            --output "$RUNNER_TEMP/7zip.tar.xz"
+          tar -xJf "$RUNNER_TEMP/7zip.tar.xz" -C "$RUNNER_TEMP/7zip"
+          chmod +x "$RUNNER_TEMP/7zip/7zz"
+          seven="$RUNNER_TEMP/7zip/7zz"
+          base='H1A1000.082ho.01.00.10r.118_userdebug_fastboot/fastboot'
+          "$seven" e -y -o"$RUNNER_TEMP/r118/archive" "$RUNNER_TEMP/r118/stock.rar" "$base/boot.img"
+          test "$(stat -c %s "$RUNNER_TEMP/r118/archive/boot.img")" = 46495016
+          rm -f "$RUNNER_TEMP/r118/stock.rar"
+
+          python3 - <<'PY'
+          import hashlib, os, struct
+          from pathlib import Path
+
+          boot = (Path(os.environ['RUNNER_TEMP']) / 'r118' / 'archive' / 'boot.img').read_bytes()
+          magic, kernel_size, kernel_addr, ramdisk_size, ramdisk_addr, second_size, second_addr, tags_addr, page_size, header_version, os_version = struct.unpack_from('<8s10I', boot, 0)
+          assert magic == b'ANDROID!'
+          assert header_version == 1
+          assert page_size == 4096
+          assert kernel_size == 37015950
+          kernel = boot[page_size:page_size + kernel_size]
+          assert len(kernel) == 37015950
+          digest = hashlib.sha256(kernel).hexdigest()
+          assert digest == '584ed86bab46bf57c2cd6b6b48ac4026c5d24a70d57bcdd04472d39c5591064d', digest
+          Path('prebuilt/Image.gz-dtb').write_bytes(kernel)
+          PY
+          echo '584ed86bab46bf57c2cd6b6b48ac4026c5d24a70d57bcdd04472d39c5591064d  prebuilt/Image.gz-dtb' | sha256sum -c -
+          test "$(stat -c %s prebuilt/Image.gz-dtb)" = 37015950
+
+      - name: Extract matching embedded kernel config
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 5 \
+            https://raw.githubusercontent.com/LineageOS/android_kernel_essential_msm8998/lineage-22.2/scripts/extract-ikconfig \
+            --output "$RUNNER_TEMP/extract-ikconfig"
+          chmod +x "$RUNNER_TEMP/extract-ikconfig"
+          "$RUNNER_TEMP/extract-ikconfig" prebuilt/Image.gz-dtb > prebuilt/stock_kernel.config
+          test -s prebuilt/stock_kernel.config
+          grep -q '^CONFIG_ARM64=y$' prebuilt/stock_kernel.config
+          grep -Eq '^(CONFIG_ARCH_MSM8998|CONFIG_MSM8998)=' prebuilt/stock_kernel.config || true
+          sha256sum prebuilt/stock_kernel.config
+
+      - name: Verify canonical build contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          PYTHONPATH="$PWD/tests:$PWD" python3 -m unittest tests.test_stock118_build_contract -v
+          git diff --check
+
+      - name: Commit exact RED .118 kernel and remove one-shot workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm .github/workflows/apply-stock118-kernel.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add prebuilt/Image.gz-dtb prebuilt/stock_kernel.config .github/workflows/apply-stock118-kernel.yml
+          git diff --cached --check
+          git commit -m 'kernel: switch bring-up prebuilt to canonical RED .118'
+          git fetch origin stock118-build-contract-tdd
+          git rebase origin/stock118-build-contract-tdd
+          git push origin HEAD:stock118-build-contract-tdd

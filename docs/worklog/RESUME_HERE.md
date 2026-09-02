@@ -2,8 +2,8 @@
 
 > **READ THIS FILE FIRST AFTER ANY INTERRUPTION.**
 
-**Marker version:** 9  
-**Last completed action file:** `docs/worklog/2026-09-02/0012-live-manifest-revisions-verified.md`  
+**Marker version:** 10  
+**Last completed action file:** `docs/worklog/2026-09-02/0013-m-nothing-preflight-tdd-green.md`  
 **Logging protocol active:** YES
 
 ## Current repository checkpoints
@@ -14,8 +14,8 @@
 - Cross-tree lock pins vendor `6fef3d7c6333602d7114aefa0284a03f5aadb454`.
 - Fresh zero-collision cross-tree evidence is pinned to that vendor commit.
 - Production local-manifest template: `docs/manifests/hydrogenone-lineage-22.2.xml`.
-- Local-manifest regression test: `tests/test_local_manifest_contract.py`.
-- Permanent production verification after manifest promotion passed both `verify` and `cross_tree`.
+- Production preflight runner: `tools/build/run_m_nothing_preflight.sh`.
+- Permanent production run `33687201146` after preflight promotion passed `verify=success` and `cross_tree=success`.
 
 ### Vendor
 - Repository: `derveror/proprietary_vendor_red_hydrogenone`.
@@ -31,14 +31,29 @@
 
 ## Clean-checkout source acquisition status
 
-All four production local-manifest refs have been verified live on GitHub:
+All four production local-manifest refs are live and tested by repository contract:
 
-1. device branch `lineage-22.2-stock118-rework` exists;
-2. exact vendor SHA `6fef3d7c...` resolves;
-3. `LineageOS/android_kernel_essential_msm8998` branch `lineage-22.2` exists (head observed `9c9099707ed19ff15321ed5e10b0659c19384d1b`);
-4. `LineageOS/android_device_qcom_sepolicy_vndr` branch `lineage-22.2-legacy-um` exists (head observed `6d3b8e5a7baa5271c8823171bee35f0a528b328f`).
+1. `device/red/hydrogenone` -> device branch `lineage-22.2-stock118-rework`;
+2. `vendor/red/hydrogenone` -> exact vendor SHA `6fef3d7c...`;
+3. `kernel/essential/msm8998` -> LineageOS branch `lineage-22.2`;
+4. `device/qcom/sepolicy-legacy-um` -> LineageOS branch `lineage-22.2-legacy-um`.
 
-The custom RED vendor remains intentionally outside `lineage.dependencies`; the checked-in local manifest is its acquisition mechanism.
+## First real build gate
+
+Use only:
+
+```text
+device/red/hydrogenone/tools/build/run_m_nothing_preflight.sh
+```
+
+The script:
+
+- refuses incomplete or dirty required checkouts;
+- verifies exact vendor SHA from the cross-tree lock;
+- has a `--validate-only` mode;
+- records device/vendor/kernel/sepolicy revisions and host metadata;
+- runs only `source build/envsetup.sh`, `lunch lineage_hydrogenone-userdebug`, and `m nothing`;
+- preserves full output and exit status under `out/hydrogenone-build-logs/`.
 
 ## Hard architecture constraints
 
@@ -51,11 +66,17 @@ The custom RED vendor remains intentionally outside `lineage.dependencies`; the 
 
 ## Immediate next action — DO THIS FIRST
 
-Create and test a single workspace preflight/build-log script. It must run from a complete LineageOS 22.2 top, verify required paths and the exact vendor commit, source `build/envsetup.sh`, run `lunch lineage_hydrogenone-userdebug`, execute `m nothing`, and save a complete timestamped log plus concise environment/revision metadata. It must fail without mutating the source tree when prerequisites are absent.
+Replace the stale historical `BUILD_FIRST.md` instructions that still mention the old `.109` 4.4.78 kernel and `m bacon`. Make it a current pointer to the tested preflight script and canonical `.118` bring-up sequence. Record that documentation cleanup as the next action file.
 
-## After preflight script GREEN
+## After documentation cleanup
 
-Use it on the user's complete LineageOS workspace. The first real `m nothing` output becomes the authoritative next debugging input; fix only errors emitted by that build, then advance through `bootimage`, `vendorimage`, `systemimage`, target-files and OTA gates.
+Run the tested preflight on the user's complete LineageOS workspace:
+
+1. `--validate-only` first;
+2. then the real `m nothing` gate;
+3. use the generated `.log`, `.meta.txt`, and `.status` files as the authoritative next debugging input.
+
+Do not start `bootimage`, `vendorimage`, `systemimage`, target-files or OTA until `m nothing` is GREEN.
 
 ## Recovery rule
 

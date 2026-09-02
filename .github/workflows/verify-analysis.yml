@@ -101,7 +101,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: derveror/proprietary_vendor_red_hydrogenone
-          ref: d30ac19025b348ca61535afaaecb23b95347b2f4
+          ref: 6fef3d7c6333602d7114aefa0284a03f5aadb454
           path: vendor-tree
 
       - name: Verify pinned cross-tree ownership contract

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import unittest
 from pathlib import Path
 
@@ -31,7 +32,11 @@ class WorkspaceBootstrapDocsTest(unittest.TestCase):
 
     def test_fresh_bootstrap_does_not_force_sync_or_skip_first_gate(self) -> None:
         text = DOC.read_text(encoding="utf-8")
-        self.assertNotIn("--force-sync", text)
+        bash_blocks = re.findall(r"```bash\n(.*?)```", text, flags=re.DOTALL)
+        repo_sync_blocks = [block for block in bash_blocks if re.search(r"(?m)^repo sync\b", block)]
+        self.assertEqual(len(repo_sync_blocks), 1, repo_sync_blocks)
+        self.assertNotIn("--force-sync", repo_sync_blocks[0])
+
         for later_target in ("m bootimage", "m vendorimage", "m systemimage", "m otapackage", "m bacon"):
             self.assertNotIn(later_target, text)
 

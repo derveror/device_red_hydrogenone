@@ -61,13 +61,15 @@ def _scan_foreach_wildcards(
         variable = start.group(1)
         glob_pattern = start.group(2).strip()
         window = text[start.end() : start.end() + 1000]
+        source_ref = re.escape(f"$({variable})")
+        notdir_ref = rf"(?:{re.escape(f'$({variable})')}|{re.escape(f'${variable}')})"
         eval_re = re.compile(
             r"\$\(\s*eval\s+PRODUCT_COPY_FILES\s*\+=\s*"
-            + re.escape(f"$({variable})")
+            + source_ref
             + r":\$\((TARGET_COPY_OUT_[A-Z0-9_]+)\)/"
             + r"([^$\s\\]*?)"
             + r"\$\(\s*notdir\s+"
-            + re.escape(f"$({variable})")
+            + notdir_ref
             + r"\s*\)"
         )
         target = eval_re.search(window)

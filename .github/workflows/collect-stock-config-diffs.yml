@@ -83,7 +83,6 @@ jobs:
                   if elem.text is not None:
                       elem.text=elem.text.strip() or None
                   elem.tail=None
-                  elem.attrib.clear() if False else None
                   for child in list(elem):
                       clean(child)
               clean(root)
@@ -138,11 +137,11 @@ jobs:
           lines=['# RED .118 device config semantic differences','',f"Different files: **{len(entries)}**.",'']
           for e in entries:
               lines += [f"## `{e['source']}`",'',f"Destination: `{e['destination']}`.",f"XML semantically identical after whitespace normalization: `{e['xml_semantically_identical']}`.",f"Changed lines: +{e['added_line_count']} / -{e['removed_line_count']}.",'','```diff']
-              lines += e['unified_diff'][:240]
+              lines += [line.rstrip() for line in e['unified_diff'][:240]]
               if len(e['unified_diff'])>240:
                   lines.append(f"... diff truncated; total lines {len(e['unified_diff'])}")
               lines += ['```','']
-          Path('docs/stock/h1a1000-r118/DEVICE_VS_STOCK_CONFIG_DIFFS.md').write_text('\n'.join(lines),encoding='utf-8')
+          Path('docs/stock/h1a1000-r118/DEVICE_VS_STOCK_CONFIG_DIFFS.md').write_text('\n'.join(line.rstrip() for line in lines),encoding='utf-8')
           PY
           python3 -m json.tool docs/stock/h1a1000-r118/device-vs-stock-config-diffs.json >/dev/null
           git diff --check

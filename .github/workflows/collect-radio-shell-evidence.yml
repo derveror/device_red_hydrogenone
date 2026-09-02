@@ -1,0 +1,185 @@
+name: Collect RED .118 radio shell evidence
+
+on:
+  push:
+    branches:
+      - lineage-22.2-stock118-rework
+    paths:
+      - .github/workflows/collect-radio-shell-evidence.yml
+
+permissions:
+  contents: write
+
+jobs:
+  collect:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Reconstruct canonical RED .118 stock
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/r118/parts" "$RUNNER_TEMP/r118/archive" "$RUNNER_TEMP/r118/vendor" "$RUNNER_TEMP/7zip"
+          ids=(
+            1_B7suPmaiZsibKtmSg_IfIcgGaPz4nvt
+            1AV1tt-lmg5z0MMn7aNKArS7bFfK8VHCp
+            1wxs2du2Ml_--JrOwGlyDb49QMlrPxVMB
+            1OMvS4diiiOCiX-yCKHH7HZKv77QaUCFn
+            18czKWOxP9Xiw5g6ljCHI1Gt68Ynzxfi4
+            19bMHqds6-PsYPtrs18okJ8XgdF85Z84L
+            1xKaDVx16zH11ozeSeOjSlldi1-xrHcuj
+            1XF4fPiTXBzVsVQU5I3VZGxw4Xm_T_DUe
+          )
+          sizes=(251658240 251658240 251658240 251658240 251658240 251658240 251658240 89063443)
+          for i in "${!ids[@]}"; do
+            out="$RUNNER_TEMP/r118/parts/part.$i"
+            curl --fail --location --retry 5 --retry-delay 2 --retry-all-errors \
+              "https://drive.usercontent.google.com/download?id=${ids[$i]}&export=download&confirm=t" \
+              --output "$out"
+            test "$(stat -c %s "$out")" = "${sizes[$i]}"
+          done
+          cat "$RUNNER_TEMP"/r118/parts/part.* > "$RUNNER_TEMP/r118/stock.rar"
+          rm -rf "$RUNNER_TEMP/r118/parts"
+          echo '7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e  '"$RUNNER_TEMP/r118/stock.rar" | sha256sum -c -
+
+          curl --fail --location --retry 5 \
+            https://github.com/ip7z/7zip/releases/download/26.02/7z2602-linux-x64.tar.xz \
+            --output "$RUNNER_TEMP/7zip.tar.xz"
+          tar -xJf "$RUNNER_TEMP/7zip.tar.xz" -C "$RUNNER_TEMP/7zip"
+          chmod +x "$RUNNER_TEMP/7zip/7zz"
+          seven="$RUNNER_TEMP/7zip/7zz"
+          base='H1A1000.082ho.01.00.10r.118_userdebug_fastboot/fastboot'
+          "$seven" e -y -o"$RUNNER_TEMP/r118/archive" "$RUNNER_TEMP/r118/stock.rar" \
+            "$base/vendor.img" "$base/Ver_info.txt"
+          test "$(stat -c %s "$RUNNER_TEMP/r118/archive/vendor.img")" = 593264872
+          test "$(stat -c %s "$RUNNER_TEMP/r118/archive/Ver_info.txt")" = 1109
+          rm -f "$RUNNER_TEMP/r118/stock.rar"
+
+      - name: Extract stock init shell scripts
+        shell: bash
+        run: |
+          set -euo pipefail
+          seven="$RUNNER_TEMP/7zip/7zz"
+          "$seven" x -y -r -o"$RUNNER_TEMP/r118/vendor" \
+            "$RUNNER_TEMP/r118/archive/vendor.img" '*.sh'
+          test -f "$RUNNER_TEMP/r118/vendor/bin/init.class_main.sh"
+          printf 'shell_files=%s\n' "$(find "$RUNNER_TEMP/r118/vendor" -type f -name '*.sh' | wc -l)"
+          sha256sum "$RUNNER_TEMP/r118/vendor/bin/init.class_main.sh"
+
+      - name: Build machine-readable shell evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from __future__ import annotations
+
+          import hashlib
+          import json
+          import os
+          import re
+          from pathlib import Path
+
+          from tools.analyze_radio_evidence import scan_shell_files
+
+          stock_sha = "7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e"
+          root = Path(os.environ["RUNNER_TEMP"]) / "r118" / "vendor"
+          script = root / "bin" / "init.class_main.sh"
+          ver_info = Path(os.environ["RUNNER_TEMP"]) / "r118" / "archive" / "Ver_info.txt"
+
+          script_bytes = script.read_bytes()
+          ver_bytes = ver_info.read_bytes()
+          script_lines = script.read_text(encoding="utf-8", errors="replace").splitlines()
+          ver_text = ver_info.read_text(encoding="utf-8", errors="replace")
+
+          controls = scan_shell_files(root)
+          radio_controls = [
+              row for row in controls
+              if any(token in row["target"].lower() for token in ("qcril", "ril-daemon", "rild"))
+          ]
+
+          decision_re = re.compile(r"qcrild_status|multisim|ver_info|modem=|version=|MPSS", re.I)
+          decision_lines = [
+              {"line": index, "text": raw.strip()}
+              for index, raw in enumerate(script_lines, 1)
+              if decision_re.search(raw)
+          ]
+
+          modem_tokens = sorted(set(re.findall(r"MPSS\.[A-Za-z0-9._-]+", ver_text)))
+          evidence = {
+              "schema_version": 1,
+              "authority": {
+                  "stock_build": "H1A1000.082ho.01.00.10r.118",
+                  "stock_archive_sha256": stock_sha,
+              },
+              "init_class_main": {
+                  "path": "vendor/bin/init.class_main.sh",
+                  "size": len(script_bytes),
+                  "sha256": hashlib.sha256(script_bytes).hexdigest(),
+                  "decision_lines": decision_lines,
+              },
+              "ver_info": {
+                  "archive_path": "fastboot/Ver_info.txt",
+                  "size": len(ver_bytes),
+                  "sha256": hashlib.sha256(ver_bytes).hexdigest(),
+                  "mpss_tokens": modem_tokens,
+              },
+              "radio_shell_controls": radio_controls,
+          }
+
+          out = Path("docs/stock/h1a1000-r118/radio-shell-evidence.json")
+          out.write_text(json.dumps(evidence, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+          md = [
+              "# RED .118 radio shell evidence",
+              "",
+              f"Canonical stock SHA-256: `{stock_sha}`",
+              "",
+              f"`vendor/bin/init.class_main.sh`: size `{len(script_bytes)}`, SHA-256 `{hashlib.sha256(script_bytes).hexdigest()}`.",
+              f"`fastboot/Ver_info.txt`: size `{len(ver_bytes)}`, SHA-256 `{hashlib.sha256(ver_bytes).hexdigest()}`.",
+              "",
+              "## MPSS tokens",
+              "",
+          ]
+          md.extend([f"- `{token}`" for token in modem_tokens] or ["- None found."])
+          md.extend(["", "## RIL/qcrild shell controls", ""])
+          for row in radio_controls:
+              md.append(f"- `{row['path']}:{row['line']}` — `{row['verb']} {row['target']}`")
+              for context in row["context"]:
+                  md.append(f"  - context: `{context}`")
+          if not radio_controls:
+              md.append("- None found.")
+          md.extend(["", "## Decision lines", ""])
+          md.extend([f"- line {row['line']}: `{row['text']}`" for row in decision_lines] or ["- None found."])
+          md.append("")
+          Path("docs/stock/h1a1000-r118/RADIO_SHELL_EVIDENCE.md").write_text("\n".join(md), encoding="utf-8")
+          PY
+          python3 -m json.tool docs/stock/h1a1000-r118/radio-shell-evidence.json >/dev/null
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          data = json.loads(Path('docs/stock/h1a1000-r118/radio-shell-evidence.json').read_text())
+          assert data['authority']['stock_archive_sha256'] == '7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e'
+          targets = {row['target'] for row in data['radio_shell_controls']}
+          assert 'vendor.qcrild' in targets or 'vendor.ril-daemon' in targets, targets
+          assert 'vendor.qcrild2' in targets or 'vendor.ril-daemon2' in targets, targets
+          PY
+          git diff --check
+
+      - name: Commit evidence and remove one-shot collector
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm .github/workflows/collect-radio-shell-evidence.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/stock/h1a1000-r118/radio-shell-evidence.json \
+            docs/stock/h1a1000-r118/RADIO_SHELL_EVIDENCE.md \
+            .github/workflows/collect-radio-shell-evidence.yml
+          git diff --cached --check
+          git commit -m 'docs: record RED .118 radio shell decision path'
+          git fetch origin lineage-22.2-stock118-rework
+          git rebase origin/lineage-22.2-stock118-rework
+          git push origin HEAD:lineage-22.2-stock118-rework

@@ -3,14 +3,9 @@
     "device_branch": "lineage-22.2-stock118-rework",
     "stock_archive_sha256": "7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e",
     "stock_build": "H1A1000.082ho.01.00.10r.118",
-    "vendor_commit": "4a29d09d23299ba5eea6ac6bfa4fee24ba9a2b27"
+    "vendor_commit": "d30ac19025b348ca61535afaaecb23b95347b2f4"
   },
-  "copy_destination_collisions": [
-    "vendor/etc/libnfc-nci.conf",
-    "vendor/etc/permissions/android.hardware.nfc.hce.xml",
-    "vendor/etc/permissions/android.hardware.nfc.xml",
-    "vendor/etc/thermal-engine.conf"
-  ],
+  "copy_destination_collisions": [],
   "device_copy_destinations": {
     "recovery/root/first_stage_ramdisk/fstab.qcom": [
       "device.mk"
@@ -219,9 +214,6 @@
     "vendor/etc/izat.conf": [
       "device.mk"
     ],
-    "vendor/etc/libnfc-nci.conf": [
-      "device.mk"
-    ],
     "vendor/etc/libnfc-nxp.conf": [
       "device.mk"
     ],
@@ -378,9 +370,6 @@
     "vendor/etc/task_profiles.json": [
       "device.mk"
     ],
-    "vendor/etc/thermal-engine.conf": [
-      "device.mk"
-    ],
     "vendor/etc/ueventd.rc": [
       "device.mk"
     ],
@@ -408,6 +397,7 @@
   },
   "device_root": "device-tree",
   "schema_version": 1,
+  "status": "zero_copy_destination_collisions",
   "vendor_copy_destinations": {
     "vendor/bin/init.qcom.sensors.sh": [
       "hydrogenone-vendor.mk"
@@ -496,13 +486,7 @@
     "vendor/etc/libnfc-qrd_rf2.conf": [
       "hydrogenone-vendor.mk"
     ],
-    "vendor/etc/permissions/android.hardware.nfc.hce.xml": [
-      "hydrogenone-vendor.mk"
-    ],
     "vendor/etc/permissions/android.hardware.nfc.hcef.xml": [
-      "hydrogenone-vendor.mk"
-    ],
-    "vendor/etc/permissions/android.hardware.nfc.xml": [
       "hydrogenone-vendor.mk"
     ],
     "vendor/etc/permissions/com.android.nfc_extras.xml": [

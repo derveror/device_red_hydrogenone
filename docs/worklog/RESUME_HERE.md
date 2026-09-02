@@ -2,8 +2,8 @@
 
 > **READ THIS FILE FIRST AFTER ANY INTERRUPTION.**
 
-**Marker version:** 6  
-**Last completed action file:** `docs/worklog/2026-09-02/0007-cross-tree-collisions-proven-false-positive.md`  
+**Marker version:** 7  
+**Last completed action file:** `docs/worklog/2026-09-02/0008-cross-tree-evidence-regenerated-green.md`  
 **Logging protocol active:** YES
 
 ## Current repository checkpoints
@@ -11,16 +11,16 @@
 ### Device
 - Repository: `derveror/device_red_hydrogenone`.
 - Branch: `lineage-22.2-stock118-rework`.
-- Cross-tree lock points to vendor `6fef3d7c6333602d7114aefa0284a03f5aadb454`.
-- Permanent cross-tree checkout uses the same vendor commit.
-- Published `cross-tree-copy-contract.json` still has stale authority from the prior vendor pin and must be regenerated.
-- The previously reported 49 live collisions are **proven diagnostic false positives**: every device-side owner was `vendor-tree/hydrogenone-vendor.mk`, because the one-shot workflow nested the vendor checkout inside the device scan root. No runtime file pruning is required from that list.
+- Cross-tree lock pins vendor `6fef3d7c6333602d7114aefa0284a03f5aadb454`.
+- Fresh zero-collision cross-tree evidence was regenerated against that exact vendor commit.
+- One-shot regeneration workflow self-deleted successfully.
+- Regeneration commit: `e01f8d83fb20aa90abf1c790fbb0e9ea8871f892`.
+- Action 0008 records the successful isolated-root audit.
 
 ### Vendor
 - Repository: `derveror/proprietary_vendor_red_hydrogenone`.
 - Branch: `lineage-22.2-android15-contract`.
 - Current GREEN head: `6fef3d7c6333602d7114aefa0284a03f5aadb454`.
-- Relative to `d30ac190...`, this head changes only permanent vendor CI; proprietary payload/config is unchanged.
 
 ## Canonical stock authority
 
@@ -44,14 +44,15 @@ LineageOS 22.2 roomservice resolves ordinary `lineage.dependencies` GitHub entri
 
 ## Immediate next action — DO THIS FIRST
 
-Fix only the one-shot regeneration workflow so the vendor checkout is outside the device scan root (for example move it to `$RUNNER_TEMP/vendor-tree` before invoking `cross_tree_contract.py`). Rerun the exact live audit. If zero collisions, regenerate `cross-tree-copy-contract.json` with vendor authority `6fef3d7c...`, self-delete the one-shot workflow, and verify permanent device CI GREEN.
+Confirm permanent device `verify-analysis.yml` on the current post-regeneration branch head. Both `verify` and `cross_tree` jobs must be GREEN. If GREEN, record it as the next action and proceed to the reproducible local-manifest/dependency gate.
 
-## After cross-tree GREEN
+## After permanent CI GREEN
 
-1. Create/test reproducible local-manifest template.
-2. Make the kernel branch explicit in `lineage.dependencies`.
-3. Move to actual clean LineageOS workspace `lunch lineage_hydrogenone-userdebug` + `m nothing`.
+1. Create/test a local-manifest template for device/vendor + required Lineage dependencies.
+2. Make kernel branch explicit in `lineage.dependencies`.
+3. Validate manifest XML and path/branch pins statically.
+4. Move to actual clean LineageOS workspace `lunch lineage_hydrogenone-userdebug` + `m nothing`.
 
 ## Recovery rule
 
-After interruption, do **not** infer state from chat prose. Read this marker, then the last numbered action file, then verify both branch heads and active one-shot workflows from GitHub before continuing.
+After interruption, do **not** infer state from chat prose. Read this marker, then the last numbered action file, then verify both branch heads and active workflows from GitHub before continuing.

@@ -1,0 +1,97 @@
+name: Prune vendor-owned device config copies
+
+on:
+  push:
+    branches:
+      - lineage-22.2-stock118-rework
+    paths:
+      - .github/workflows/prune-vendor-owned-device-configs.yml
+
+permissions:
+  contents: write
+
+jobs:
+  prune:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Remove stale active device copies
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          device = Path('device.mk')
+          s = device.read_text(encoding='utf-8')
+          replacements = {
+              '    $(LOCAL_PATH)/configs/thermal-engine.conf:$(TARGET_COPY_OUT_VENDOR)/etc/thermal-engine.conf \\\n': '',
+              '    $(LOCAL_PATH)/configs/nfc/libnfc-nci.conf:$(TARGET_COPY_OUT_VENDOR)/etc/libnfc-nci.conf \\\n': '',
+              '# IRQ / thermal / Qualcomm security config': '# IRQ / Qualcomm security config; canonical RED .118 thermal config is vendor-owned',
+              '# NFC - NXP PN80T-family configuration selected by RED .109 (ro.hardware.nfc_nci=nqx.default)': '# NFC - source service; canonical RED .118 libnfc-nci.conf is vendor-owned',
+          }
+          for old, new in replacements.items():
+              if old not in s:
+                  raise SystemExit(f'missing device.mk ownership anchor: {old!r}')
+              s = s.replace(old, new, 1)
+          device.write_text(s, encoding='utf-8')
+
+          audit = Path('tests/test_full_tree.py')
+          t = audit.read_text(encoding='utf-8')
+          audit_replacements = {
+              "'configs/msm_irqbalance.conf','configs/thermal-engine.conf','configs/public.libraries.txt',": "'configs/msm_irqbalance.conf','configs/public.libraries.txt',",
+              "'configs/camera/camera_config.xml','configs/nfc/libnfc-nci.conf','configs/nfc/libnfc-nxp.conf',": "'configs/camera/camera_config.xml','configs/nfc/libnfc-nxp.conf',",
+              "    'configs/nfc/libnfc-nci.conf:$(TARGET_COPY_OUT_VENDOR)/etc/libnfc-nci.conf',\n": '',
+              '# Full subsystem wiring: RED camera tuning and NXP NFC configs must be installed.': '# Full subsystem wiring: RED camera tuning and the device-owned NXP HAL config must be installed.',
+          }
+          for old, new in audit_replacements.items():
+              if old not in t:
+                  raise SystemExit(f'missing test_full_tree ownership anchor: {old!r}')
+              t = t.replace(old, new, 1)
+          audit.write_text(t, encoding='utf-8')
+
+          for path in (Path('configs/nfc/libnfc-nci.conf'), Path('configs/thermal-engine.conf')):
+              if not path.is_file():
+                  raise SystemExit(f'missing stale active config before prune: {path}')
+              path.unlink()
+          PY
+
+      - name: Verify device contract GREEN
+        shell: bash
+        run: |
+          set -euo pipefail
+          PYTHONPATH="$PWD/tests:$PWD" python3 - <<'PY'
+          import pathlib
+          import unittest
+          loader = unittest.defaultTestLoader
+          suite = unittest.TestSuite()
+          for path in sorted(pathlib.Path('tests').glob('test_*.py')):
+              if path.name == 'test_full_tree.py':
+                  continue
+              suite.addTests(loader.loadTestsFromName(f'tests.{path.stem}'))
+          result = unittest.TextTestRunner(verbosity=2).run(suite)
+          raise SystemExit(0 if result.wasSuccessful() else 1)
+          PY
+          python3 tests/test_full_tree.py
+          git diff --check
+          test ! -e configs/nfc/libnfc-nci.conf
+          test ! -e configs/thermal-engine.conf
+          ! grep -Fq 'configs/nfc/libnfc-nci.conf:$(TARGET_COPY_OUT_VENDOR)/etc/libnfc-nci.conf' device.mk
+          ! grep -Fq 'configs/thermal-engine.conf:$(TARGET_COPY_OUT_VENDOR)/etc/thermal-engine.conf' device.mk
+
+      - name: Commit verified ownership cleanup
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm .github/workflows/prune-vendor-owned-device-configs.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --check
+          git commit -m 'device: defer RED .118 NFC and thermal configs to vendor'
+          git fetch origin lineage-22.2-stock118-rework
+          git rebase origin/lineage-22.2-stock118-rework
+          git push origin HEAD:lineage-22.2-stock118-rework

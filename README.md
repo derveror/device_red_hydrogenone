@@ -1,135 +1,196 @@
 # RED Hydrogen One (`hydrogenone`) — LineageOS 22.2
 
-Full source-side device configuration for the RED Hydrogen One H1A1000 (Snapdragon 835 / MSM8998).
-The tree is intended for `device/red/hydrogenone`.
+Device configuration for the RED Hydrogen One H1A1000 (Snapdragon 835 / MSM8998), intended for:
 
-## Design
+```text
+device/red/hydrogenone
+```
 
-Hardware authority is the RED H1A1000 `.109` stock firmware. The maintained Essential PH-1
-`mata` LineageOS 22.2 tree is used as the primary MSM8998/A-B/Treble architectural reference;
-OnePlus 5/5T and Nubia Z17 are secondary references. Donor-specific hardware data is not used as
-RED hardware configuration.
+Target userspace is LineageOS 22.2 / Android 15. The canonical hardware and stock-userspace authority for this rework is RED build `H1A1000.082ho.01.00.10r.118` (Android 9), not the older `.109` tree history.
 
-The first bring-up deliberately keeps the exact RED stock `Image.gz-dtb` so that RED/CloudMinds
-board DTBs, panels, touch, fingerprint and SmartPort wiring are not replaced by donor hardware.
+Canonical stock archive SHA-256:
 
-## Included source-side subsystems
+```text
+7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e
+```
 
-- `audio/` — RED `.109` audio policy, Tasha mixer, sound-trigger and platform configuration.
-- `configs/camera/` — RED `.109` camera module topology and all stock chromatix-selection XMLs.
-- `configs/nfc/` — RED/NXP PN80T-family NFC configuration.
-- `gps/`, `location/` — MSM8998 Qualcomm GNSS source stack with RED stock configs. The optional
-  SS5 `libsynergy_loc_api` blueprint is inactive because RED `.109` does not select that backend and
-  its QMI link libraries belong to the future vendor tree.
-- `keylayout/` — power, volume and two-stage camera shutter layout.
-- `media/` — RED stock media codec/profile configuration.
-- `overlay/`, `overlay-lineage/`, `rro_overlays/` — Hydrogen One framework/Lineage/Wi-Fi overlays.
-- `power/` — RED stock power hint configuration.
-- `rootdir/` — Android 15-adapted fstab, init, USB and ueventd configuration.
-- `seccomp/` — media seccomp policy from stock.
-- `sepolicy/` — source SELinux policy adapted from maintained MSM8998 patterns and RED paths.
-- `wifi/` — RED stock WCNSS and supplicant configuration.
-- `prebuilt/` — exact stock 4.4.78 kernel payload and extracted kernel config.
-- `tools/` — targeted Android 8.1 HIDL compatibility data used by `extract-files.py`.
+## Authority and reference policy
 
-A `bluetooth/impl` directory is intentionally **not** copied from mata: mata's implementation reads
-Essential-specific Bluetooth address storage. RED uses the stock Qualcomm Cherokee provider; its
-binary/provider closure belongs in the future `vendor/red/hydrogenone` tree. The same rule applies
-to donor-only `devicesettings` and hardware-specific powerstats implementations.
+RED `.118` controls device-specific facts: boot image layout, partition sizes, stock identity, modem/radio behavior, RED/CloudMinds hardware, firmware and proprietary userspace.
+
+Maintained LineageOS 22.2 MSM8998 trees are architectural references only. Essential PH-1 (`mata`) is the primary reference for MSM8998/A-B/Treble structure; OnePlus 5/5T, Nubia Z17 and Razer Phone are secondary references. Donor-specific hardware payloads are not treated as RED hardware evidence.
+
+Canonical analysis is recorded under:
+
+```text
+docs/stock/h1a1000-r118/
+```
+
+Important machine-readable contracts include `boot-image-contract.json`, radio evidence, stock inventories and the cross-tree vendor lock.
+
+## Current build contract
+
+### Stock identity
+
+The product compatibility identity is pinned to RED `.118`:
+
+```text
+RED/HydrogenONE/HydrogenONE:9/PKQ1.190118.001/118:userdebug/release-keys
+```
+
+Verified stock values include:
+
+- Android 9 / SDK 28; first API level 27
+- system security patch `2019-04-05`
+- vendor security patch `2018-08-05`
+- Treble, system-as-root and A/B
+- platform `msm8998`
+
+### Boot / kernel
+
+First bring-up deliberately uses the exact kernel extracted from the canonical RED `.118` `boot.img`. This preserves RED DTBs and board wiring while userspace is brought up.
+
+Verified boot contract:
+
+- Android boot header v1
+- page size 4096
+- kernel load address `0x00008000`
+- ramdisk address `0x01000000`
+- second address `0x00f00000`
+- tags address `0x00000100`
+- boot partition 64 MiB
+- system partition 4 GiB
+- vendor partition 1 GiB
+- kernel payload size `37015950`
+- kernel SHA-256 `584ed86bab46bf57c2cd6b6b48ac4026c5d24a70d57bcdd04472d39c5591064d`
+
+`prebuilt/Image.gz-dtb` is regression-tested against that exact size and hash.
+
+`kernel/essential/msm8998` remains a temporary build dependency for generated MSM8998 kernel/UAPI headers used by source-built Qualcomm components. Its Mata kernel image or DTBs are not used as the Hydrogen One boot payload.
+
+The final target remains a source-built RED-capable kernel. The stock prebuilt is a controlled bring-up stage, not the release end state.
+
+### Kernel command line
+
+The Android 15 command line retains RED `.118` hardware/runtime arguments such as `msm_rtb.filter=0x37`, HMP/power-aware scheduler flags and `firmware_class.path=/vendor/firmware_mnt/image`. It also keeps `androidboot.boot_devices=soc/1da4000.ufshc` for modern first-stage block-device discovery.
+
+Stock build/signing identity such as `buildvariant=userdebug` and the stock `veritykeyid` is intentionally not hardcoded into the Android 15 build.
+
+### Radio
+
+Canonical `.118` evidence identifies:
+
+- `persist.radio.multisim.config=dsds`
+- modem family `MPSS.AT.2.0...`
+- primary `vendor.qcrild`
+- DSDS second instance `vendor.qcrild2`
+
+The Android 15 rootdir starts those two qcrild instances. It does not start `vendor.qcrild3` or the legacy `vendor.ril-daemon*` path. The stale `.109` `vendor.rild.libpath` property has been removed.
+
+### Filesystems
+
+The active Android 15 fstab keeps the measured RED UFS partition paths and MSM8998 firmware/persist mounts while using the Android 15 migration contract:
+
+- A/B first-stage mounts for system and vendor
+- userdata migrated to FBE with `fileencryption=ice` and quota
+- modem at `/vendor/firmware_mnt`
+- Bluetooth firmware at `/vendor/bt_firmware`
+- DSP at `/vendor/dsp`
+- persist at `/mnt/vendor/persist`
+
+`rootdir/etc/fstab.qcom` and recovery fstab are regression-tested as one mount contract. Raw `.118` boot-ramdisk fstab extraction is still a separate evidence gap; the Android 15 FBE configuration is therefore a deliberate migration decision, not a claim that stock Android 9 used identical flags.
 
 ## Vendor tree
 
-Proprietary blobs are not bundled here. Future vendor output is wired at:
+The proprietary tree is required and is expected at:
 
 ```text
 vendor/red/hydrogenone
 ```
 
-`BoardConfig.mk` conditionally includes `BoardConfigVendor.mk`, and the product conditionally
-inherits `hydrogenone-vendor.mk`. `proprietary-files.txt` and `extract-files.py` are included for that next stage. Source-owned
-configuration paths are removed from the proprietary inventory to avoid duplicate installs.
+The current Android 15 vendor contract lives in:
 
-## Kernel / boot contract
+```text
+derveror/proprietary_vendor_red_hydrogenone
+branch: lineage-22.2-android15-contract
+```
 
-The initial diagnostic kernel is the exact RED `.109` payload:
+The exact compatible vendor commit is pinned by:
 
-- Linux 4.4.78-perf+
-- `Image.gz-dtb`
-- SHA-256 `6cf3a70ece8b32dcd6bccf9db1a22c1da29b9b37fe67cc0e4ec9b4f87fec2426`
-- boot header v0
-- page size 4096
-- boot partition 64 MiB
-- system partition 4 GiB
-- vendor partition 1 GiB
+```text
+docs/reference/cross-tree-lock.json
+```
 
-This old kernel is a bring-up choice, not a release-quality Android 15 kernel.
+Device CI checks out that exact vendor revision and runs the live cross-tree contract. `BoardConfigVendor.mk` and `hydrogenone-vendor.mk` are inherited fail-fast; a build checkout without the required RED vendor tree is not considered a valid full build configuration.
 
-LineageOS native Qualcomm modules also require generated Linux UAPI headers during
-`vendorimage`. Because RED did not publish a matching kernel source tree, the maintained
-LineageOS `android_kernel_essential_msm8998` tree is downloaded at
-`kernel/essential/msm8998` and used **only** for `headers_install`. The exact RED
-`Image.gz-dtb` remains forced through `TARGET_FORCE_PREBUILT_KERNEL := true`; no Mata
-kernel image or DTB is placed in the Hydrogen One boot image.
+The vendor tree is generated from verified `.118` blobs and has permanent Android 15 contract tests for selected blobs, ELF closure/exceptions, VINTF ownership and P0 daemon requirements.
 
-## Legacy ARM graphics ELF exceptions
+## Source-side subsystems
 
-The exact RED `.109` ARM32 graphics stack retains legacy ARM EABI
-compiler-runtime references. The first real `vendorimage` failure exposed
-`libgsl.so` (`__aeabi_ul2d`, `__aeabi_uldivmod`), and the next run exposed
-`libEGL_adreno.so` (`__aeabi_ldivmod`). A complete `readelf --dyn-syms` audit
-then identified the same narrowly defined non-memory `__aeabi_*` class in nine
-ARM32 P0 blobs.
+The tree contains Android 15 source-side configuration for audio/media, camera configuration, NFC, GNSS/location, overlays, power, rootdir, SELinux, Wi-Fi and RED-specific hardware paths.
 
-LineageOS 22.2 bionic still lists these compatibility exports across
-`libc/arch-arm/bionic/libcrt_compat.c`, `libc/libc.map.txt`, and the ARM-only
-`LIBC_DEPRECATED` block in `libm/libm.map.txt`. The Soong vendor prebuilt checker
-nevertheless rejects the old Android 8.1 references. The proprietary list uses
-file-scoped `DISABLE_CHECKELF` only for the audited ARM32 inputs; no ARM64 source
-entry is flagged and no RED binary is modified or replaced by a Mata payload.
+Some configuration originated during the older `.109` bring-up. Such files are retained only where current tests/evidence justify them or are explicitly treated as legacy carry-over pending `.118` validation. A historical filename or comment must not be interpreted as `.118` proof.
 
-Because extract-utils combines each ABI pair into one Soong module, the generated
-`check_elf_files: false` property is module-wide. The vendor regression test
-compensates by pinning every ARM32 source hash and exact strong non-memory EABI
-symbol set, while ensuring that the ARM64 proprietary-file entries remain
-unflagged. This bypass only removes Soong's static check; physical-device linker
-validation remains mandatory during bring-up.
+Narrow `DISABLE_CHECKELF` exceptions in the vendor tree are limited to audited legacy proprietary modules whose ABI behavior cannot be represented by the Android 15 vendor stubs. They are hash/symbol pinned and remain runtime hypotheses until verified on physical hardware; there is no global ELF-check bypass.
 
-## Legacy RED Vulkan private-symbol exception
+## Build
 
-The RED Android 8.1 `vendor/lib64/hw/vulkan.msm8998.so` additionally references
-`android::AHardwareBuffer_to_ANativeWindowBuffer(const AHardwareBuffer*)`. In
-LineageOS 22.2 the full `libnativewindow` still implements and exports this symbol
-inside the `LIBNATIVEWINDOW_PLATFORM` version node, but the vendor-facing stub
-used by `check_elf_file` intentionally omits platform-only C++ exports. This makes
-the static checker fail even though the implementation remains in the platform
-library.
+Place the repositories at:
 
-The exact RED Vulkan blob is therefore given its own file-scoped
-`DISABLE_CHECKELF`; it is not replaced by Mata's newer Android 29 Vulkan payload.
-The blob hash and exact undefined symbol are pinned by the vendor regression test.
-This remains a runtime hypothesis until the Vulkan SP-HAL loads successfully on
-the physical H1A1000; a linker failure there will require a dedicated shim or a
-carefully matched newer MSM8998 graphics stack rather than a broader bypass.
+```text
+device/red/hydrogenone
+vendor/red/hydrogenone
+```
 
-## Build target
-
-Place this repository at `device/red/hydrogenone`, then from a LineageOS 22.2 checkout:
+Then from a LineageOS 22.2 checkout:
 
 ```bash
 source build/envsetup.sh
-breakfast hydrogenone
-lunch lineage_hydrogenone-bp1a-userdebug
-m nothing -j1
+lunch lineage_hydrogenone-userdebug
+m nothing
 ```
 
-After `vendor/red/hydrogenone` is generated, continue with `vendorimage`, `bootimage`, `systemimage`
-and `bacon`. A successful static build still does not prove device boot; physical H1A1000 logs are
-required for runtime validation.
+The two-component lunch form is valid on LineageOS 22.2; when no release component is supplied the build environment resolves the default release configuration. The device product itself declares `lineage_hydrogenone-user`, `lineage_hydrogenone-userdebug` and `lineage_hydrogenone-eng`.
 
-## Lineage dependencies
+After `m nothing` is clean, run the image gates explicitly:
 
-The tree pins `android_device_qcom_sepolicy_vndr` to `lineage-22.2-legacy-um` at
-`device/qcom/sepolicy-legacy-um`. It also declares the same maintained MSM8998 kernel source
-used by the official Mata tree at `kernel/essential/msm8998`, solely to generate UAPI headers
-needed by source-built Qualcomm modules. The RED boot kernel remains the verified stock
-prebuilt and is never replaced by the dependency.
+```bash
+m bootimage
+m vendorimage
+m systemimage
+m target-files-package
+m otapackage
+```
+
+Do not treat static CI or successful image compilation as proof of a bootable ROM. A new full LineageOS workspace build from the current `.118` branches and physical H1A1000 bring-up are still required.
+
+## Current verification gates
+
+Permanent device CI validates:
+
+- canonical `.118` source locks and stock records
+- unit/contract tests
+- exact `.118` boot/kernel identity
+- radio DSDS/qcrild behavior
+- Android 15 fstab and kernel-cmdline contracts
+- tree audits and stale-source guards
+- live device/vendor cross-tree compatibility against the pinned vendor commit
+
+Permanent vendor CI validates its Android 15 proprietary contract independently.
+
+## Remaining milestones
+
+The current work is not declared release-complete or device-bootable. Major remaining gates are:
+
+1. finish exhaustive `.118` per-file ownership/dependency classification;
+2. close remaining evidence gaps such as raw stock boot-ramdisk fstab data;
+3. run a clean full LineageOS 22.2 workspace build from the pinned device/vendor revisions;
+4. fix build-system failures only from their actual logs;
+5. perform staged physical bring-up with logs for kernel/init/mounts/SELinux/graphics/touch/radio;
+6. validate P1 hardware (telephony/IMS, Wi-Fi, Bluetooth, GNSS, sensors, fingerprint, camera, NFC, audio, thermal/suspend, A/B OTA/recovery);
+7. validate RED-specific P2 hardware such as Leia display/3D and SmartPort;
+8. replace the transitional prebuilt kernel with a validated source-built RED kernel.
+
+## Dependencies
+
+`lineage.dependencies` declares the LineageOS legacy Qualcomm SELinux tree and the maintained Essential MSM8998 kernel source needed for current build plumbing. The RED boot payload remains the exact verified `.118` prebuilt until the source-kernel milestone is completed.

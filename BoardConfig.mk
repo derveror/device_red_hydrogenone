@@ -58,11 +58,10 @@ DEVICE_MANIFEST_FILE := $(DEVICE_PATH)/manifest.xml
 DEVICE_MATRIX_FILE := hardware/qcom-caf/common/compatibility_matrix.xml
 PRODUCT_FULL_TREBLE_OVERRIDE := true
 
-# Kernel - exact RED .109 stock 4.4.78 Image.gz-dtb for first bring-up
-# Required even with a prebuilt: LineageOS kernel.mk compares the version for
-# every Qualcomm target before selecting the prebuilt-kernel path.
+# Kernel - exact RED .118 stock 4.4.153+ Image.gz-dtb for first bring-up.
+# Canonical boot image: header v1, 4096-byte pages, kernel load address 0x8000.
 TARGET_KERNEL_VERSION := 4.4
-BOARD_BOOT_HEADER_VERSION := 0
+BOARD_BOOT_HEADER_VERSION := 1
 BOARD_KERNEL_BASE := 0x00000000
 BOARD_KERNEL_PAGESIZE := 4096
 BOARD_KERNEL_IMAGE_NAME := Image.gz-dtb
@@ -70,9 +69,9 @@ BOARD_KERNEL_OFFSET := 0x00008000
 BOARD_RAMDISK_OFFSET := 0x01000000
 BOARD_SECOND_OFFSET := 0x00f00000
 BOARD_TAGS_OFFSET := 0x00000100
-# LineageOS native vendor modules consume generated kernel UAPI headers.  Use
-# the maintained mata MSM8998 source tree only for headers, while forcing the
-# exact RED .109 Image.gz-dtb as the boot/recovery kernel payload.
+# LineageOS native vendor modules consume generated kernel UAPI headers. Use
+# the maintained Essential MSM8998 source tree only for headers while forcing
+# the exact RED .118 Image.gz-dtb as the boot/recovery kernel payload.
 TARGET_KERNEL_SOURCE := kernel/essential/msm8998
 TARGET_KERNEL_CONFIG := lineageos_mata_defconfig
 TARGET_FORCE_PREBUILT_KERNEL := true
@@ -85,7 +84,7 @@ BOARD_KERNEL_CMDLINE += androidboot.boot_devices=soc/1da4000.ufshc loop.max_part
 BOARD_KERNEL_CMDLINE += earlycon=msm_serial_dm,0xc1b0000 console=ttyMSM0,115200,n8
 BOARD_KERNEL_CMDLINE += androidboot.console=ttyMSM0 user_debug=31
 
-# Partitions - verified from RED .109
+# Partitions - verified from RED .118 partition.xml
 BOARD_BOOTIMAGE_PARTITION_SIZE := 67108864
 BOARD_SYSTEMIMAGE_PARTITION_SIZE := 4294967296
 BOARD_VENDORIMAGE_PARTITION_SIZE := 1073741824
@@ -121,8 +120,8 @@ PRODUCT_PUBLIC_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/public
 # Properties
 TARGET_VENDOR_PROP += $(DEVICE_PATH)/vendor.prop
 
-# Stock vendor patch level
-VENDOR_SECURITY_PATCH := 2018-12-01
+# Stock .118 vendor patch level
+VENDOR_SECURITY_PATCH := 2018-08-05
 
 # Diagnostic bring-up uses an unlocked legacy AVB1 chain
 BOARD_AVB_ENABLE := false
@@ -140,5 +139,5 @@ WIFI_DRIVER_FW_PATH_P2P := "p2p"
 WIFI_HIDL_FEATURE_DUAL_INTERFACE := true
 WIFI_HIDL_UNIFIED_SUPPLICANT_SERVICE_RC_ENTRY := true
 
-# Generated separately from RED .109 proprietary blobs
+# Generated from canonical RED .118 proprietary blobs
 -include vendor/red/hydrogenone/BoardConfigVendor.mk

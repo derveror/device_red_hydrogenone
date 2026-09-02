@@ -61,10 +61,16 @@ class LocalManifestContractTest(unittest.TestCase):
         self.assertNotIn("device/red/msm8998-common", text)
         self.assertNotIn("vendor/red/msm8998-common", text)
 
-    def test_lineage_dependencies_pin_lineage_owned_branches(self) -> None:
+    def test_lineage_dependencies_use_supported_roomservice_contract(self) -> None:
         dependencies = json.loads(DEPENDENCIES.read_text(encoding="utf-8"))
         by_path = {entry["target_path"]: entry for entry in dependencies}
-        self.assertEqual(by_path["kernel/essential/msm8998"].get("branch"), "lineage-22.2")
+
+        # The sepolicy project has a non-default branch and therefore needs an
+        # explicit branch. The kernel follows the active Lineage default branch;
+        # roomservice.py resolves an omitted GitHub dependency branch through
+        # get_default_or_fallback_revision(). The local-manifest template above
+        # still pins the kernel revision explicitly for deterministic clean sync.
+        self.assertNotIn("branch", by_path["kernel/essential/msm8998"])
         self.assertEqual(by_path["device/qcom/sepolicy-legacy-um"].get("branch"), "lineage-22.2-legacy-um")
 
     def test_custom_vendor_is_not_misdeclared_as_lineage_dependency(self) -> None:

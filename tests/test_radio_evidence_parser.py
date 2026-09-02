@@ -80,6 +80,30 @@ class RadioEvidenceParserTest(unittest.TestCase):
             self.assertIn(("ctl.start", "vendor.qcrild3"), controls)
             self.assertIn(("ctl.stop", "vendor.qcrild3"), controls)
 
+    def test_scans_conditional_shell_radio_controls_with_guard_context(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            bin_dir = root / "bin"
+            bin_dir.mkdir(parents=True)
+            (bin_dir / "init.class_main.sh").write_text(
+                "multisim=`getprop persist.radio.multisim.config`\n"
+                "if [ \"$multisim\" = \"dsds\" ]; then\n"
+                "    if [ \"$qcrild_status\" = \"true\" ]; then\n"
+                "        start vendor.qcrild2\n"
+                "    else\n"
+                "        start vendor.ril-daemon2\n"
+                "    fi\n"
+                "fi\n",
+                encoding="utf-8",
+            )
+            rows = self.module.scan_shell_files(root)
+            by_target = {row["target"]: row for row in rows}
+            self.assertEqual(by_target["vendor.qcrild2"]["verb"], "start")
+            self.assertEqual(by_target["vendor.ril-daemon2"]["verb"], "start")
+            context = "\n".join(by_target["vendor.qcrild2"]["context"])
+            self.assertIn("multisim", context)
+            self.assertIn("qcrild_status", context)
+
     def test_summary_does_not_invent_extra_ril_instances(self) -> None:
         evidence = {
             "properties": [

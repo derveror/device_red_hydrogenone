@@ -2,22 +2,54 @@
 
 This directory defines the evidence and integrity contract for the stock package used to rebuild the LineageOS 22.2 device and vendor trees.
 
-## Expected source
+## Verified source identity
 
 ```text
 Archive: [FileSell]_H1A1000.082ho.01.00.10r.118_USERDEBUG_FASTBOOT.rar
-Google Drive reported size: 1,851,974,911 bytes
-Expected update label: H1A1000.082ho.01.00.10r.118
-Claimed source Android version: Android 9
+Size: 1,851,974,911 bytes
+SHA-256: 6fcc610fd86b9b9152f1fcc9d0ca24a4ecba340d8dfd3f011495e2b8fc4d9c6c
+Container: RAR5, one volume, non-solid
+Visible entries: 79 total, 78 regular files
+Encryption: all 78 regular files use RAR5 AES
 ```
 
-The Android version is not considered verified from the filename. It must later be confirmed from the extracted `build.prop`/property files, SDK level, build fingerprint, security patch, VNDK properties, boot header, and runtime capture.
+The original archive was supplied as eight parts because the connected Google Drive path rejects an individual download larger than 268,435,456 bytes. All eight part hashes matched `parts.sha256`; concatenation produced the exact size and SHA-256 in `original.sha256`.
 
-The connected Google Drive download path rejects an individual file larger than 268,435,456 bytes. Split parts must therefore remain below this boundary. The project standard is 240 MiB per part.
+Detailed evidence:
 
-## Creating uploadable parts
+- `ACQUISITION.md` — reconstruction and encryption report;
+- `archive-entries.tsv` — every archive entry visible before decryption;
+- `original.sha256` — canonical RAR digest;
+- `parts.sha256` — all eight part digests;
+- `SECONDARY_BUILD_METADATA.md` — exact-build public properties, retained as secondary evidence.
 
-Run in the directory containing the original RAR:
+## Current gate
+
+Archive headers are readable, but the file data is encrypted. The archive comment states that the password is supplied by the archive vendor as a sold/paid item. The project will not attempt password cracking or bypass that access control.
+
+The stock extraction phase can continue from either of these legitimate inputs:
+
+1. the correct archive password; or
+2. the complete locally extracted `fastboot/` directory, accompanied by a `sha256sum` manifest.
+
+Until one of those inputs exists, no claim is made about the bytes inside `boot.img`, `system.img`, `vendor.img`, `NON-HLOS.bin`, the partition XML files, or any other encrypted member.
+
+## Exact-build metadata already established as secondary evidence
+
+A public build-property archive contains files whose identity is exactly:
+
+```text
+H1A1000.082ho.01.00.10r.118
+RED/HydrogenONE/HydrogenONE:9/PKQ1.190118.001/118:userdebug/release-keys
+```
+
+It reports Android 9, SDK 28, first API level 27, A/B updates, system-as-root, Treble, platform `msm8998`, system security patch `2019-04-05`, and vendor security patch `2018-08-05`.
+
+Those facts may guide investigation, but they do not replace comparison with the decrypted files. See `SECONDARY_BUILD_METADATA.md` for the pinned source commit and blob hashes.
+
+## Reproducible splitting procedure
+
+The original parts were created using 240 MiB chunks:
 
 ```bash
 mkdir -p H1A1000_r118_parts
@@ -40,67 +72,23 @@ sha256sum \
   > original.sha256
 ```
 
-Expected part names begin with:
+The checked-in `tools/analysis/reconstruct_stock.py` validates manifest syntax, verifies every part before writing output, concatenates into a temporary file, verifies the final digest, and atomically installs the reconstructed archive.
 
-```text
-H1A1000_r118.rar.00.part
-H1A1000_r118.rar.01.part
-H1A1000_r118.rar.02.part
-```
+## Extraction procedure after password availability
 
-Upload every `.part` file, `parts.sha256`, and `original.sha256`. Do not recompress the parts or edit either manifest.
-
-## Manifest format
-
-`parts.sha256` uses the standard `sha256sum` format, one part per line:
-
-```text
-<64 lowercase hex characters><two spaces><filename>
-```
-
-The manifest order is the reconstruction order. Filenames must be basenames only; directory separators, `.` and `..` entries, duplicate names, malformed hashes, absent parts, and hash mismatches are rejected.
-
-## Reconstruction
-
-Read the final digest from `original.sha256`, then run:
+Use a new empty destination and never modify the evidence archive:
 
 ```bash
-python3 tools/analysis/reconstruct_stock.py \
-  --parts-dir /path/to/H1A1000_r118_parts \
-  --manifest /path/to/H1A1000_r118_parts/parts.sha256 \
-  --output '/path/to/[FileSell]_H1A1000.082ho.01.00.10r.118_USERDEBUG_FASTBOOT.rar' \
-  --expected-sha256 '<digest copied from original.sha256>'
+archive='[FileSell]_H1A1000.082ho.01.00.10r.118_USERDEBUG_FASTBOOT.rar'
+out='stock-r118-extracted'
+
+7zz t -p"$R118_ARCHIVE_PASSWORD" "$archive"
+mkdir "$out"
+7zz x -p"$R118_ARCHIVE_PASSWORD" -o"$out" -- "$archive"
+find "$out" -type f -print0 | sort -z | xargs -0 sha256sum > extracted-files.sha256
 ```
 
-The tool performs these operations in order:
-
-1. validates manifest syntax and filenames;
-2. validates every part SHA-256 without creating a partial output;
-3. concatenates parts in manifest order into `<output>.partial`;
-4. flushes and `fsync`s the partial file;
-5. verifies the reconstructed RAR SHA-256;
-6. atomically renames the verified partial file to the requested output path.
-
-An existing output file is preserved. Replacing it requires the explicit `--replace` option.
-
-## Required verification before extraction
-
-The archive is not accepted as stock evidence until all commands below succeed:
-
-```bash
-stat --printf='%s  %n\n' \
-  '[FileSell]_H1A1000.082ho.01.00.10r.118_USERDEBUG_FASTBOOT.rar'
-
-sha256sum \
-  '[FileSell]_H1A1000.082ho.01.00.10r.118_USERDEBUG_FASTBOOT.rar'
-
-7z t \
-  '[FileSell]_H1A1000.082ho.01.00.10r.118_USERDEBUG_FASTBOOT.rar'
-```
-
-The recorded size must equal `1,851,974,911` bytes. The SHA-256 must equal the digest in `original.sha256`. `7z t` must report no archive, CRC, or data errors.
-
-After the RAR test succeeds, extraction is performed into a new empty directory. The original RAR and parts remain read-only evidence. The extracted package receives its own complete path/size/SHA-256 manifest before any image is mounted or modified.
+The password must be provided through an environment variable or interactive prompt and must never be committed to Git.
 
 ## Security boundary
 
@@ -116,12 +104,20 @@ The stock package can contain device-specific partitions or files. Analysis outp
 
 Only generic firmware, configuration, executable metadata, hashes, dependency records, and explicitly reviewed redistributable vendor material may enter the project repositories.
 
-## Entry gate for the stock extraction phase
+## Entry gate for image analysis
 
-The next plan, `docs/superpowers/plans/2026-09-02-hydrogenone-stock118-extraction.md`, is not created or executed until these facts exist:
+Already satisfied:
 
-- verified reconstructed archive SHA-256;
-- exact archive size;
-- successful `7z t` output;
-- extracted package file manifest with SHA-256 values;
-- confirmed Android release, SDK, fingerprint, build ID, security patch, and product identity from extracted files.
+- all eight part hashes verified;
+- reconstructed size verified;
+- reconstructed SHA-256 verified;
+- RAR5 headers and complete entry inventory read successfully;
+- Android release and build identity independently corroborated as secondary evidence.
+
+Still required:
+
+- legitimate password or locally extracted contents;
+- successful full `7zz t` with the password;
+- complete extracted-file SHA-256 manifest;
+- direct comparison of extracted `build.prop` files with the secondary capture;
+- image-format, partition, boot-header, VINTF, init, ELF, firmware, and SELinux analysis.

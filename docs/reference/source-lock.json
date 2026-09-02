@@ -7,22 +7,40 @@
     "android_api_level": 35
   },
   "authoritative_stock": {
-    "name": "[FileSell]_H1A1000.082ho.01.00.10r.118_USERDEBUG_FASTBOOT.rar",
-    "size_bytes": 1851974911,
-    "sha256": "6fcc610fd86b9b9152f1fcc9d0ca24a4ecba340d8dfd3f011495e2b8fc4d9c6c",
+    "name": "H1A1000.082ho.01.00.10r.118_userdebug_fastboot.rar",
+    "size_bytes": 1850671123,
+    "sha256": "7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e",
     "split_part_count": 8,
     "split_parts_verified": true,
     "reconstructed_archive_verified": true,
+    "archive_test_status": "passed",
     "archive_format": "RAR5",
-    "archive_entry_count": 79,
-    "encrypted_regular_file_count": 78,
-    "extraction_status": "blocked_by_archive_password",
-    "status": "byte-identical archive reconstructed; content extraction pending legitimate password",
-    "authority": "archive identity is authoritative; file contents become authoritative only after password-based extraction, per-file hashing, and image validation",
+    "archive_encrypted": false,
+    "archive_object_count": 76,
+    "archive_regular_file_count": 74,
+    "archive_directory_count": 2,
+    "declared_extracted_bytes": 4630918949,
+    "extraction_status": "verified_complete",
+    "build_identity_verified_from_extracted_files": true,
+    "authority": "canonical RED .118 stock source for file, partition, boot, VINTF, init, ELF, firmware, and Android 15 migration analysis",
+    "image_hashes": {
+      "boot.img": "8e120a2920f5d4eec65cb5929d31fe271738af85b218d5adb96035eb28806af6",
+      "system.img": "5cb9695ecae27ec092b9413a73a90a2178cb815d76b8f197cda5cadee292c1dc",
+      "vendor.img": "8f564431ce915e1e7e5c51b0db48e6154fdc3785494fbee512734a7ae3002156",
+      "ramdisk.img": "1cef7d02466e0f3658270a8574b18e48f67b25d5e603cf0e182f820e79bb527f",
+      "NON-HLOS.bin": "07ce51680158521d6c51fd24291d9d6494594ec5f2ec82221fefc19841f387c5",
+      "BTFM.bin": "8cf8b8816569e053ab4336dff6908ae5e93ed5051040600a41a764538ba5389e",
+      "adspso.bin": "d0c8b604dd7081cf9e2d94dd5b57d99bca99141a207791fe36901f9886dd4467",
+      "persist.img": "583bd0b844b1720edaaf053cd3ff22681117236397f5132d119352fec7a866e3",
+      "userdata.img": "2d6208cabf93085540cf658067d9d2301b3c6efa53e21a05e511104cd69dd841"
+    },
     "reports": [
       "docs/stock/h1a1000-r118/ACQUISITION.md",
-      "docs/stock/h1a1000-r118/archive-entries.tsv",
-      "docs/stock/h1a1000-r118/SECONDARY_BUILD_METADATA.md"
+      "docs/stock/h1a1000-r118/ANALYSIS_STATUS.md",
+      "docs/stock/h1a1000-r118/archive-files.tsv",
+      "docs/stock/h1a1000-r118/extracted-files.sha256",
+      "docs/stock/h1a1000-r118/inventory-summary.json",
+      "docs/stock/h1a1000-r118/DONOR_STOCK_COMPARISON.md"
     ]
   },
   "reference_archives": [
@@ -149,5 +167,28 @@
     "main_commit": "a9e9d30959f1844e3e5ef05cb1c51a05ac29b14e",
     "archival_branch": "legacy-pre-stock118-rework",
     "development_branch": "lineage-22.2-stock118-rework"
+  },
+  "alternate_stock_packages": [
+    {
+      "name": "[FileSell]_H1A1000.082ho.01.00.10r.118_USERDEBUG_FASTBOOT.rar",
+      "size_bytes": 1851974911,
+      "sha256": "6fcc610fd86b9b9152f1fcc9d0ca24a4ecba340d8dfd3f011495e2b8fc4d9c6c",
+      "split_part_count": 8,
+      "split_parts_verified": true,
+      "reconstructed_archive_verified": true,
+      "archive_format": "RAR5",
+      "archive_object_count": 79,
+      "encrypted_regular_file_count": 78,
+      "extraction_status": "blocked_by_archive_password",
+      "role": "alternate byte-verified package; not used as the canonical extracted source"
+    }
+  ],
+  "analysis_evidence": {
+    "filename": "hydrogenone-r118-analysis-evidence-2026-09-02.tar.zst",
+    "size_bytes": 2085673,
+    "sha256": "c3a1ef6be4a8f67220cb7252344ef38d4a41c36fdc8cd4ac8c9492b6444b7527",
+    "member_count": 81,
+    "contains_proprietary_images_or_payload": false,
+    "purpose": "reproducible inventories, dependency graphs, reports, and analysis scripts"
   }
 }

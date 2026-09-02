@@ -22,20 +22,14 @@ jobs:
           python3 -m json.tool docs/reference/source-lock.json >/dev/null
           python3 -m json.tool docs/reference/archive-inventory.json >/dev/null
           python3 -m json.tool docs/reference/archive-comparisons.json >/dev/null
-          python3 tools/analysis/source_lock.py \
-            --validate \
-            --lock docs/reference/source-lock.json \
-            --inventory docs/reference/archive-inventory.json
+          python3 -m json.tool docs/stock/h1a1000-r118/inventory-summary.json >/dev/null
+          python3 tools/analysis/source_lock.py             --validate             --lock docs/reference/source-lock.json             --inventory docs/reference/archive-inventory.json
 
       - name: Run analysis unit tests
         shell: bash
         run: |
           set -euo pipefail
-          PYTHONPATH="$PWD/tests:$PWD" python3 -m unittest -v \
-            tests.test_archive_inventory \
-            tests.test_reconstruct_stock \
-            tests.test_source_lock \
-            tests.test_tree_compare
+          PYTHONPATH="$PWD/tests:$PWD" python3 -m unittest -v             tests.test_archive_inventory             tests.test_reconstruct_stock             tests.test_source_lock             tests.test_tree_compare
 
       - name: Run complete tree contract audit
         shell: bash
@@ -43,16 +37,20 @@ jobs:
           set -euo pipefail
           python3 tests/test_full_tree.py
 
-      - name: Verify stock intake records
+      - name: Verify canonical stock records
         shell: bash
         run: |
           set -euo pipefail
           test "$(wc -l < docs/stock/h1a1000-r118/parts.sha256)" -eq 8
-          test "$(wc -l < docs/stock/h1a1000-r118/archive-entries.tsv)" -eq 80
-          grep -Fq '6fcc610fd86b9b9152f1fcc9d0ca24a4ecba340d8dfd3f011495e2b8fc4d9c6c' \
-            docs/stock/h1a1000-r118/original.sha256
+          test "$(wc -l < docs/stock/h1a1000-r118/archive-files.tsv)" -eq 75
+          test "$(wc -l < docs/stock/h1a1000-r118/extracted-files.sha256)" -eq 74
+          grep -Fq '7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e'             docs/stock/h1a1000-r118/original.sha256
           grep -Fq '"android_release": "15"' docs/reference/source-lock.json
           grep -Fq '"android_api_level": 35' docs/reference/source-lock.json
-          grep -Fq '"extraction_status": "blocked_by_archive_password"' docs/reference/source-lock.json
+          grep -Fq '"extraction_status": "verified_complete"' docs/reference/source-lock.json
+          grep -Fq '"archive_encrypted": false' docs/reference/source-lock.json
+          grep -Fq 'c3a1ef6be4a8f67220cb7252344ef38d4a41c36fdc8cd4ac8c9492b6444b7527'             docs/stock/h1a1000-r118/analysis-evidence.sha256
+          test -f docs/stock/h1a1000-r118/ANALYSIS_STATUS.md
+          test -f docs/stock/h1a1000-r118/DONOR_STOCK_COMPARISON.md
           ! find . -type d -path './device/red/msm8998-common' -print -quit | grep -q .
           ! find . -type d -path './vendor/red/msm8998-common' -print -quit | grep -q .

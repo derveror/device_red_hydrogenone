@@ -1,55 +1,55 @@
 # RED Hydrogen One `.118` stock acquisition report
 
-**Captured:** 2026-09-02
+**Captured:** 2026-09-02  
+**Status:** canonical archive reconstructed, tested, extracted, and inventoried
 
-## Reconstruction verification
+## Canonical source
 
-- Canonical archive: `[FileSell]_H1A1000.082ho.01.00.10r.118_USERDEBUG_FASTBOOT.rar`
-- Reconstructed size: `1851974911` bytes
-- SHA-256: `6fcc610fd86b9b9152f1fcc9d0ca24a4ecba340d8dfd3f011495e2b8fc4d9c6c`
-- Split parts: `8/8` matched the supplied `parts.sha256` manifest.
-- Reconstructed archive size and SHA-256 matched `original.sha256` exactly.
-- Container: RAR5, one volume, non-solid, 79 blocks.
-- Archive headers are readable; all 78 regular files are AES-encrypted.
-- Extraction status: blocked by the archive password. No image payload has been trusted or analyzed as extracted stock yet.
+```text
+H1A1000.082ho.01.00.10r.118_userdebug_fastboot.rar
+size:    1,850,671,123 bytes
+SHA-256: 7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e
+format:  RAR5, one volume, non-solid, unencrypted
+```
 
-## Archive contents visible without decryption
+All eight split parts matched `parts.sha256`. Concatenation produced the exact size and digest in `original.sha256`. A complete 7-Zip test returned `Everything is Ok`, and extraction returned the same result:
 
-- Entries: `79` (`78` files, `1` directory).
-- Declared uncompressed file size: `4635168668` bytes.
-- Key payloads include `boot.img`, `ramdisk.img`, `system.img`, `vendor.img`, `NON-HLOS.bin`, Qualcomm firehose/GPT/rawprogram/patch files, and boot-chain images.
+```text
+Folders:    2
+Files:      74
+Size:       4,630,918,949 bytes
+Compressed: 1,850,671,123 bytes
+```
 
-### Largest declared files
+`archive-files.tsv` and `extracted-files.sha256` record every extracted fastboot-package file. The canonical package contains `boot.img`, `system.img`, `vendor.img`, `ramdisk.img`, modem/DSP/Bluetooth firmware, Qualcomm GPT/rawprogram/patch data, boot-chain images, flash scripts, and build metadata.
 
-| Path | Declared size (bytes) | Encrypted |
-|---|---:|:---:|
-| `fastboot/system.img` | 3746394440 | yes |
-| `fastboot/vendor.img` | 593264872 | yes |
-| `fastboot/NON-HLOS.bin` | 109105152 | yes |
-| `fastboot/boot.img` | 46495016 | yes |
-| `fastboot/otafs_ufs_2gb.img` | 36364976 | yes |
-| `fastboot/persist.img` | 33554432 | yes |
-| `fastboot/mdtp.img` | 17808306 | yes |
-| `fastboot/adspso.bin` | 16777216 | yes |
-| `fastboot/splash.img` | 11075640 | yes |
-| `fastboot/userdata.img` | 5756588 | yes |
-| `fastboot/adb.exe` | 5462626 | yes |
-| `fastboot/xbl.elf` | 2686892 | yes |
-| `fastboot/tz.mbn` | 1912832 | yes |
-| `fastboot/ramdisk.img` | 1905816 | yes |
-| `fastboot/fastboot.exe` | 1339392 | yes |
+## Important image identities
 
-## Encryption boundary
+| Image | Bytes | SHA-256 |
+|---|---:|---|
+| `boot.img` | 46,495,016 | `8e120a2920f5d4eec65cb5929d31fe271738af85b218d5adb96035eb28806af6` |
+| `system.img` | 3,746,394,440 | `5cb9695ecae27ec092b9413a73a90a2178cb815d76b8f197cda5cadee292c1dc` |
+| `vendor.img` | 593,264,872 | `8f564431ce915e1e7e5c51b0db48e6154fdc3785494fbee512734a7ae3002156` |
+| `ramdisk.img` | 1,905,816 | `1cef7d02466e0f3658270a8574b18e48f67b25d5e603cf0e182f820e79bb527f` |
+| `NON-HLOS.bin` | 109,105,152 | `07ce51680158521d6c51fd24291d9d6494594ec5f2ec82221fefc19841f387c5` |
+| `BTFM.bin` | 421,888 | `8cf8b8816569e053ab4336dff6908ae5e93ed5051040600a41a764538ba5389e` |
+| `adspso.bin` | 16,777,216 | `d0c8b604dd7081cf9e2d94dd5b57d99bca99141a207791fe36901f9886dd4467` |
 
-The RAR comment states that the password is supplied by the archive vendor as a sold/paid item. Public site-name and contact-string candidates were tested only to rule out a published generic password; 7-Zip reported `Wrong password`. No password cracking or access-control bypass is part of this project. The next accepted input is either the legitimate password or a locally extracted copy of the archive contents.
+`persist.img` and `userdata.img` were hashed and format-inspected, but their contents are not published or used as vendor material.
+
+## Alternate encrypted package
+
+A different package supplied earlier remains byte-verified but is not the canonical extracted source:
+
+```text
+[FileSell]_H1A1000.082ho.01.00.10r.118_USERDEBUG_FASTBOOT.rar
+size:    1,851,974,911 bytes
+SHA-256: 6fcc610fd86b9b9152f1fcc9d0ca24a4ecba340d8dfd3f011495e2b8fc4d9c6c
+status:  RAR5 headers readable; 78 regular files encrypted
+```
+
+Its listing remains in `archive-entries.tsv`; its checksums are preserved under the `encrypted-alternate-*` filenames. The unencrypted archive supersedes it for analysis without erasing its provenance.
 
 ## Trust boundary
 
-This report proves that the supplied split files reconstruct the expected byte-identical RAR. It does not prove the contents of any encrypted member. Build properties found independently in a public exact-build archive are recorded separately and remain secondary evidence until the RAR payload is decrypted and compared.
-
-## Next verification after password availability
-
-1. Test the complete archive with 7-Zip.
-2. Extract into a clean directory without overwriting unrelated files.
-3. Hash every extracted member and validate image formats.
-4. Confirm Android release, SDK, fingerprint, security patches, partition metadata, boot header, VINTF, init, and proprietary payload directly from the extracted images.
+The canonical archive identity and extraction are now authoritative. This does **not** mean every Android 9 file belongs in LineageOS 22.2. Each file still requires classification as AOSP-built, proprietary blob, firmware, configuration, obsolete/debug material, or prohibited per-device data, followed by Android 15 compatibility analysis.

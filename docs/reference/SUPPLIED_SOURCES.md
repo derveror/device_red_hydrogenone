@@ -1,6 +1,6 @@
 # Supplied source lock
 
-This file records the exact archives supplied for the RED Hydrogen One LineageOS 22.2 bring-up. Archive-level SHA-256 values are authoritative for this analysis session.
+This file records the exact inputs used for the RED Hydrogen One LineageOS 22.2 bring-up.
 
 ## Target
 
@@ -8,30 +8,24 @@ This file records the exact archives supplied for the RED Hydrogen One LineageOS
 - Android target: Android 15 / API 35
 - Device: RED Hydrogen One H1A1000 (`hydrogenone`)
 - SoC: Qualcomm MSM8998
-- Repository topology: `device/red/hydrogenone`, `vendor/red/hydrogenone`, and a separately versioned kernel tree. No MSM8998 common repository is permitted.
+- Repository topology: `device/red/hydrogenone`, `vendor/red/hydrogenone`, and a separate kernel tree. No RED MSM8998 common repository is permitted.
 
-## Git baseline
+## Git safety boundary
 
-- Existing baseline commit: `a9e9d30959f1844e3e5ef05cb1c51a05ac29b14e`
-- Immutable archival branch: `legacy-pre-stock118-rework`
-- Rework branch: `lineage-22.2-stock118-rework`
+- Historical baseline commit: `a9e9d30959f1844e3e5ef05cb1c51a05ac29b14e`
+- Archival branch: `legacy-pre-stock118-rework`
+- Development branch: `lineage-22.2-stock118-rework`
 
-## Stock source
+## Canonical stock source
 
-- File: `[FileSell]_H1A1000.082ho.01.00.10r.118_USERDEBUG_FASTBOOT.rar`
-- Supplied as eight reconstructable parts: seven files of `251,658,240` bytes and one file of `90,367,231` bytes.
-- All `8/8` part SHA-256 values match the supplied `parts.sha256` manifest.
-- Reconstructed size: `1,851,974,911` bytes.
-- Reconstructed SHA-256: `6fcc610fd86b9b9152f1fcc9d0ca24a4ecba340d8dfd3f011495e2b8fc4d9c6c`, exactly matching `original.sha256`.
-- Container: RAR5, one volume, non-solid, 79 archive blocks.
-- Visible contents: 78 regular files and one directory; every regular file is AES-encrypted.
-- Current state: archive identity is verified, but extraction is blocked by the archive vendor's legitimate password. Full image-level stock authority begins only after decryption, per-file hashing, and image validation.
-- Recorded evidence:
-  - `docs/stock/h1a1000-r118/ACQUISITION.md`
-  - `docs/stock/h1a1000-r118/archive-entries.tsv`
-  - `docs/stock/h1a1000-r118/original.sha256`
-  - `docs/stock/h1a1000-r118/parts.sha256`
-  - `docs/stock/h1a1000-r118/SECONDARY_BUILD_METADATA.md`
+```text
+H1A1000.082ho.01.00.10r.118_userdebug_fastboot.rar
+size:    1,850,671,123 bytes
+SHA-256: 7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e
+status:  all 8 parts verified; RAR test passed; 74 files extracted successfully
+```
+
+The older `[FileSell]` archive remains recorded as an encrypted alternate with SHA-256 `6fcc610fd86b9b9152f1fcc9d0ca24a4ecba340d8dfd3f011495e2b8fc4d9c6c`.
 
 ## Reference archives
 
@@ -51,9 +45,9 @@ This file records the exact archives supplied for the RED Hydrogen One LineageOS
 | `proprietary_vendor_oneplus_msm8998-common-lineage-22.2.zip` | `de920245bb19635422643ba46d4c6e03a6cd6668` | 736 | `2e805b08de0142b4a683e9bf7648e840b2a82aa091b49b9b8f8de0cb38415a64` |
 | `proprietary_vendor_razer_cheryl-lineage-22.2.zip` | `a7725d8bf663838d755aaff953a16c58450e533d` | 731 | `57ddb1285d0d23536f48c123e822afbd56df395d0a48d8023bedac06d1909733` |
 
-## Initial comparison facts
+## Initial conclusions
 
-- The two supplied Hydrogen One ZIP files contain the same 423 relative files and every file is byte-identical, despite their different archive SHA-256 values.
-- The current Hydrogen One tree and the supplied mata tree share 299 relative paths; 253 of those paths are byte-identical. Existing mata-derived content is therefore historical input, not presumed RED hardware truth.
-- OnePlus and Nubia MSM8998 common device trees share 59 relative paths, but only 8 are byte-identical. Their common layers are manufacturer-family implementations, not a universal MSM8998 template.
-- Donor common trees are analysis inputs only. Adopted open configuration is flattened into `device/red/hydrogenone`; proprietary payload and generated proprietary module declarations belong to `vendor/red/hydrogenone`.
+- The existing Hydrogen One tree shares 299 relative paths with mata, 253 byte-identically. Donor-derived content remains historical input, not RED hardware truth.
+- OnePlus and Nubia device-common trees share 59 relative paths but only eight byte-identically, proving that their common layers are manufacturer-family implementations rather than a universal MSM8998 template.
+- Stock-versus-vendor comparison found real Qualcomm-common blobs, but only a minority of each donor list is byte-identical to RED `.118`.
+- Donor common trees remain analysis inputs. Selected open configuration is flattened into `device/red/hydrogenone`; proprietary RED payload belongs in `vendor/red/hydrogenone`.

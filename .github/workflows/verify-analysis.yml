@@ -23,6 +23,10 @@ jobs:
           python3 -m json.tool docs/reference/archive-inventory.json >/dev/null
           python3 -m json.tool docs/reference/archive-comparisons.json >/dev/null
           python3 -m json.tool docs/stock/h1a1000-r118/inventory-summary.json >/dev/null
+          python3 -m json.tool docs/stock/h1a1000-r118/boot-image-contract.json >/dev/null
+          python3 -m json.tool docs/stock/h1a1000-r118/radio-init-evidence.json >/dev/null
+          python3 -m json.tool docs/stock/h1a1000-r118/radio-all-layers-evidence.json >/dev/null
+          python3 -m json.tool docs/stock/h1a1000-r118/radio-shell-evidence.json >/dev/null
           python3 tools/analysis/source_lock.py \
             --validate \
             --lock docs/reference/source-lock.json \
@@ -71,3 +75,14 @@ jobs:
           test -f docs/stock/h1a1000-r118/DONOR_STOCK_COMPARISON.md
           ! find . -type d -path './device/red/msm8998-common' -print -quit | grep -q .
           ! find . -type d -path './vendor/red/msm8998-common' -print -quit | grep -q .
+
+      - name: Verify canonical RED .118 boot payload
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(stat -c %s prebuilt/Image.gz-dtb)" -eq 37015950
+          echo '584ed86bab46bf57c2cd6b6b48ac4026c5d24a70d57bcdd04472d39c5591064d  prebuilt/Image.gz-dtb' | sha256sum -c -
+          grep -Fq '# Linux/arm64 4.4.153 Kernel Configuration' prebuilt/stock_kernel.config
+          grep -Eq '^BOARD_BOOT_HEADER_VERSION[[:space:]]*:=[[:space:]]*1$' BoardConfig.mk
+          grep -Eq '^VENDOR_SECURITY_PATCH[[:space:]]*:=[[:space:]]*2018-08-05$' BoardConfig.mk
+          grep -Fq 'BuildFingerprint=RED/HydrogenONE/HydrogenONE:9/PKQ1.190118.001/118:userdebug/release-keys' lineage_hydrogenone.mk

@@ -94,7 +94,7 @@ cc_prebuilt_binary {
         )
         self.assertEqual(
             sorted(payload["vendor_soong_install_outputs"]["vendor/bin/vendor.foo"]),
-            ["vendor.foo.duplicate", "vendor.foo.primary"],
+            ["vendor.foo.duplicate@Android.bp", "vendor.foo.primary@Android.bp"],
         )
 
     def test_distinct_vendor_soong_output_is_green(self) -> None:

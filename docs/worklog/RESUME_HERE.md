@@ -2,8 +2,8 @@
 
 > **READ THIS FILE FIRST AFTER ANY INTERRUPTION.**
 
-**Marker version:** 1  
-**Last completed action file:** `docs/worklog/2026-09-02/0001-persistent-resume-protocol.md`  
+**Marker version:** 2  
+**Last completed action file:** `docs/worklog/2026-09-02/0003-verify-current-vendor-head.md`  
 **Logging protocol active:** YES
 
 ## Current repository checkpoints
@@ -12,21 +12,21 @@
 - Repository: `derveror/device_red_hydrogenone`
 - Branch: `lineage-22.2-stock118-rework`
 - Last non-log project commit observed before enabling worklog: `4036ecea476c5561001310ec17451cb8bcb18adb`
-- Meaning: camera topology/tuning restored from audit-pinned RED `.118` evidence on top of the prior GREEN `.118` build/boot/radio/fstab/vendor-lock work.
+- Logging commits after that do not change device runtime/build behavior.
 
 ### Vendor
 - Repository: `derveror/proprietary_vendor_red_hydrogenone`
 - Branch: `lineage-22.2-android15-contract`
-- Current branch head observed: `6fef3d7c6333602d7114aefa0284a03f5aadb454`
-- Parent: `d30ac19025b348ca61535afaaecb23b95347b2f4`
-- Device cross-tree lock last known to pin: `d30ac19025b348ca61535afaaecb23b95347b2f4`
+- Current verified GREEN head: `6fef3d7c6333602d7114aefa0284a03f5aadb454`
+- Previous device-pinned commit: `d30ac19025b348ca61535afaaecb23b95347b2f4`
+- Comparison result: `6fef3d7c...` is exactly one commit ahead and changes only `.github/workflows/verify-vendor-contract.yml`; proprietary payload/config is unchanged.
 
 ## Canonical stock authority
 
 - Build: `H1A1000.082ho.01.00.10r.118`
 - Android: 9 / API 28; first API 27
 - Archive SHA-256: `7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e`
-- Boot image contract, `.118` kernel, product identity, vendor patch level, radio DSDS/qcrild startup and major static Android 15 ownership contracts are already pinned in the device repository.
+- Boot image contract, exact `.118` transitional kernel, product identity, vendor patch level, radio DSDS/qcrild startup, fstab migration and major Android 15 ownership contracts are pinned and statically tested.
 
 ## Hard architecture constraints
 
@@ -40,10 +40,9 @@
 
 ## Next planned action
 
-1. Compare vendor commit `d30ac190...` to current vendor head `6fef3d7c...`.
-2. Verify whether `6fef3d7c...` changes payload/contract or is verification-only.
-3. If it is a compatible successor, update the device cross-tree lock to the current GREEN vendor head and verify both repositories.
-4. Continue the clean-checkout build-readiness gate leading to an actual LineageOS workspace `lunch` + `m nothing`.
+1. Update `docs/reference/cross-tree-lock.json` to vendor commit `6fef3d7c6333602d7114aefa0284a03f5aadb454`.
+2. Verify permanent device CI/cross-tree checks on the updated lock.
+3. Continue clean-checkout build-readiness work leading to an actual LineageOS workspace `lunch lineage_hydrogenone-userdebug` and `m nothing`.
 
 ## Recovery rule
 

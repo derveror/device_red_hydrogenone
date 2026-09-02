@@ -7,6 +7,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 INIT_QCOM = ROOT / "rootdir" / "etc" / "init" / "hw" / "init.qcom.rc"
+VENDOR_PROP = ROOT / "vendor.prop"
 SHELL_EVIDENCE = ROOT / "docs" / "stock" / "h1a1000-r118" / "radio-shell-evidence.json"
 LAYER_EVIDENCE = ROOT / "docs" / "stock" / "h1a1000-r118" / "radio-all-layers-evidence.json"
 
@@ -40,6 +41,13 @@ class Red118RadioRuntimeContractTest(unittest.TestCase):
         )
         for service in forbidden:
             self.assertNotRegex(text, rf"(?m)^\s*start\s+{re.escape(service)}\s*$", service)
+
+    def test_qcrild_path_does_not_advertise_legacy_rild_library(self) -> None:
+        text = VENDOR_PROP.read_text(encoding="utf-8")
+        self.assertNotRegex(text, r"(?m)^\s*vendor\.rild\.libpath\s*=")
+        self.assertNotIn("stock .109 Qualcomm QMI RIL", text)
+        self.assertIn("RED .118", text)
+        self.assertIn("qcrild", text.lower())
 
 
 if __name__ == "__main__":

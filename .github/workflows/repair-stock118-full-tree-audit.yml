@@ -1,0 +1,80 @@
+name: Repair stock118 full-tree audit
+
+on:
+  push:
+    branches:
+      - lineage-22.2-stock118-rework
+    paths:
+      - .github/workflows/repair-stock118-full-tree-audit.yml
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Replace stale .109 audit constants with canonical evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('tests/test_full_tree.py')
+          text = path.read_text(encoding='utf-8')
+
+          old_kernel = '''# Exact stock kernel hash from verified .109 analysis.\nk=ROOT/'prebuilt/Image.gz-dtb'\nif k.exists():\n    h=hashlib.sha256(k.read_bytes()).hexdigest()\n    if h!='6cf3a70ece8b32dcd6bccf9db1a22c1da29b9b37fe67cc0e4ec9b4f87fec2426':\n        errors.append('stock kernel hash mismatch: '+h)\n'''
+          new_kernel = '''# Exact bring-up kernel identity comes from the canonical RED .118 boot contract.\n# Cross-check the boot contract against the independently generated stock inventory\n# so changing the prebuilt and its expected hash together cannot silently weaken this audit.\nboot_contract_path=ROOT/'docs/stock/h1a1000-r118/boot-image-contract.json'\nstock_inventory_path=ROOT/'docs/stock/h1a1000-r118/inventory-summary.json'\ntry:\n    boot_contract=json.loads(boot_contract_path.read_text(encoding='utf-8'))\n    stock_inventory=json.loads(stock_inventory_path.read_text(encoding='utf-8'))\n    contract_stock_sha=boot_contract.get('authority',{}).get('stock_archive_sha256')\n    inventory_stock_sha=stock_inventory.get('canonical_archive',{}).get('sha256')\n    if not contract_stock_sha or contract_stock_sha != inventory_stock_sha:\n        errors.append('boot contract stock authority does not match canonical inventory')\n    expected_kernel=boot_contract.get('kernel',{})\n    expected_kernel_sha=expected_kernel.get('sha256')\n    expected_kernel_size=expected_kernel.get('size')\n    k=ROOT/'prebuilt/Image.gz-dtb'\n    if k.exists():\n        data=k.read_bytes()\n        h=hashlib.sha256(data).hexdigest()\n        if h != expected_kernel_sha:\n            errors.append('stock kernel hash mismatch: '+h)\n        if len(data) != expected_kernel_size:\n            errors.append(f'stock kernel size mismatch: {len(data)} != {expected_kernel_size}')\nexcept Exception as e:\n    errors.append(f'cannot validate canonical RED .118 kernel contract: {e}')\n'''
+          if text.count(old_kernel) != 1:
+              raise SystemExit(f'expected one stale kernel audit block, found {text.count(old_kernel)}')
+          text = text.replace(old_kernel, new_kernel, 1)
+
+          old_fp = '''if 'BuildFingerprint=RED/HydrogenONE/HydrogenONE:8.1.0/H1A1000.010ho.01.01.01r.109/109:user/release-keys' not in prod:\n    errors.append('missing exact stock BuildFingerprint override')\n'''
+          new_fp = '''try:\n    fingerprint_contract=json.loads((ROOT/'docs/stock/h1a1000-r118/boot-image-contract.json').read_text(encoding='utf-8'))\n    expected_fingerprint=fingerprint_contract.get('build_properties',{}).get('ro.build.fingerprint')\n    if not expected_fingerprint:\n        errors.append('canonical RED .118 boot contract lacks stock fingerprint')\n    elif f'BuildFingerprint={expected_fingerprint}' not in prod:\n        errors.append('missing exact canonical RED .118 BuildFingerprint override')\nexcept Exception as e:\n    errors.append(f'cannot validate canonical RED .118 BuildFingerprint: {e}')\n'''
+          if text.count(old_fp) != 1:
+              raise SystemExit(f'expected one stale fingerprint audit block, found {text.count(old_fp)}')
+          text = text.replace(old_fp, new_fp, 1)
+
+          path.write_text(text, encoding='utf-8')
+          PY
+          grep -q 'canonical RED .118 boot contract' tests/test_full_tree.py
+          ! grep -q '6cf3a70ece8b32dcd6bccf9db1a22c1da29b9b37fe67cc0e4ec9b4f87fec2426' tests/test_full_tree.py
+          ! grep -q 'H1A1000.010ho.01.01.01r.109/109:user/release-keys' tests/test_full_tree.py
+          git diff --check
+
+      - name: Verify repaired audit and complete unit suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tests/test_full_tree.py
+          PYTHONPATH="$PWD/tests:$PWD" python3 - <<'PY'
+          import pathlib
+          import unittest
+          loader=unittest.defaultTestLoader
+          suite=unittest.TestSuite()
+          for path in sorted(pathlib.Path('tests').glob('test_*.py')):
+              if path.name == 'test_full_tree.py':
+                  continue
+              suite.addTests(loader.loadTestsFromName(f'tests.{path.stem}'))
+          result=unittest.TextTestRunner(verbosity=1).run(suite)
+          raise SystemExit(0 if result.wasSuccessful() else 1)
+          PY
+
+      - name: Commit repair and remove one-shot workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm .github/workflows/repair-stock118-full-tree-audit.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add tests/test_full_tree.py .github/workflows/repair-stock118-full-tree-audit.yml
+          git diff --cached --check
+          git commit -m 'tests: bind full-tree audit to canonical RED .118 evidence'
+          git fetch origin lineage-22.2-stock118-rework
+          git rebase origin/lineage-22.2-stock118-rework
+          git push origin HEAD:lineage-22.2-stock118-rework

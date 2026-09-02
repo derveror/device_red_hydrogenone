@@ -1,0 +1,60 @@
+name: Finalize vendor inheritance on current head
+
+on:
+  push:
+    branches:
+      - vendor-inheritance-final
+    paths:
+      - .github/workflows/finalize-vendor-inheritance.yml
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Update full-tree vendor ownership rule
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          path=Path('tests/test_full_tree.py')
+          text=path.read_text(encoding='utf-8')
+          old='''# Vendor hooks must be future-safe, not mandatory for source-only stage.\nboard=(ROOT/'BoardConfig.mk').read_text(errors='ignore') if (ROOT/'BoardConfig.mk').exists() else ''\nprod=(ROOT/'lineage_hydrogenone.mk').read_text(errors='ignore') if (ROOT/'lineage_hydrogenone.mk').exists() else ''\nif '-include vendor/red/hydrogenone/BoardConfigVendor.mk' not in board:\n    errors.append('missing optional BoardConfigVendor hook')\nif 'inherit-product-if-exists, vendor/red/hydrogenone/hydrogenone-vendor.mk' not in prod:\n    errors.append('missing optional vendor product hook')\n'''
+          new='''# A real LineageOS build requires the verified RED .118 vendor tree. Match\n# maintained Lineage device trees and fail early if generated vendor makefiles\n# are absent instead of silently configuring a source-only product.\nboard=(ROOT/'BoardConfig.mk').read_text(errors='ignore') if (ROOT/'BoardConfig.mk').exists() else ''\nprod=(ROOT/'lineage_hydrogenone.mk').read_text(errors='ignore') if (ROOT/'lineage_hydrogenone.mk').exists() else ''\nif not re.search(r'(?m)^\\s*include\\s+vendor/red/hydrogenone/BoardConfigVendor\\.mk\\s*$', board):\n    errors.append('missing mandatory RED BoardConfigVendor include')\nif re.search(r'(?m)^\\s*-include\\s+vendor/red/hydrogenone/BoardConfigVendor\\.mk\\s*$', board):\n    errors.append('RED BoardConfigVendor must not be optional')\nif '$(call inherit-product, vendor/red/hydrogenone/hydrogenone-vendor.mk)' not in prod:\n    errors.append('missing mandatory RED vendor product inheritance')\nif 'inherit-product-if-exists, vendor/red/hydrogenone/hydrogenone-vendor.mk' in prod:\n    errors.append('RED vendor product inheritance must not be optional')\n'''
+          count=text.count(old)
+          if count != 1:
+              raise SystemExit(f'expected one old vendor-hook audit block, found {count}')
+          path.write_text(text.replace(old,new,1), encoding='utf-8')
+          PY
+          git diff --check
+
+      - name: Verify full current contract suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          PYTHONPATH="$PWD/tests:$PWD" python3 -m unittest discover -s tests -p 'test_*.py' -v
+          python3 tests/test_full_tree.py
+          python3 -m json.tool docs/stock/h1a1000-r118/cross-tree-copy-contract.json >/dev/null
+          git diff --check
+
+      - name: Commit verified current-head contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm .github/workflows/finalize-vendor-inheritance.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add BoardConfig.mk lineage_hydrogenone.mk tests/test_vendor_inheritance_contract.py tests/test_full_tree.py \
+            .github/workflows/finalize-vendor-inheritance.yml
+          git diff --cached --check
+          git commit -m 'device: require verified RED vendor tree'
+          git fetch origin vendor-inheritance-final
+          git rebase origin/vendor-inheritance-final
+          git push origin HEAD:vendor-inheritance-final

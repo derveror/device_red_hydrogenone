@@ -1,0 +1,158 @@
+# RED .118 radio shell evidence
+
+Canonical stock SHA-256: `7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e`
+
+`vendor/bin/init.class_main.sh`: size `5903`, SHA-256 `3e1200ce1f54f61a5a1d46a2ec2ab38808f82f2337b43f396bdf13001ab84ce3`.
+`fastboot/Ver_info.txt`: size `1109`, SHA-256 `0c288e0d12eaa3ce3715766104e9f83abd045b39fdc81804499cb613fde23715`.
+
+## MPSS tokens
+
+- `MPSS.AT.2.0.c4-00988-8998_GEN_PACK-1`
+
+## RIL/qcrild shell controls
+
+- `bin/init.class_main.sh:105` — `start ril-daemon`
+  - context: `qcrild_status=false`
+  - context: `fi`
+  - context: `fi`
+  - context: `if [ "$qcrild_status" = "true" ]; then`
+  - context: `stop ril-daemon`
+  - context: `stop vendor.ril-daemon`
+  - context: `start vendor.qcrild`
+  - context: `else`
+- `bin/init.class_main.sh:41` — `stop ril-daemon`
+  - context: `baseband=`getprop ro.baseband``
+  - context: `sgltecsfb=`getprop persist.vendor.radio.sglte_csfb``
+  - context: `datamode=`getprop persist.vendor.data.mode``
+  - context: `qcrild_status=true`
+  - context: `case "$baseband" in`
+  - context: `"apq" | "sda" | "qcs" )`
+  - context: `setprop ro.vendor.radio.noril yes`
+- `bin/init.class_main.sh:100` — `stop ril-daemon`
+  - context: `qcrild_status=false`
+  - context: `fi`
+  - context: `fi`
+  - context: `elif [ "$modem" = "TH" ]; then`
+  - context: `qcrild_status=false`
+  - context: `fi`
+  - context: `fi`
+  - context: `if [ "$qcrild_status" = "true" ]; then`
+- `bin/init.class_main.sh:103` — `start vendor.qcrild`
+  - context: `fi`
+  - context: `elif [ "$modem" = "TH" ]; then`
+  - context: `qcrild_status=false`
+  - context: `fi`
+  - context: `fi`
+  - context: `if [ "$qcrild_status" = "true" ]; then`
+  - context: `stop ril-daemon`
+  - context: `stop vendor.ril-daemon`
+- `bin/init.class_main.sh:43` — `stop vendor.qcrild`
+  - context: `sgltecsfb=`getprop persist.vendor.radio.sglte_csfb``
+  - context: `datamode=`getprop persist.vendor.data.mode``
+  - context: `qcrild_status=true`
+  - context: `case "$baseband" in`
+  - context: `"apq" | "sda" | "qcs" )`
+  - context: `setprop ro.vendor.radio.noril yes`
+  - context: `stop ril-daemon`
+  - context: `stop vendor.ril-daemon`
+- `bin/init.class_main.sh:128` — `start vendor.qcrild2`
+  - context: `else`
+  - context: `setprop persist.vendor.radio.voice.modem.index 0`
+  - context: `fi`
+  - context: `;;`
+  - context: `esac`
+  - context: `multisim=`getprop persist.radio.multisim.config``
+  - context: `if [ "$multisim" = "dsds" ] || [ "$multisim" = "dsda" ]; then`
+  - context: `if [ "$qcrild_status" = "true" ]; then`
+- `bin/init.class_main.sh:134` — `start vendor.qcrild2`
+  - context: `if [ "$multisim" = "dsds" ] || [ "$multisim" = "dsda" ]; then`
+  - context: `if [ "$qcrild_status" = "true" ]; then`
+  - context: `start vendor.qcrild2`
+  - context: `else`
+  - context: `start vendor.ril-daemon2`
+  - context: `fi`
+  - context: `elif [ "$multisim" = "tsts" ]; then`
+  - context: `if [ "$qcrild_status" = "true" ]; then`
+- `bin/init.class_main.sh:135` — `start vendor.qcrild3`
+  - context: `if [ "$qcrild_status" = "true" ]; then`
+  - context: `start vendor.qcrild2`
+  - context: `else`
+  - context: `start vendor.ril-daemon2`
+  - context: `fi`
+  - context: `elif [ "$multisim" = "tsts" ]; then`
+  - context: `if [ "$qcrild_status" = "true" ]; then`
+  - context: `start vendor.qcrild2`
+- `bin/init.class_main.sh:106` — `start vendor.ril-daemon`
+  - context: `fi`
+  - context: `fi`
+  - context: `if [ "$qcrild_status" = "true" ]; then`
+  - context: `stop ril-daemon`
+  - context: `stop vendor.ril-daemon`
+  - context: `start vendor.qcrild`
+  - context: `else`
+  - context: `start ril-daemon`
+- `bin/init.class_main.sh:42` — `stop vendor.ril-daemon`
+  - context: `baseband=`getprop ro.baseband``
+  - context: `sgltecsfb=`getprop persist.vendor.radio.sglte_csfb``
+  - context: `datamode=`getprop persist.vendor.data.mode``
+  - context: `qcrild_status=true`
+  - context: `case "$baseband" in`
+  - context: `"apq" | "sda" | "qcs" )`
+  - context: `setprop ro.vendor.radio.noril yes`
+  - context: `stop ril-daemon`
+- `bin/init.class_main.sh:101` — `stop vendor.ril-daemon`
+  - context: `fi`
+  - context: `fi`
+  - context: `elif [ "$modem" = "TH" ]; then`
+  - context: `qcrild_status=false`
+  - context: `fi`
+  - context: `fi`
+  - context: `if [ "$qcrild_status" = "true" ]; then`
+  - context: `stop ril-daemon`
+- `bin/init.class_main.sh:130` — `start vendor.ril-daemon2`
+  - context: `fi`
+  - context: `;;`
+  - context: `esac`
+  - context: `multisim=`getprop persist.radio.multisim.config``
+  - context: `if [ "$multisim" = "dsds" ] || [ "$multisim" = "dsda" ]; then`
+  - context: `if [ "$qcrild_status" = "true" ]; then`
+  - context: `start vendor.qcrild2`
+  - context: `else`
+- `bin/init.class_main.sh:137` — `start vendor.ril-daemon2`
+  - context: `else`
+  - context: `start vendor.ril-daemon2`
+  - context: `fi`
+  - context: `elif [ "$multisim" = "tsts" ]; then`
+  - context: `if [ "$qcrild_status" = "true" ]; then`
+  - context: `start vendor.qcrild2`
+  - context: `start vendor.qcrild3`
+  - context: `else`
+- `bin/init.class_main.sh:138` — `start vendor.ril-daemon3`
+  - context: `start vendor.ril-daemon2`
+  - context: `fi`
+  - context: `elif [ "$multisim" = "tsts" ]; then`
+  - context: `if [ "$qcrild_status" = "true" ]; then`
+  - context: `start vendor.qcrild2`
+  - context: `start vendor.qcrild3`
+  - context: `else`
+  - context: `start vendor.ril-daemon2`
+
+## Decision lines
+
+- line 36: `qcrild_status=true`
+- line 61: `if [ -f /vendor/firmware_mnt/verinfo/ver_info.txt ]; then`
+- line 62: `modem=`cat /vendor/firmware_mnt/verinfo/ver_info.txt |`
+- line 64: `sed 's/.*MPSS.\(.*\)/\1/g' | cut -d \. -f 1``
+- line 66: `version=`cat /vendor/firmware_mnt/verinfo/ver_info.txt |`
+- line 71: `qcrild_status=false`
+- line 75: `version=`cat /vendor/firmware_mnt/verinfo/ver_info.txt |`
+- line 80: `qcrild_status=false`
+- line 84: `version=`cat /vendor/firmware_mnt/verinfo/ver_info.txt |`
+- line 89: `qcrild_status=false`
+- line 93: `qcrild_status=false`
+- line 97: `if [ "$qcrild_status" = "true" ]; then`
+- line 124: `multisim=`getprop persist.radio.multisim.config``
+- line 126: `if [ "$multisim" = "dsds" ] || [ "$multisim" = "dsda" ]; then`
+- line 127: `if [ "$qcrild_status" = "true" ]; then`
+- line 132: `elif [ "$multisim" = "tsts" ]; then`
+- line 133: `if [ "$qcrild_status" = "true" ]; then`

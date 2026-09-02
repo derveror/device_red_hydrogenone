@@ -1,0 +1,315 @@
+{
+  "authority": {
+    "stock_archive_sha256": "7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e",
+    "stock_build": "H1A1000.082ho.01.00.10r.118"
+  },
+  "init_class_main": {
+    "decision_lines": [
+      {
+        "line": 36,
+        "text": "qcrild_status=true"
+      },
+      {
+        "line": 61,
+        "text": "if [ -f /vendor/firmware_mnt/verinfo/ver_info.txt ]; then"
+      },
+      {
+        "line": 62,
+        "text": "modem=`cat /vendor/firmware_mnt/verinfo/ver_info.txt |"
+      },
+      {
+        "line": 64,
+        "text": "sed 's/.*MPSS.\\(.*\\)/\\1/g' | cut -d \\. -f 1`"
+      },
+      {
+        "line": 66,
+        "text": "version=`cat /vendor/firmware_mnt/verinfo/ver_info.txt |"
+      },
+      {
+        "line": 71,
+        "text": "qcrild_status=false"
+      },
+      {
+        "line": 75,
+        "text": "version=`cat /vendor/firmware_mnt/verinfo/ver_info.txt |"
+      },
+      {
+        "line": 80,
+        "text": "qcrild_status=false"
+      },
+      {
+        "line": 84,
+        "text": "version=`cat /vendor/firmware_mnt/verinfo/ver_info.txt |"
+      },
+      {
+        "line": 89,
+        "text": "qcrild_status=false"
+      },
+      {
+        "line": 93,
+        "text": "qcrild_status=false"
+      },
+      {
+        "line": 97,
+        "text": "if [ \"$qcrild_status\" = \"true\" ]; then"
+      },
+      {
+        "line": 124,
+        "text": "multisim=`getprop persist.radio.multisim.config`"
+      },
+      {
+        "line": 126,
+        "text": "if [ \"$multisim\" = \"dsds\" ] || [ \"$multisim\" = \"dsda\" ]; then"
+      },
+      {
+        "line": 127,
+        "text": "if [ \"$qcrild_status\" = \"true\" ]; then"
+      },
+      {
+        "line": 132,
+        "text": "elif [ \"$multisim\" = \"tsts\" ]; then"
+      },
+      {
+        "line": 133,
+        "text": "if [ \"$qcrild_status\" = \"true\" ]; then"
+      }
+    ],
+    "path": "vendor/bin/init.class_main.sh",
+    "sha256": "3e1200ce1f54f61a5a1d46a2ec2ab38808f82f2337b43f396bdf13001ab84ce3",
+    "size": 5903
+  },
+  "radio_shell_controls": [
+    {
+      "context": [
+        "qcrild_status=false",
+        "fi",
+        "fi",
+        "if [ \"$qcrild_status\" = \"true\" ]; then",
+        "stop ril-daemon",
+        "stop vendor.ril-daemon",
+        "start vendor.qcrild",
+        "else"
+      ],
+      "line": 105,
+      "path": "bin/init.class_main.sh",
+      "target": "ril-daemon",
+      "verb": "start"
+    },
+    {
+      "context": [
+        "baseband=`getprop ro.baseband`",
+        "sgltecsfb=`getprop persist.vendor.radio.sglte_csfb`",
+        "datamode=`getprop persist.vendor.data.mode`",
+        "qcrild_status=true",
+        "case \"$baseband\" in",
+        "\"apq\" | \"sda\" | \"qcs\" )",
+        "setprop ro.vendor.radio.noril yes"
+      ],
+      "line": 41,
+      "path": "bin/init.class_main.sh",
+      "target": "ril-daemon",
+      "verb": "stop"
+    },
+    {
+      "context": [
+        "qcrild_status=false",
+        "fi",
+        "fi",
+        "elif [ \"$modem\" = \"TH\" ]; then",
+        "qcrild_status=false",
+        "fi",
+        "fi",
+        "if [ \"$qcrild_status\" = \"true\" ]; then"
+      ],
+      "line": 100,
+      "path": "bin/init.class_main.sh",
+      "target": "ril-daemon",
+      "verb": "stop"
+    },
+    {
+      "context": [
+        "fi",
+        "elif [ \"$modem\" = \"TH\" ]; then",
+        "qcrild_status=false",
+        "fi",
+        "fi",
+        "if [ \"$qcrild_status\" = \"true\" ]; then",
+        "stop ril-daemon",
+        "stop vendor.ril-daemon"
+      ],
+      "line": 103,
+      "path": "bin/init.class_main.sh",
+      "target": "vendor.qcrild",
+      "verb": "start"
+    },
+    {
+      "context": [
+        "sgltecsfb=`getprop persist.vendor.radio.sglte_csfb`",
+        "datamode=`getprop persist.vendor.data.mode`",
+        "qcrild_status=true",
+        "case \"$baseband\" in",
+        "\"apq\" | \"sda\" | \"qcs\" )",
+        "setprop ro.vendor.radio.noril yes",
+        "stop ril-daemon",
+        "stop vendor.ril-daemon"
+      ],
+      "line": 43,
+      "path": "bin/init.class_main.sh",
+      "target": "vendor.qcrild",
+      "verb": "stop"
+    },
+    {
+      "context": [
+        "else",
+        "setprop persist.vendor.radio.voice.modem.index 0",
+        "fi",
+        ";;",
+        "esac",
+        "multisim=`getprop persist.radio.multisim.config`",
+        "if [ \"$multisim\" = \"dsds\" ] || [ \"$multisim\" = \"dsda\" ]; then",
+        "if [ \"$qcrild_status\" = \"true\" ]; then"
+      ],
+      "line": 128,
+      "path": "bin/init.class_main.sh",
+      "target": "vendor.qcrild2",
+      "verb": "start"
+    },
+    {
+      "context": [
+        "if [ \"$multisim\" = \"dsds\" ] || [ \"$multisim\" = \"dsda\" ]; then",
+        "if [ \"$qcrild_status\" = \"true\" ]; then",
+        "start vendor.qcrild2",
+        "else",
+        "start vendor.ril-daemon2",
+        "fi",
+        "elif [ \"$multisim\" = \"tsts\" ]; then",
+        "if [ \"$qcrild_status\" = \"true\" ]; then"
+      ],
+      "line": 134,
+      "path": "bin/init.class_main.sh",
+      "target": "vendor.qcrild2",
+      "verb": "start"
+    },
+    {
+      "context": [
+        "if [ \"$qcrild_status\" = \"true\" ]; then",
+        "start vendor.qcrild2",
+        "else",
+        "start vendor.ril-daemon2",
+        "fi",
+        "elif [ \"$multisim\" = \"tsts\" ]; then",
+        "if [ \"$qcrild_status\" = \"true\" ]; then",
+        "start vendor.qcrild2"
+      ],
+      "line": 135,
+      "path": "bin/init.class_main.sh",
+      "target": "vendor.qcrild3",
+      "verb": "start"
+    },
+    {
+      "context": [
+        "fi",
+        "fi",
+        "if [ \"$qcrild_status\" = \"true\" ]; then",
+        "stop ril-daemon",
+        "stop vendor.ril-daemon",
+        "start vendor.qcrild",
+        "else",
+        "start ril-daemon"
+      ],
+      "line": 106,
+      "path": "bin/init.class_main.sh",
+      "target": "vendor.ril-daemon",
+      "verb": "start"
+    },
+    {
+      "context": [
+        "baseband=`getprop ro.baseband`",
+        "sgltecsfb=`getprop persist.vendor.radio.sglte_csfb`",
+        "datamode=`getprop persist.vendor.data.mode`",
+        "qcrild_status=true",
+        "case \"$baseband\" in",
+        "\"apq\" | \"sda\" | \"qcs\" )",
+        "setprop ro.vendor.radio.noril yes",
+        "stop ril-daemon"
+      ],
+      "line": 42,
+      "path": "bin/init.class_main.sh",
+      "target": "vendor.ril-daemon",
+      "verb": "stop"
+    },
+    {
+      "context": [
+        "fi",
+        "fi",
+        "elif [ \"$modem\" = \"TH\" ]; then",
+        "qcrild_status=false",
+        "fi",
+        "fi",
+        "if [ \"$qcrild_status\" = \"true\" ]; then",
+        "stop ril-daemon"
+      ],
+      "line": 101,
+      "path": "bin/init.class_main.sh",
+      "target": "vendor.ril-daemon",
+      "verb": "stop"
+    },
+    {
+      "context": [
+        "fi",
+        ";;",
+        "esac",
+        "multisim=`getprop persist.radio.multisim.config`",
+        "if [ \"$multisim\" = \"dsds\" ] || [ \"$multisim\" = \"dsda\" ]; then",
+        "if [ \"$qcrild_status\" = \"true\" ]; then",
+        "start vendor.qcrild2",
+        "else"
+      ],
+      "line": 130,
+      "path": "bin/init.class_main.sh",
+      "target": "vendor.ril-daemon2",
+      "verb": "start"
+    },
+    {
+      "context": [
+        "else",
+        "start vendor.ril-daemon2",
+        "fi",
+        "elif [ \"$multisim\" = \"tsts\" ]; then",
+        "if [ \"$qcrild_status\" = \"true\" ]; then",
+        "start vendor.qcrild2",
+        "start vendor.qcrild3",
+        "else"
+      ],
+      "line": 137,
+      "path": "bin/init.class_main.sh",
+      "target": "vendor.ril-daemon2",
+      "verb": "start"
+    },
+    {
+      "context": [
+        "start vendor.ril-daemon2",
+        "fi",
+        "elif [ \"$multisim\" = \"tsts\" ]; then",
+        "if [ \"$qcrild_status\" = \"true\" ]; then",
+        "start vendor.qcrild2",
+        "start vendor.qcrild3",
+        "else",
+        "start vendor.ril-daemon2"
+      ],
+      "line": 138,
+      "path": "bin/init.class_main.sh",
+      "target": "vendor.ril-daemon3",
+      "verb": "start"
+    }
+  ],
+  "schema_version": 1,
+  "ver_info": {
+    "archive_path": "fastboot/Ver_info.txt",
+    "mpss_tokens": [
+      "MPSS.AT.2.0.c4-00988-8998_GEN_PACK-1"
+    ],
+    "sha256": "0c288e0d12eaa3ce3715766104e9f83abd045b39fdc81804499cb613fde23715",
+    "size": 1109
+  }
+}

@@ -60,6 +60,26 @@ class RadioEvidenceParserTest(unittest.TestCase):
             self.assertIn("vendor.qcrild", {row["target"] for row in result["starts"]})
             self.assertNotIn("vendor.qcrild2", {row["target"] for row in result["starts"]})
 
+    def test_scans_enable_restart_and_ctl_start_as_activations(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            init_dir = root / "etc" / "init"
+            init_dir.mkdir(parents=True)
+            (init_dir / "controls.rc").write_text(
+                "on property:vendor.radio.ready=1\n"
+                "    enable vendor.qcrild\n"
+                "    restart vendor.qcrild2\n"
+                "    setprop ctl.start vendor.qcrild3\n"
+                "    setprop ctl.stop vendor.qcrild3\n",
+                encoding="utf-8",
+            )
+            result = self.module.scan_init_files(root)
+            controls = {(row["verb"], row["target"]) for row in result["controls"]}
+            self.assertIn(("enable", "vendor.qcrild"), controls)
+            self.assertIn(("restart", "vendor.qcrild2"), controls)
+            self.assertIn(("ctl.start", "vendor.qcrild3"), controls)
+            self.assertIn(("ctl.stop", "vendor.qcrild3"), controls)
+
     def test_summary_does_not_invent_extra_ril_instances(self) -> None:
         evidence = {
             "properties": [
@@ -72,12 +92,34 @@ class RadioEvidenceParserTest(unittest.TestCase):
                 ],
                 "starts": [{"target": "vendor.qcrild", "trigger": "boot", "path": "init.qcom.rc", "line": 10}],
                 "stops": [],
+                "controls": [],
                 "imports": [],
             },
         }
         summary = self.module.derive_summary(evidence)
         self.assertEqual(summary["explicit_qcrild_start_targets"], ["vendor.qcrild"])
+        self.assertEqual(summary["qcrild_activation_targets"], ["vendor.qcrild"])
         self.assertEqual(summary["multisim_values"], ["ssss"])
+        self.assertEqual(summary["recommended_runtime_instances_from_evidence"], ["vendor.qcrild"])
+
+    def test_summary_includes_non_start_activation_evidence(self) -> None:
+        evidence = {
+            "properties": [],
+            "init": {
+                "services": [
+                    {"name": "vendor.qcrild", "executable": "/vendor/bin/hw/qcrild", "disabled": True}
+                ],
+                "starts": [],
+                "stops": [],
+                "controls": [
+                    {"verb": "enable", "target": "vendor.qcrild", "trigger": "boot", "path": "x.rc", "line": 1}
+                ],
+                "imports": [],
+            },
+        }
+        summary = self.module.derive_summary(evidence)
+        self.assertEqual(summary["explicit_qcrild_start_targets"], [])
+        self.assertEqual(summary["qcrild_activation_targets"], ["vendor.qcrild"])
         self.assertEqual(summary["recommended_runtime_instances_from_evidence"], ["vendor.qcrild"])
 
 

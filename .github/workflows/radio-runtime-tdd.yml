@@ -1,0 +1,20 @@
+name: Radio runtime TDD
+
+on:
+  push:
+    branches:
+      - radio-runtime-tdd
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run RED .118 radio runtime contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          PYTHONPATH="$PWD/tests:$PWD" python3 -m unittest tests.test_radio_runtime_contract -v

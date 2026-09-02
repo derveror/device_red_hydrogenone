@@ -19,9 +19,19 @@ This file records the exact archives supplied for the RED Hydrogen One LineageOS
 ## Stock source
 
 - File: `[FileSell]_H1A1000.082ho.01.00.10r.118_USERDEBUG_FASTBOOT.rar`
-- Drive-reported size: `1,851,974,911` bytes
-- Current state: not yet downloaded because the connected Drive download path rejects files larger than `268,435,456` bytes.
-- Authority rule: the archive is not treated as verified Android 9 stock until its SHA-256, build properties, partition metadata, and image contents have been captured after reconstruction.
+- Supplied as eight reconstructable parts: seven files of `251,658,240` bytes and one file of `90,367,231` bytes.
+- All `8/8` part SHA-256 values match the supplied `parts.sha256` manifest.
+- Reconstructed size: `1,851,974,911` bytes.
+- Reconstructed SHA-256: `6fcc610fd86b9b9152f1fcc9d0ca24a4ecba340d8dfd3f011495e2b8fc4d9c6c`, exactly matching `original.sha256`.
+- Container: RAR5, one volume, non-solid, 79 archive blocks.
+- Visible contents: 78 regular files and one directory; every regular file is AES-encrypted.
+- Current state: archive identity is verified, but extraction is blocked by the archive vendor's legitimate password. Full image-level stock authority begins only after decryption, per-file hashing, and image validation.
+- Recorded evidence:
+  - `docs/stock/h1a1000-r118/ACQUISITION.md`
+  - `docs/stock/h1a1000-r118/archive-entries.tsv`
+  - `docs/stock/h1a1000-r118/original.sha256`
+  - `docs/stock/h1a1000-r118/parts.sha256`
+  - `docs/stock/h1a1000-r118/SECONDARY_BUILD_METADATA.md`
 
 ## Reference archives
 

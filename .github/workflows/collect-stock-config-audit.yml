@@ -1,0 +1,139 @@
+name: Collect canonical RED .118 device config audit
+
+on:
+  push:
+    branches:
+      - stock-config-audit-tdd
+    paths:
+      - .github/workflows/collect-stock-config-audit.yml
+
+permissions:
+  contents: write
+
+jobs:
+  collect:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Reconstruct canonical RED .118 vendor image
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/r118/parts" "$RUNNER_TEMP/r118/archive" "$RUNNER_TEMP/r118/stock-vendor" "$RUNNER_TEMP/7zip"
+          ids=(
+            1_B7suPmaiZsibKtmSg_IfIcgGaPz4nvt
+            1AV1tt-lmg5z0MMn7aNKArS7bFfK8VHCp
+            1wxs2du2Ml_--JrOwGlyDb49QMlrPxVMB
+            1OMvS4diiiOCiX-yCKHH7HZKv77QaUCFn
+            18czKWOxP9Xiw5g6ljCHI1Gt68Ynzxfi4
+            19bMHqds6-PsYPtrs18okJ8XgdF85Z84L
+            1xKaDVx16zH11ozeSeOjSlldi1-xrHcuj
+            1XF4fPiTXBzVsVQU5I3VZGxw4Xm_T_DUe
+          )
+          sizes=(251658240 251658240 251658240 251658240 251658240 251658240 251658240 89063443)
+          for i in "${!ids[@]}"; do
+            out="$RUNNER_TEMP/r118/parts/part.$i"
+            curl --fail --location --retry 5 --retry-delay 2 --retry-all-errors \
+              "https://drive.usercontent.google.com/download?id=${ids[$i]}&export=download&confirm=t" \
+              --output "$out"
+            test "$(stat -c %s "$out")" = "${sizes[$i]}"
+          done
+          cat "$RUNNER_TEMP"/r118/parts/part.* > "$RUNNER_TEMP/r118/stock.rar"
+          rm -rf "$RUNNER_TEMP/r118/parts"
+          echo '7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e  '"$RUNNER_TEMP/r118/stock.rar" | sha256sum -c -
+
+          curl --fail --location --retry 5 \
+            https://github.com/ip7z/7zip/releases/download/26.02/7z2602-linux-x64.tar.xz \
+            --output "$RUNNER_TEMP/7zip.tar.xz"
+          tar -xJf "$RUNNER_TEMP/7zip.tar.xz" -C "$RUNNER_TEMP/7zip"
+          chmod +x "$RUNNER_TEMP/7zip/7zz"
+          seven="$RUNNER_TEMP/7zip/7zz"
+          base='H1A1000.082ho.01.00.10r.118_userdebug_fastboot/fastboot'
+          "$seven" e -y -o"$RUNNER_TEMP/r118/archive" "$RUNNER_TEMP/r118/stock.rar" "$base/vendor.img"
+          test "$(stat -c %s "$RUNNER_TEMP/r118/archive/vendor.img")" = 593264872
+          rm -f "$RUNNER_TEMP/r118/stock.rar"
+          "$seven" x -y -o"$RUNNER_TEMP/r118/stock-vendor" "$RUNNER_TEMP/r118/archive/vendor.img"
+          test -d "$RUNNER_TEMP/r118/stock-vendor/etc"
+          test -d "$RUNNER_TEMP/r118/stock-vendor/bin"
+
+      - name: Generate SHA-level device config audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          raw="$RUNNER_TEMP/device-stock-config.raw.json"
+          python3 tools/analysis/device_stock_config_audit.py \
+            --device-root . \
+            --stock-vendor-root "$RUNNER_TEMP/r118/stock-vendor" \
+            --json > "$raw"
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          raw=Path(os.environ['RUNNER_TEMP'])/'device-stock-config.raw.json'
+          report=json.loads(raw.read_text())
+          assert report['summary']['missing_device_source'] == 0, report['summary']
+          report['authority']={
+              'device_branch':'lineage-22.2-stock118-rework',
+              'stock_build':'H1A1000.082ho.01.00.10r.118',
+              'stock_archive_sha256':'7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e',
+              'stock_vendor_image_size':593264872,
+          }
+          report['device_root']='device-tree'
+          report['stock_vendor_root']='stock-.118-vendor'
+          out=Path('docs/stock/h1a1000-r118/device-vs-stock-config-audit.json')
+          out.write_text(json.dumps(report,indent=2,sort_keys=True)+'\n',encoding='utf-8')
+
+          s=report['summary']
+          lines=[
+              '# RED .118 device-owned vendor config audit', '',
+              'Canonical stock: `H1A1000.082ho.01.00.10r.118` / `7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e`.', '',
+              'This report compares every LOCAL_PATH-owned file copied into `/vendor` with the same destination in canonical RED `.118` `vendor.img`.', '',
+              '## Summary', '',
+              f"- local vendor-copy mappings: **{s['total']}**",
+              f"- byte-identical to stock: **{s['identical']}**",
+              f"- different from stock: **{s['different']}**",
+              f"- no stock counterpart: **{s['missing_in_stock']}**",
+              f"- missing device source: **{s['missing_device_source']}**", '',
+              'A byte difference is evidence for review, not an automatic error: modern Lineage source-owned policy/config may intentionally differ from Android 9 stock.', '',
+              '## Different from stock', '',
+          ]
+          different=[r for r in report['rows'] if r['status']=='different']
+          for r in different:
+              lines.append(f"- `{r['source']}` → `{r['destination']}` — device `{r['device_sha256']}`, stock `{r['stock_sha256']}`")
+          if not different:
+              lines.append('- None.')
+          lines.extend(['', '## No stock counterpart', ''])
+          missing=[r for r in report['rows'] if r['status']=='missing_in_stock']
+          for r in missing:
+              lines.append(f"- `{r['source']}` → `{r['destination']}`")
+          if not missing:
+              lines.append('- None.')
+          lines.append('')
+          Path('docs/stock/h1a1000-r118/DEVICE_VS_STOCK_CONFIG_AUDIT.md').write_text('\n'.join(lines),encoding='utf-8')
+          PY
+          python3 -m json.tool docs/stock/h1a1000-r118/device-vs-stock-config-audit.json >/dev/null
+          PYTHONPATH="$PWD/tests:$PWD" python3 -m unittest tests.test_device_stock_config_audit -v
+          git diff --check
+
+      - name: Commit analyzer, tests, evidence and remove temporary workflows
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm .github/workflows/stock-config-audit-tdd.yml
+          rm .github/workflows/collect-stock-config-audit.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add tools/analysis/device_stock_config_audit.py tests/test_device_stock_config_audit.py \
+            docs/stock/h1a1000-r118/device-vs-stock-config-audit.json \
+            docs/stock/h1a1000-r118/DEVICE_VS_STOCK_CONFIG_AUDIT.md \
+            .github/workflows/stock-config-audit-tdd.yml \
+            .github/workflows/collect-stock-config-audit.yml
+          git diff --cached --check
+          git commit -m 'analysis: audit device vendor configs against RED .118'
+          git fetch origin stock-config-audit-tdd
+          git rebase origin/stock-config-audit-tdd
+          git push origin HEAD:stock-config-audit-tdd

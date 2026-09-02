@@ -33,7 +33,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python3 -m unittest -v \
+          PYTHONPATH="$PWD/tests:$PWD" python3 -m unittest -v \
             tests.test_archive_inventory \
             tests.test_reconstruct_stock \
             tests.test_source_lock \

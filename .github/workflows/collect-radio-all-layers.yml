@@ -1,0 +1,175 @@
+name: Collect RED .118 radio controls across init layers
+
+on:
+  push:
+    branches:
+      - lineage-22.2-stock118-rework
+    paths:
+      - .github/workflows/collect-radio-all-layers.yml
+
+permissions:
+  contents: write
+
+jobs:
+  collect:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Reconstruct canonical stock and extract images
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/r118/parts" "$RUNNER_TEMP/r118/images" "$RUNNER_TEMP/7zip"
+          ids=(
+            1_B7suPmaiZsibKtmSg_IfIcgGaPz4nvt
+            1AV1tt-lmg5z0MMn7aNKArS7bFfK8VHCp
+            1wxs2du2Ml_--JrOwGlyDb49QMlrPxVMB
+            1OMvS4diiiOCiX-yCKHH7HZKv77QaUCFn
+            18czKWOxP9Xiw5g6ljCHI1Gt68Ynzxfi4
+            19bMHqds6-PsYPtrs18okJ8XgdF85Z84L
+            1xKaDVx16zH11ozeSeOjSlldi1-xrHcuj
+            1XF4fPiTXBzVsVQU5I3VZGxw4Xm_T_DUe
+          )
+          sizes=(251658240 251658240 251658240 251658240 251658240 251658240 251658240 89063443)
+          for i in "${!ids[@]}"; do
+            out="$RUNNER_TEMP/r118/parts/part.$i"
+            curl --fail --location --retry 5 --retry-delay 2 --retry-all-errors \
+              "https://drive.usercontent.google.com/download?id=${ids[$i]}&export=download&confirm=t" \
+              --output "$out"
+            test "$(stat -c %s "$out")" = "${sizes[$i]}"
+          done
+          cat "$RUNNER_TEMP"/r118/parts/part.* > "$RUNNER_TEMP/r118/stock.rar"
+          rm -rf "$RUNNER_TEMP/r118/parts"
+          echo '7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e  '"$RUNNER_TEMP/r118/stock.rar" | sha256sum -c -
+
+          curl --fail --location --retry 5 \
+            https://github.com/ip7z/7zip/releases/download/26.02/7z2602-linux-x64.tar.xz \
+            --output "$RUNNER_TEMP/7zip.tar.xz"
+          tar -xJf "$RUNNER_TEMP/7zip.tar.xz" -C "$RUNNER_TEMP/7zip"
+          chmod +x "$RUNNER_TEMP/7zip/7zz"
+          seven="$RUNNER_TEMP/7zip/7zz"
+          base='H1A1000.082ho.01.00.10r.118_userdebug_fastboot/fastboot'
+          "$seven" e -y -o"$RUNNER_TEMP/r118/images" "$RUNNER_TEMP/r118/stock.rar" \
+            "$base/vendor.img" "$base/system.img" "$base/boot.img" "$base/ramdisk.img" "$base/build.prop"
+          test "$(stat -c %s "$RUNNER_TEMP/r118/images/vendor.img")" = 593264872
+          test "$(stat -c %s "$RUNNER_TEMP/r118/images/system.img")" = 3746394440
+          test -s "$RUNNER_TEMP/r118/images/boot.img"
+          test -s "$RUNNER_TEMP/r118/images/ramdisk.img"
+          rm -f "$RUNNER_TEMP/r118/stock.rar"
+
+      - name: Extract only init and property text from each image
+        shell: bash
+        run: |
+          set -euo pipefail
+          seven="$RUNNER_TEMP/7zip/7zz"
+          for layer in vendor system; do
+            mkdir -p "$RUNNER_TEMP/r118/$layer-root"
+            "$seven" x -y -r -o"$RUNNER_TEMP/r118/$layer-root" \
+              "$RUNNER_TEMP/r118/images/$layer.img" '*.rc' '*.prop'
+          done
+          mkdir -p "$RUNNER_TEMP/r118/boot-root" "$RUNNER_TEMP/r118/standalone-ramdisk-root"
+          "$seven" x -y -r -o"$RUNNER_TEMP/r118/boot-root" \
+            "$RUNNER_TEMP/r118/images/boot.img" '*.rc' '*.prop' || true
+          "$seven" x -y -r -o"$RUNNER_TEMP/r118/standalone-ramdisk-root" \
+            "$RUNNER_TEMP/r118/images/ramdisk.img" '*.rc' '*.prop' || true
+          find "$RUNNER_TEMP/r118/vendor-root" -type f | grep -q .
+          find "$RUNNER_TEMP/r118/system-root" -type f | grep -q .
+          printf 'vendor_text_files=%s\n' "$(find "$RUNNER_TEMP/r118/vendor-root" -type f | wc -l)"
+          printf 'system_text_files=%s\n' "$(find "$RUNNER_TEMP/r118/system-root" -type f | wc -l)"
+          printf 'boot_text_files=%s\n' "$(find "$RUNNER_TEMP/r118/boot-root" -type f | wc -l)"
+          printf 'standalone_ramdisk_text_files=%s\n' "$(find "$RUNNER_TEMP/r118/standalone-ramdisk-root" -type f | wc -l)"
+
+      - name: Build combined machine-readable evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -c '
+          import json, sys
+          from pathlib import Path
+          sys.path.insert(0, ".")
+          from tools.analyze_radio_evidence import scan_init_files, scan_property_files, derive_summary
+          base = Path("'"$RUNNER_TEMP"'/r118")
+          layers = {
+              "vendor": base / "vendor-root",
+              "system": base / "system-root",
+              "boot": base / "boot-root",
+              "standalone_ramdisk": base / "standalone-ramdisk-root",
+          }
+          merged_init = {"services": [], "starts": [], "stops": [], "controls": [], "imports": []}
+          properties = []
+          counts = {}
+          for label, root in layers.items():
+              init = scan_init_files(root)
+              props = scan_property_files(root)
+              for key, rows in init.items():
+                  for row in rows:
+                      item = dict(row)
+                      if "path" in item:
+                          item["path"] = f"{label}:{item["path"]}"
+                      merged_init[key].append(item)
+              for row in props:
+                  item = dict(row)
+                  item["path"] = f"{label}:{item["path"]}"
+                  properties.append(item)
+              counts[label] = {"init_services": len(init["services"]), "controls": len(init["controls"]), "radio_properties": len(props)}
+          archive_prop = base / "images" / "build.prop"
+          if archive_prop.is_file():
+              for line_no, raw in enumerate(archive_prop.read_text(errors="replace").splitlines(), 1):
+                  if "=" not in raw or raw.lstrip().startswith("#"):
+                      continue
+                  key, value = raw.split("=", 1)
+                  if any(token in key.lower() for token in ("radio", "ril", "ims", "multisim", "telephony")):
+                      properties.append({"path": "archive:fastboot/build.prop", "line": line_no, "key": key.strip(), "value": value.strip()})
+          for key in merged_init:
+              merged_init[key].sort(key=lambda row: (row.get("target", row.get("name", "")), row.get("verb", ""), row.get("path", ""), row.get("line", 0)))
+          properties.sort(key=lambda row: (row["key"], row["path"], row["line"]))
+          evidence = {
+              "schema_version": 1,
+              "authority": {
+                  "stock_build": "H1A1000.082ho.01.00.10r.118",
+                  "stock_archive_sha256": "7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e",
+                  "layers": list(layers),
+              },
+              "layer_counts": counts,
+              "properties": properties,
+              "init": merged_init,
+          }
+          evidence["summary"] = derive_summary(evidence)
+          out = Path("docs/stock/h1a1000-r118/radio-all-layers-evidence.json")
+          out.write_text(json.dumps(evidence, indent=2, sort_keys=True) + "\n")
+          lines = [
+              "# RED .118 radio controls across init layers", "",
+              f"Stock SHA-256: `{evidence["authority"]["stock_archive_sha256"]}`", "",
+              f"Multi-SIM: `{evidence["summary"]["multisim_values"]}`", 
+              f"Defined qcrild services: `{evidence["summary"]["defined_qcrild_services"]}`",
+              f"qcrild activation targets: `{evidence["summary"]["qcrild_activation_targets"]}`", "",
+              "## qcrild controls", "",
+          ]
+          q = [r for r in merged_init["controls"] if "qcril" in r.get("target", "").lower()]
+          lines += [f"- `{r["path"]}:{r["line"]}` `{r["trigger"]}` — `{r["verb"]} {r["target"]}`" for r in q] or ["- None found."]
+          lines += ["", "## rild controls", ""]
+          rild = [r for r in merged_init["controls"] if "rild" in r.get("target", "").lower() and "qcril" not in r.get("target", "").lower()]
+          lines += [f"- `{r["path"]}:{r["line"]}` `{r["trigger"]}` — `{r["verb"]} {r["target"]}`" for r in rild] or ["- None found."]
+          Path("docs/stock/h1a1000-r118/RADIO_ALL_LAYERS_EVIDENCE.md").write_text("\n".join(lines) + "\n")
+          '
+          python3 -m json.tool docs/stock/h1a1000-r118/radio-all-layers-evidence.json >/dev/null
+          git diff --check
+
+      - name: Commit evidence and remove collector
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm .github/workflows/collect-radio-all-layers.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/stock/h1a1000-r118/radio-all-layers-evidence.json \
+            docs/stock/h1a1000-r118/RADIO_ALL_LAYERS_EVIDENCE.md \
+            .github/workflows/collect-radio-all-layers.yml
+          git diff --cached --check
+          git commit -m 'docs: trace RED .118 radio controls across init layers'
+          git fetch origin lineage-22.2-stock118-rework
+          git rebase origin/lineage-22.2-stock118-rework
+          git push origin HEAD:lineage-22.2-stock118-rework

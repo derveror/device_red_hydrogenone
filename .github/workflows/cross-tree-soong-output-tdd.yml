@@ -18,3 +18,52 @@ jobs:
         run: |
           set -euo pipefail
           PYTHONPATH="$PWD/tests:$PWD" python3 -m unittest tests.test_cross_tree_soong_outputs -v
+
+  real_tree:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout device TDD branch
+        uses: actions/checkout@v4
+        with:
+          path: device-tree
+      - name: Checkout pinned vendor tree
+        uses: actions/checkout@v4
+        with:
+          repository: derveror/proprietary_vendor_red_hydrogenone
+          ref: d30ac19025b348ca61535afaaecb23b95347b2f4
+          path: vendor-tree
+      - name: Audit real Make and Soong install outputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +e
+          python3 device-tree/tools/analysis/cross_tree_contract.py \
+            --device-root device-tree \
+            --vendor-root vendor-tree \
+            --json > "$RUNNER_TEMP/cross-tree-schema3.json"
+          rc=$?
+          set -e
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          p = Path(os.environ['RUNNER_TEMP']) / 'cross-tree-schema3.json'
+          data = json.loads(p.read_text())
+          print('schema:', data['schema_version'])
+          for key in (
+              'copy_destination_collisions',
+              'device_copy_vs_vendor_soong_collisions',
+              'vendor_copy_vs_vendor_soong_collisions',
+              'vendor_soong_output_collisions',
+              'install_destination_collisions',
+          ):
+              print(key + ':', data[key])
+          print('vendor_soong_outputs:', len(data['vendor_soong_install_outputs']))
+          expected_rc = 1 if data['install_destination_collisions'] else 0
+          if int(os.environ.get('ANALYZER_RC', '-1')) not in (-1, expected_rc):
+              raise SystemExit('analyzer exit code does not match collision state')
+          PY
+          if [ "$rc" -ne 0 ]; then
+            echo "real tree has install-output collisions; see report above"
+            exit "$rc"
+          fi

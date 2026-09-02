@@ -1,0 +1,20 @@
+name: Stock config audit TDD
+
+on:
+  push:
+    branches:
+      - stock-config-audit-tdd
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run device-vs-stock config audit tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          PYTHONPATH="$PWD/tests:$PWD" python3 -m unittest tests.test_device_stock_config_audit -v

@@ -9,6 +9,12 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 TOOL = ROOT / "tools" / "analysis" / "cross_tree_contract.py"
+DEVICE_MK = ROOT / "device.mk"
+
+VENDOR_OWNED_RED118_CONFIGS = {
+    "configs/nfc/libnfc-nci.conf": "$(TARGET_COPY_OUT_VENDOR)/etc/libnfc-nci.conf",
+    "configs/thermal-engine.conf": "$(TARGET_COPY_OUT_VENDOR)/etc/thermal-engine.conf",
+}
 
 
 class CrossTreeContractTest(unittest.TestCase):
@@ -62,6 +68,12 @@ class CrossTreeContractTest(unittest.TestCase):
         self.assertEqual(proc.returncode, 0, proc.stderr)
         payload = json.loads(proc.stdout)
         self.assertEqual(payload["copy_destination_collisions"], [])
+
+    def test_red118_vendor_owned_configs_are_not_active_device_copies(self) -> None:
+        text = DEVICE_MK.read_text(encoding="utf-8")
+        for source, destination in sorted(VENDOR_OWNED_RED118_CONFIGS.items()):
+            self.assertNotIn(f"$(LOCAL_PATH)/{source}:{destination}", text, source)
+            self.assertFalse((ROOT / source).exists(), source)
 
 
 if __name__ == "__main__":

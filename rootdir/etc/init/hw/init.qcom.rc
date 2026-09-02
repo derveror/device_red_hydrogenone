@@ -29,6 +29,12 @@ on post-fs-data
     mkdir /data/vendor/qvr 0770 system system
 
 on boot
+    # RED .118 canonical modem is MPSS.AT and stock is DSDS. Stock
+    # init.class_main.sh therefore selects qcrild instances 1 and 2; qcrild3
+    # is reserved for TSTS and legacy rild is the non-qcrild fallback.
+    start vendor.qcrild
+    start vendor.qcrild2
+
     # FPC side-mounted fingerprint reader / power key
     chown system system /sys/bus/platform/devices/soc:fpc1020/irq
     chown system system /sys/bus/platform/devices/soc:fpc1020/wakeup_enable

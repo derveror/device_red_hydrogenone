@@ -98,7 +98,7 @@
       "archive": "proprietary_vendor_nubia_msm8998-common-lineage-22.2.zip",
       "embedded_source_commit": "7e2744c4c7ce246b0acb9c81d68deca355e58a63",
       "sha256": "3c44f6894e25b6b3d33efdce9424ef85d33c37ff6d96a6d612dacbfa88047863",
-      "archive_size_bytes": 201982679,
+      "archive_size_bytes": 73591468,
       "uncompressed_size_bytes": 202293884,
       "file_count": 449,
       "root_directory": "proprietary_vendor_nubia_msm8998-common-lineage-22.2"
@@ -107,7 +107,7 @@
       "archive": "proprietary_vendor_oneplus_dumpling-lineage-22.2.zip",
       "embedded_source_commit": "a19d15c9b8da744f8d537b1365e3f7e869239b0d",
       "sha256": "8e366b0d9b47b55eedfa572338eefe8cd189f36ded22e368efd17a86d9da5bb0",
-      "archive_size_bytes": 3050269,
+      "archive_size_bytes": 2418219,
       "uncompressed_size_bytes": 7401320,
       "file_count": 70,
       "root_directory": "proprietary_vendor_oneplus_dumpling-lineage-22.2"
@@ -116,7 +116,7 @@
       "archive": "proprietary_vendor_oneplus_msm8998-common-lineage-22.2.zip",
       "embedded_source_commit": "de920245bb19635422643ba46d4c6e03a6cd6668",
       "sha256": "2e805b08de0142b4a683e9bf7648e840b2a82aa091b49b9b8f8de0cb38415a64",
-      "archive_size_bytes": 116999506,
+      "archive_size_bytes": 100280975,
       "uncompressed_size_bytes": 259309379,
       "file_count": 736,
       "root_directory": "proprietary_vendor_oneplus_msm8998-common-lineage-22.2"
@@ -125,7 +125,7 @@
       "archive": "proprietary_vendor_razer_cheryl-lineage-22.2.zip",
       "embedded_source_commit": "a7725d8bf663838d755aaff953a16c58450e533d",
       "sha256": "57ddb1285d0d23536f48c123e822afbd56df395d0a48d8023bedac06d1909733",
-      "archive_size_bytes": 111952264,
+      "archive_size_bytes": 87443955,
       "uncompressed_size_bytes": 246544619,
       "file_count": 731,
       "root_directory": "proprietary_vendor_razer_cheryl-lineage-22.2"

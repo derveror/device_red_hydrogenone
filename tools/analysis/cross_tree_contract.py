@@ -10,6 +10,11 @@ from typing import Iterable
 COPY_DEST_RE = re.compile(
     r":\$\((TARGET_COPY_OUT_[A-Z0-9_]+)\)(?:/([^\s\\]+))?"
 )
+FOREACH_WILDCARD_RE = re.compile(
+    r"\$\(\s*foreach\s+([A-Za-z_][A-Za-z0-9_]*),"
+    r"\$\(\s*wildcard\s+\$\(LOCAL_PATH\)/([^)]+)\),",
+    re.S,
+)
 
 PARTITION_NAMES = {
     "TARGET_COPY_OUT_VENDOR": "vendor",
@@ -32,14 +37,71 @@ def normalize_destination(variable: str, relative: str | None) -> str:
     return partition if not relative else f"{partition}/{relative.lstrip('/')}"
 
 
+def _add_owner(owners: dict[str, list[str]], destination: str, makefile: str) -> None:
+    paths = owners.setdefault(destination, [])
+    if makefile not in paths:
+        paths.append(makefile)
+
+
+def _scan_foreach_wildcards(
+    root: Path,
+    text: str,
+    makefile: str,
+    owners: dict[str, list[str]],
+) -> None:
+    """Expand the simple foreach/wildcard/notdir copy pattern used by device.mk.
+
+    This is intentionally not a GNU Make interpreter. It only recognizes the
+    concrete pattern used by Android device trees to copy every file matching a
+    LOCAL_PATH-relative glob into a fixed TARGET_COPY_OUT_* directory while
+    retaining each source basename.
+    """
+
+    for start in FOREACH_WILDCARD_RE.finditer(text):
+        variable = start.group(1)
+        glob_pattern = start.group(2).strip()
+        window = text[start.end() : start.end() + 1000]
+        eval_re = re.compile(
+            r"\$\(\s*eval\s+PRODUCT_COPY_FILES\s*\+=\s*"
+            + re.escape(f"$({variable})")
+            + r":\$\((TARGET_COPY_OUT_[A-Z0-9_]+)\)/"
+            + r"([^$\s\\]*?)"
+            + r"\$\(\s*notdir\s+"
+            + re.escape(f"$({variable})")
+            + r"\s*\)"
+        )
+        target = eval_re.search(window)
+        if target is None:
+            continue
+        partition_variable = target.group(1)
+        destination_prefix = target.group(2)
+        for source in sorted(root.glob(glob_pattern)):
+            if not source.is_file():
+                continue
+            destination = normalize_destination(
+                partition_variable,
+                f"{destination_prefix}{source.name}",
+            )
+            _add_owner(owners, destination, makefile)
+
+
 def scan_copy_destinations(root: Path) -> dict[str, list[str]]:
     owners: dict[str, list[str]] = {}
     for path in iter_makefiles(root):
         text = path.read_text(encoding="utf-8", errors="replace")
         rel = path.relative_to(root).as_posix()
+
+        _scan_foreach_wildcards(root, text, rel, owners)
+
         for match in COPY_DEST_RE.finditer(text):
-            destination = normalize_destination(match.group(1), match.group(2))
-            owners.setdefault(destination, []).append(rel)
+            relative = match.group(2)
+            # A raw match that still contains Make expansion syntax is not a
+            # concrete output path. Supported foreach forms are expanded above.
+            if relative and "$(" in relative:
+                continue
+            destination = normalize_destination(match.group(1), relative)
+            _add_owner(owners, destination, rel)
+
     for paths in owners.values():
         paths.sort()
     return dict(sorted(owners.items()))
@@ -50,7 +112,7 @@ def build_report(device_root: Path, vendor_root: Path) -> dict[str, object]:
     vendor = scan_copy_destinations(vendor_root)
     collisions = sorted(set(device) & set(vendor))
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "device_root": str(device_root),
         "vendor_root": str(vendor_root),
         "device_copy_destinations": device,

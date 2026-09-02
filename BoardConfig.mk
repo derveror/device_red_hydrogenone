@@ -76,10 +76,14 @@ TARGET_KERNEL_SOURCE := kernel/essential/msm8998
 TARGET_KERNEL_CONFIG := lineageos_mata_defconfig
 TARGET_FORCE_PREBUILT_KERNEL := true
 TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/Image.gz-dtb
-BOARD_KERNEL_CMDLINE := androidboot.hardware=qcom ehci-hcd.park=3
-BOARD_KERNEL_CMDLINE += lpm_levels.sleep_disabled=1 service_locator.enable=1
-BOARD_KERNEL_CMDLINE += swiotlb=2048 androidboot.configfs=true
+# Keep RED .118 hardware/runtime arguments while leaving build/signing identity
+# to the Android 15 build. androidboot.boot_devices is retained for modern
+# first-stage block-device discovery even though it was not present in stock .118.
+BOARD_KERNEL_CMDLINE := androidboot.hardware=qcom ehci-hcd.park=3 msm_rtb.filter=0x37
+BOARD_KERNEL_CMDLINE += lpm_levels.sleep_disabled=1 sched_enable_hmp=1 sched_enable_power_aware=1
+BOARD_KERNEL_CMDLINE += service_locator.enable=1 swiotlb=2048 androidboot.configfs=true
 BOARD_KERNEL_CMDLINE += androidboot.usbcontroller=a800000.dwc3
+BOARD_KERNEL_CMDLINE += firmware_class.path=/vendor/firmware_mnt/image
 BOARD_KERNEL_CMDLINE += androidboot.boot_devices=soc/1da4000.ufshc loop.max_part=7
 BOARD_KERNEL_CMDLINE += earlycon=msm_serial_dm,0xc1b0000 console=ttyMSM0,115200,n8
 BOARD_KERNEL_CMDLINE += androidboot.console=ttyMSM0 user_debug=31

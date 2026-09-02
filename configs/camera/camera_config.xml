@@ -87,6 +87,7 @@ LensInfo : Information of the lens present in the module.
 -->
 
 <CameraConfigurationRoot>
+<!--
   <CameraModuleConfig>
     <CameraId>0</CameraId>
     <SensorName>s5k2l7sx</SensorName>
@@ -165,7 +166,7 @@ LensInfo : Information of the lens present in the module.
       <MinFocusDistance>0.1</MinFocusDistance>
     </LensInfo>
   </CameraModuleConfig>
-
+-->
   <CameraModuleConfig>
     <CameraId>0</CameraId>
     <SensorName>imx380_main</SensorName>
@@ -253,6 +254,7 @@ LensInfo : Information of the lens present in the module.
       <MinFocusDistance>0.34</MinFocusDistance>
     </LensInfo>
   </CameraModuleConfig>
+
   <CameraModuleConfig>
     <CameraId>3</CameraId>
     <SensorName>imx268_main</SensorName>

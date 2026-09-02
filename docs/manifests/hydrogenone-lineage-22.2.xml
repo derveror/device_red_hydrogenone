@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest>
+    <!--
+        Clean-checkout template for RED Hydrogen One / LineageOS 22.2.
+        Copy this file to .repo/local_manifests/hydrogenone.xml after repo init.
+        The RED vendor revision is intentionally pinned to the exact commit
+        verified by docs/reference/cross-tree-lock.json.
+    -->
+    <remote name="derveror" fetch="https://github.com/derveror/" />
+    <remote name="lineageos" fetch="https://github.com/LineageOS/" />
+
+    <project
+        name="device_red_hydrogenone"
+        path="device/red/hydrogenone"
+        remote="derveror"
+        revision="lineage-22.2-stock118-rework" />
+
+    <project
+        name="proprietary_vendor_red_hydrogenone"
+        path="vendor/red/hydrogenone"
+        remote="derveror"
+        revision="6fef3d7c6333602d7114aefa0284a03f5aadb454" />
+
+    <project
+        name="android_kernel_essential_msm8998"
+        path="kernel/essential/msm8998"
+        remote="lineageos"
+        revision="lineage-22.2" />
+
+    <project
+        name="android_device_qcom_sepolicy_vndr"
+        path="device/qcom/sepolicy-legacy-um"
+        remote="lineageos"
+        revision="lineage-22.2-legacy-um" />
+</manifest>

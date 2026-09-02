@@ -1,0 +1,20 @@
+name: Cross-tree evidence TDD
+
+on:
+  push:
+    branches:
+      - cross-tree-green-tdd
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run cross-tree contract tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          PYTHONPATH="$PWD/tests:$PWD" python3 -m unittest tests.test_cross_tree_contract -v

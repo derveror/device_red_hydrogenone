@@ -1,0 +1,76 @@
+name: Cross-tree Soong output TDD
+
+on:
+  push:
+    branches:
+      - cross-tree-schema3-integration2
+
+permissions:
+  contents: read
+
+jobs:
+  device_contract:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run complete device contract suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m json.tool docs/reference/cross-tree-lock.json >/dev/null
+          python3 -m json.tool docs/stock/h1a1000-r118/cross-tree-copy-contract.json >/dev/null
+          PYTHONPATH="$PWD/tests:$PWD" python3 - <<'PY'
+          import pathlib
+          import unittest
+          loader = unittest.defaultTestLoader
+          suite = unittest.TestSuite()
+          for path in sorted(pathlib.Path('tests').glob('test_*.py')):
+              if path.name == 'test_full_tree.py':
+                  continue
+              suite.addTests(loader.loadTestsFromName(f'tests.{path.stem}'))
+          result = unittest.TextTestRunner(verbosity=2).run(suite)
+          raise SystemExit(0 if result.wasSuccessful() else 1)
+          PY
+          python3 tests/test_full_tree.py
+          git diff --check
+
+  live_cross_tree:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: device-tree
+      - uses: actions/checkout@v4
+        with:
+          repository: derveror/proprietary_vendor_red_hydrogenone
+          ref: d30ac19025b348ca61535afaaecb23b95347b2f4
+          path: vendor-tree
+      - name: Compare live schema-v3 report with committed evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 device-tree/tools/analysis/cross_tree_contract.py \
+            --device-root device-tree \
+            --vendor-root vendor-tree \
+            --json > "$RUNNER_TEMP/live.json"
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          evidence = json.loads(Path('device-tree/docs/stock/h1a1000-r118/cross-tree-copy-contract.json').read_text())
+          live = json.loads((Path(os.environ['RUNNER_TEMP']) / 'live.json').read_text())
+          assert live['schema_version'] == evidence['schema_version'] == 3
+          assert len(live['vendor_soong_install_outputs']) == 451
+          assert evidence['status'] == 'zero_make_and_soong_install_collisions'
+          for key in (
+              'copy_destination_collisions',
+              'device_copy_vs_vendor_soong_collisions',
+              'vendor_copy_vs_vendor_soong_collisions',
+              'copy_vs_vendor_soong_collisions',
+              'vendor_soong_output_collisions',
+              'install_destination_collisions',
+          ):
+              assert live[key] == evidence[key] == [], (key, live[key], evidence[key])
+          for key in ('device_copy_destinations', 'vendor_copy_destinations', 'vendor_soong_install_outputs'):
+              assert live[key] == evidence[key], key
+          PY

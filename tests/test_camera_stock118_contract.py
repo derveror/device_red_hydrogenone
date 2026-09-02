@@ -1,24 +1,43 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+AUDIT = ROOT / "docs" / "stock" / "h1a1000-r118" / "device-vs-stock-config-audit.json"
+STOCK_SHA = "7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e"
+CAMERA_FILES = (
+    "configs/camera/camera_config.xml",
+    "configs/camera/imx268_main_chromatix.xml",
+    "configs/camera/imx268_sub_chromatix.xml",
+    "configs/camera/imx380_main_chromatix.xml",
+    "configs/camera/imx380_sub_chromatix.xml",
+)
 
-EXPECTED = {
-    "configs/camera/camera_config.xml": (5903, "436c8d655df7bde99889a10e2fdd6a7a1c9c540829b5428c55de61bdb6d9e5ef"),
-    "configs/camera/imx268_main_chromatix.xml": (11295, "70726f6300db246e16316dac0d8fc0ae46851543df0aa6c9ee9d54367d9abcd2"),
-    "configs/camera/imx268_sub_chromatix.xml": (11271, "436887e6d26c83d7be69dc10403edee5e56c416566e563eef962521f3dd3fa84"),
-    "configs/camera/imx380_main_chromatix.xml": (14923, "e6d7d669c9771161f9337eb8d47a40ba720b093712cc0f75f809462ddb6431df"),
-    "configs/camera/imx380_sub_chromatix.xml": (16489, "9cb4ed48cca0bb97314872779686150728a4129efe0ac07af2c9c33d944649fd"),
-}
+
+def expected_camera_identity() -> dict[str, tuple[int, str]]:
+    audit = json.loads(AUDIT.read_text(encoding="utf-8"))
+    authority = audit.get("authority", {})
+    if authority.get("stock_archive_sha256") != STOCK_SHA:
+        raise AssertionError(f"unexpected stock authority: {authority}")
+    by_source = {row["source"]: row for row in audit.get("rows", [])}
+    result: dict[str, tuple[int, str]] = {}
+    for source in CAMERA_FILES:
+        row = by_source.get(source)
+        if row is None:
+            raise AssertionError(f"camera source missing from canonical audit: {source}")
+        if not row.get("stock_sha256") or row.get("stock_size") is None:
+            raise AssertionError(f"camera stock identity missing from canonical audit: {source}")
+        result[source] = (int(row["stock_size"]), str(row["stock_sha256"]))
+    return result
 
 
 class CameraStock118ContractTest(unittest.TestCase):
     def test_exact_canonical_red118_camera_files(self) -> None:
         failures = []
-        for relative, (expected_size, expected_sha) in EXPECTED.items():
+        for relative, (expected_size, expected_sha) in expected_camera_identity().items():
             path = ROOT / relative
             if not path.is_file():
                 failures.append(f"missing {relative}")

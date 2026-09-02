@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - lineage-22.2-stock118-rework
-    paths:
-      - .github/workflows/verify-analysis.yml
   workflow_dispatch:
 
 permissions:

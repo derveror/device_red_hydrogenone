@@ -8,9 +8,22 @@
   },
   "authoritative_stock": {
     "name": "[FileSell]_H1A1000.082ho.01.00.10r.118_USERDEBUG_FASTBOOT.rar",
-    "expected_size_bytes": 1851974911,
-    "status": "visible through Google Drive connector but not downloaded; connector enforces 268435456-byte per-file limit",
-    "authority": "becomes authoritative only after local extraction, SHA-256 capture, and build-property verification"
+    "size_bytes": 1851974911,
+    "sha256": "6fcc610fd86b9b9152f1fcc9d0ca24a4ecba340d8dfd3f011495e2b8fc4d9c6c",
+    "split_part_count": 8,
+    "split_parts_verified": true,
+    "reconstructed_archive_verified": true,
+    "archive_format": "RAR5",
+    "archive_entry_count": 79,
+    "encrypted_regular_file_count": 78,
+    "extraction_status": "blocked_by_archive_password",
+    "status": "byte-identical archive reconstructed; content extraction pending legitimate password",
+    "authority": "archive identity is authoritative; file contents become authoritative only after password-based extraction, per-file hashing, and image validation",
+    "reports": [
+      "docs/stock/h1a1000-r118/ACQUISITION.md",
+      "docs/stock/h1a1000-r118/archive-entries.tsv",
+      "docs/stock/h1a1000-r118/SECONDARY_BUILD_METADATA.md"
+    ]
   },
   "reference_archives": [
     {

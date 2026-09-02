@@ -1,0 +1,62 @@
+name: Apply verified reference analysis
+
+on:
+  push:
+    branches:
+      - lineage-22.2-stock118-rework
+    paths:
+      - .github/workflows/apply-reference-analysis.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out rework branch
+        uses: actions/checkout@v4
+        with:
+          ref: lineage-22.2-stock118-rework
+          fetch-depth: 0
+
+      - name: Verify, apply, and test analysis patch
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          cat .github/bootstrap/analysis.patch.xz.b64.part* \
+            | base64 -d > /tmp/hydrogenone-analysis.patch.xz
+          echo "f7d08b64b65a7ac8803a86ac1ab67777387ab7767d6b15abbcaaa581e3fdd5ea  /tmp/hydrogenone-analysis.patch.xz" \
+            | sha256sum -c -
+          xz -dc /tmp/hydrogenone-analysis.patch.xz \
+            > /tmp/hydrogenone-analysis.patch
+
+          git apply --check /tmp/hydrogenone-analysis.patch
+          git apply /tmp/hydrogenone-analysis.patch
+
+          PYTHONPATH=tests:. python3 -m unittest \
+            tests.test_archive_inventory \
+            tests.test_tree_compare \
+            tests.test_source_lock \
+            tests.test_reconstruct_stock -v
+          python3 tests/test_full_tree.py
+          python3 tools/analysis/source_lock.py \
+            --validate \
+            --lock docs/reference/source-lock.json \
+            --inventory docs/reference/archive-inventory.json
+          python3 -m py_compile \
+            tools/analysis/archive_inventory.py \
+            tools/analysis/tree_compare.py \
+            tools/analysis/source_lock.py \
+            tools/analysis/reconstruct_stock.py
+
+          rm -rf .github/bootstrap
+          rm -f .github/workflows/apply-reference-analysis.yml
+
+          git config user.name "OpenAI"
+          git config user.email "noreply@openai.com"
+          git add -A
+          git commit -m "tools: add verified reference archive analysis"
+          git push origin HEAD:lineage-22.2-stock118-rework

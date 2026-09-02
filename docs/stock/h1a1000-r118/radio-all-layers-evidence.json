@@ -1,0 +1,457 @@
+{
+  "authority": {
+    "layers": [
+      "vendor",
+      "system",
+      "boot",
+      "standalone_ramdisk"
+    ],
+    "stock_archive_sha256": "7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e",
+    "stock_build": "H1A1000.082ho.01.00.10r.118"
+  },
+  "init": {
+    "controls": [
+      {
+        "line": 1044,
+        "path": "vendor:etc/init/hw/init.qcom.rc",
+        "target": "ims_regmanager",
+        "trigger": "property:persist.ims.regmanager.mode=1",
+        "verb": "start"
+      },
+      {
+        "line": 452,
+        "path": "vendor:etc/init/hw/init.target.rc",
+        "target": "vendor.ims_rtp_daemon",
+        "trigger": "property:vendor.ims.DATA_DAEMON_STATUS=1",
+        "verb": "restart"
+      },
+      {
+        "line": 203,
+        "path": "vendor:etc/init/hw/init.target.rc",
+        "target": "vendor.ims_rtp_daemon",
+        "trigger": "property:sys.shutdown.requested=*",
+        "verb": "stop"
+      },
+      {
+        "line": 430,
+        "path": "vendor:etc/init/hw/init.target.rc",
+        "target": "vendor.imsdatadaemon",
+        "trigger": "property:vendor.ims.QMI_DAEMON_STATUS=1",
+        "verb": "start"
+      }
+    ],
+    "imports": [
+      {
+        "line": 9,
+        "path": "system:init.rc",
+        "target": "/init.${ro.hardware}.rc"
+      },
+      {
+        "line": 12,
+        "path": "system:init.rc",
+        "target": "/init.${ro.zygote}.rc"
+      },
+      {
+        "line": 7,
+        "path": "system:init.rc",
+        "target": "/init.environ.rc"
+      },
+      {
+        "line": 11,
+        "path": "system:init.rc",
+        "target": "/init.usb.configfs.rc"
+      },
+      {
+        "line": 8,
+        "path": "system:init.rc",
+        "target": "/init.usb.rc"
+      },
+      {
+        "line": 10,
+        "path": "system:init.rc",
+        "target": "/vendor/etc/init/hw/init.${ro.hardware}.rc"
+      },
+      {
+        "line": 29,
+        "path": "vendor:etc/init/hw/init.qcom.rc",
+        "target": "/vendor/etc/init/hw/init.msm.usb.configfs.rc"
+      },
+      {
+        "line": 31,
+        "path": "vendor:etc/init/hw/init.qcom.rc",
+        "target": "/vendor/etc/init/hw/init.qcom.factory.rc"
+      },
+      {
+        "line": 32,
+        "path": "vendor:etc/init/hw/init.qcom.rc",
+        "target": "/vendor/etc/init/hw/init.qcom.test.rc"
+      },
+      {
+        "line": 28,
+        "path": "vendor:etc/init/hw/init.qcom.rc",
+        "target": "/vendor/etc/init/hw/init.qcom.usb.rc"
+      },
+      {
+        "line": 30,
+        "path": "vendor:etc/init/hw/init.qcom.rc",
+        "target": "/vendor/etc/init/hw/init.target.rc"
+      }
+    ],
+    "services": [
+      {
+        "disabled": true,
+        "executable": "/system/vendor/bin/exe-ims-regmanagerprocessnative",
+        "line": 1038,
+        "name": "ims_regmanager",
+        "path": "vendor:etc/init/hw/init.qcom.rc"
+      },
+      {
+        "disabled": false,
+        "executable": "/system/vendor/bin/ims_rtp_daemon",
+        "line": 441,
+        "name": "vendor.ims_rtp_daemon",
+        "path": "vendor:etc/init/hw/init.target.rc"
+      },
+      {
+        "disabled": true,
+        "executable": "/system/vendor/bin/imsdatadaemon",
+        "line": 366,
+        "name": "vendor.imsdatadaemon",
+        "path": "vendor:etc/init/hw/init.target.rc"
+      },
+      {
+        "disabled": false,
+        "executable": "/system/vendor/bin/imsqmidaemon",
+        "line": 359,
+        "name": "vendor.imsqmidaemon",
+        "path": "vendor:etc/init/hw/init.target.rc"
+      },
+      {
+        "disabled": false,
+        "executable": "/system/vendor/bin/imsrcsd",
+        "line": 446,
+        "name": "vendor.imsrcsservice",
+        "path": "vendor:etc/init/hw/init.target.rc"
+      },
+      {
+        "disabled": true,
+        "executable": "/vendor/bin/hw/qcrild",
+        "line": 1,
+        "name": "vendor.qcrild",
+        "path": "vendor:etc/init/qcrild.rc"
+      },
+      {
+        "disabled": true,
+        "executable": "/vendor/bin/hw/qcrild -c 2",
+        "line": 8,
+        "name": "vendor.qcrild2",
+        "path": "vendor:etc/init/qcrild.rc"
+      },
+      {
+        "disabled": true,
+        "executable": "/vendor/bin/hw/qcrild -c 3",
+        "line": 15,
+        "name": "vendor.qcrild3",
+        "path": "vendor:etc/init/qcrild.rc"
+      },
+      {
+        "disabled": true,
+        "executable": "/vendor/bin/hw/rild",
+        "line": 1,
+        "name": "vendor.ril-daemon",
+        "path": "vendor:etc/init/rild.rc"
+      },
+      {
+        "disabled": true,
+        "executable": "/vendor/bin/hw/rild",
+        "line": 1,
+        "name": "vendor.ril-daemon",
+        "path": "vendor:etc/init/vendor.rild.rc"
+      },
+      {
+        "disabled": true,
+        "executable": "/vendor/bin/hw/rild -c 2",
+        "line": 1055,
+        "name": "vendor.ril-daemon2",
+        "path": "vendor:etc/init/hw/init.qcom.rc"
+      },
+      {
+        "disabled": true,
+        "executable": "/vendor/bin/hw/rild -c 3",
+        "line": 1062,
+        "name": "vendor.ril-daemon3",
+        "path": "vendor:etc/init/hw/init.qcom.rc"
+      }
+    ],
+    "starts": [
+      {
+        "line": 1044,
+        "path": "vendor:etc/init/hw/init.qcom.rc",
+        "target": "ims_regmanager",
+        "trigger": "property:persist.ims.regmanager.mode=1"
+      },
+      {
+        "line": 430,
+        "path": "vendor:etc/init/hw/init.target.rc",
+        "target": "vendor.imsdatadaemon",
+        "trigger": "property:vendor.ims.QMI_DAEMON_STATUS=1"
+      }
+    ],
+    "stops": [
+      {
+        "line": 203,
+        "path": "vendor:etc/init/hw/init.target.rc",
+        "target": "vendor.ims_rtp_daemon",
+        "trigger": "property:sys.shutdown.requested=*"
+      }
+    ]
+  },
+  "layer_counts": {
+    "boot": {
+      "controls": 0,
+      "init_services": 0,
+      "radio_properties": 0
+    },
+    "standalone_ramdisk": {
+      "controls": 0,
+      "init_services": 0,
+      "radio_properties": 0
+    },
+    "system": {
+      "controls": 0,
+      "init_services": 0,
+      "radio_properties": 20
+    },
+    "vendor": {
+      "controls": 4,
+      "init_services": 12,
+      "radio_properties": 7
+    }
+  },
+  "properties": [
+    {
+      "key": "persist.data.iwlan.ims.enable",
+      "line": 99,
+      "path": "archive:fastboot/build.prop",
+      "value": "1"
+    },
+    {
+      "key": "persist.data.iwlan.ims.enable",
+      "line": 99,
+      "path": "system:system/build.prop",
+      "value": "1"
+    },
+    {
+      "key": "persist.dbg.allow_ims_off",
+      "line": 103,
+      "path": "archive:fastboot/build.prop",
+      "value": "1"
+    },
+    {
+      "key": "persist.dbg.allow_ims_off",
+      "line": 103,
+      "path": "system:system/build.prop",
+      "value": "1"
+    },
+    {
+      "key": "persist.radio.VT_ENABLE",
+      "line": 96,
+      "path": "archive:fastboot/build.prop",
+      "value": "1"
+    },
+    {
+      "key": "persist.radio.VT_ENABLE",
+      "line": 96,
+      "path": "system:system/build.prop",
+      "value": "1"
+    },
+    {
+      "key": "persist.radio.VT_HYBRID_ENABLE",
+      "line": 97,
+      "path": "archive:fastboot/build.prop",
+      "value": "1"
+    },
+    {
+      "key": "persist.radio.VT_HYBRID_ENABLE",
+      "line": 97,
+      "path": "system:system/build.prop",
+      "value": "1"
+    },
+    {
+      "key": "persist.radio.data_con_rprt",
+      "line": 100,
+      "path": "archive:fastboot/build.prop",
+      "value": "1"
+    },
+    {
+      "key": "persist.radio.data_con_rprt",
+      "line": 100,
+      "path": "system:system/build.prop",
+      "value": "1"
+    },
+    {
+      "key": "persist.radio.flex_map_inactive",
+      "line": 107,
+      "path": "archive:fastboot/build.prop",
+      "value": "true"
+    },
+    {
+      "key": "persist.radio.flex_map_inactive",
+      "line": 107,
+      "path": "system:system/build.prop",
+      "value": "true"
+    },
+    {
+      "key": "persist.radio.multisim.config",
+      "line": 90,
+      "path": "vendor:build.prop",
+      "value": "dsds"
+    },
+    {
+      "key": "persist.rild.nitz_long_ons_0",
+      "line": 9,
+      "path": "system:system/system.prop",
+      "value": ""
+    },
+    {
+      "key": "persist.rild.nitz_long_ons_1",
+      "line": 10,
+      "path": "system:system/system.prop",
+      "value": ""
+    },
+    {
+      "key": "persist.rild.nitz_long_ons_2",
+      "line": 11,
+      "path": "system:system/system.prop",
+      "value": ""
+    },
+    {
+      "key": "persist.rild.nitz_long_ons_3",
+      "line": 12,
+      "path": "system:system/system.prop",
+      "value": ""
+    },
+    {
+      "key": "persist.rild.nitz_plmn",
+      "line": 8,
+      "path": "system:system/system.prop",
+      "value": ""
+    },
+    {
+      "key": "persist.rild.nitz_short_ons_0",
+      "line": 13,
+      "path": "system:system/system.prop",
+      "value": ""
+    },
+    {
+      "key": "persist.rild.nitz_short_ons_1",
+      "line": 14,
+      "path": "system:system/system.prop",
+      "value": ""
+    },
+    {
+      "key": "persist.rild.nitz_short_ons_2",
+      "line": 15,
+      "path": "system:system/system.prop",
+      "value": ""
+    },
+    {
+      "key": "persist.rild.nitz_short_ons_3",
+      "line": 16,
+      "path": "system:system/system.prop",
+      "value": ""
+    },
+    {
+      "key": "persist.vendor.radio.apm_sim_not_pwdn",
+      "line": 47,
+      "path": "vendor:build.prop",
+      "value": "1"
+    },
+    {
+      "key": "persist.vendor.radio.custom_ecc",
+      "line": 49,
+      "path": "vendor:build.prop",
+      "value": "1"
+    },
+    {
+      "key": "persist.vendor.radio.rat_on",
+      "line": 50,
+      "path": "vendor:build.prop",
+      "value": "combine"
+    },
+    {
+      "key": "persist.vendor.radio.sib16_support",
+      "line": 48,
+      "path": "vendor:build.prop",
+      "value": "1"
+    },
+    {
+      "key": "ril.subscription.types",
+      "line": 17,
+      "path": "system:system/system.prop",
+      "value": "NV,RUIM"
+    },
+    {
+      "key": "rild.libpath",
+      "line": 6,
+      "path": "system:system/system.prop",
+      "value": "/system/vendor/lib64/libril-qc-qmi-1.so"
+    },
+    {
+      "key": "rild.libpath",
+      "line": 87,
+      "path": "vendor:build.prop",
+      "value": "/system/vendor/lib64/libril-qc-qmi-1.so"
+    },
+    {
+      "key": "ro.telephony.default_network",
+      "line": 64,
+      "path": "archive:fastboot/build.prop",
+      "value": "22,22"
+    },
+    {
+      "key": "ro.telephony.default_network",
+      "line": 64,
+      "path": "system:system/build.prop",
+      "value": "22,22"
+    },
+    {
+      "key": "ro.telephony.default_network",
+      "line": 20,
+      "path": "system:system/system.prop",
+      "value": "22,20"
+    },
+    {
+      "key": "telephony.lteOnCdmaDevice",
+      "line": 86,
+      "path": "system:system/system.prop",
+      "value": "1"
+    },
+    {
+      "key": "vendor.rild.libpath",
+      "line": 89,
+      "path": "vendor:build.prop",
+      "value": "/system/vendor/lib64/libril-qc-qmi-1.so"
+    }
+  ],
+  "schema_version": 1,
+  "summary": {
+    "defined_qcrild_services": [
+      "vendor.qcrild",
+      "vendor.qcrild2",
+      "vendor.qcrild3"
+    ],
+    "explicit_qcrild_start_targets": [],
+    "multisim_values": [
+      "dsds"
+    ],
+    "note": "Runtime recommendation is limited to stock init activation evidence (start/enable/restart/ctl.start); service definitions alone do not prove an instance should be started.",
+    "qcrild_activation_targets": [],
+    "recommended_runtime_instances_from_evidence": [],
+    "unstarted_defined_qcrild_services": [
+      "vendor.qcrild",
+      "vendor.qcrild2",
+      "vendor.qcrild3"
+    ]
+  }
+}

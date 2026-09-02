@@ -208,7 +208,13 @@
     "vendor/etc/fstab.qcom": [
       "device.mk"
     ],
-    "vendor/etc/init/hw/$(notdir": [
+    "vendor/etc/init/hw/init.qcom.rc": [
+      "device.mk"
+    ],
+    "vendor/etc/init/hw/init.qcom.usb.rc": [
+      "device.mk"
+    ],
+    "vendor/etc/init/hw/init.target.rc": [
       "device.mk"
     ],
     "vendor/etc/izat.conf": [
@@ -396,8 +402,8 @@
     ]
   },
   "device_root": "device-tree",
-  "schema_version": 1,
-  "status": "zero_copy_destination_collisions",
+  "schema_version": 2,
+  "status": "zero_expanded_copy_destination_collisions",
   "vendor_copy_destinations": {
     "vendor/bin/init.qcom.sensors.sh": [
       "hydrogenone-vendor.mk"

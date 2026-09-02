@@ -1,0 +1,60 @@
+name: Verify stock intake and analysis tooling
+
+on:
+  push:
+    branches:
+      - lineage-22.2-stock118-rework
+    paths:
+      - .github/workflows/verify-analysis.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate JSON and source lock
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m json.tool docs/reference/source-lock.json >/dev/null
+          python3 -m json.tool docs/reference/archive-inventory.json >/dev/null
+          python3 -m json.tool docs/reference/archive-comparisons.json >/dev/null
+          python3 tools/analysis/source_lock.py \
+            --validate \
+            --lock docs/reference/source-lock.json \
+            --inventory docs/reference/archive-inventory.json
+
+      - name: Run analysis unit tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m unittest -v \
+            tests.test_archive_inventory \
+            tests.test_reconstruct_stock \
+            tests.test_source_lock \
+            tests.test_tree_compare
+
+      - name: Run complete tree contract audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tests/test_full_tree.py
+
+      - name: Verify stock intake records
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(wc -l < docs/stock/h1a1000-r118/parts.sha256)" -eq 8
+          test "$(wc -l < docs/stock/h1a1000-r118/archive-entries.tsv)" -eq 80
+          grep -Fq '6fcc610fd86b9b9152f1fcc9d0ca24a4ecba340d8dfd3f011495e2b8fc4d9c6c' \
+            docs/stock/h1a1000-r118/original.sha256
+          grep -Fq '"android_release": "15"' docs/reference/source-lock.json
+          grep -Fq '"android_api_level": 35' docs/reference/source-lock.json
+          grep -Fq '"extraction_status": "blocked_by_archive_password"' docs/reference/source-lock.json
+          ! find . -type d -path './device/red/msm8998-common' -print -quit | grep -q .
+          ! find . -type d -path './vendor/red/msm8998-common' -print -quit | grep -q .

@@ -18,7 +18,12 @@ VENDOR_OWNED_RED118_CONFIGS = {
 
 
 class CrossTreeContractTest(unittest.TestCase):
-    def run_tool(self, device_mk: str, vendor_mk: str) -> subprocess.CompletedProcess[str]:
+    def run_tool(
+        self,
+        device_mk: str,
+        vendor_mk: str,
+        device_files: dict[str, str] | None = None,
+    ) -> subprocess.CompletedProcess[str]:
         with tempfile.TemporaryDirectory() as td:
             base = Path(td)
             device = base / "device"
@@ -27,6 +32,10 @@ class CrossTreeContractTest(unittest.TestCase):
             vendor.mkdir()
             (device / "device.mk").write_text(device_mk, encoding="utf-8")
             (vendor / "hydrogenone-vendor.mk").write_text(vendor_mk, encoding="utf-8")
+            for relative, content in (device_files or {}).items():
+                path = device / relative
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text(content, encoding="utf-8")
             return subprocess.run(
                 [
                     sys.executable,
@@ -68,6 +77,23 @@ class CrossTreeContractTest(unittest.TestCase):
         self.assertEqual(proc.returncode, 0, proc.stderr)
         payload = json.loads(proc.stdout)
         self.assertEqual(payload["copy_destination_collisions"], [])
+
+    def test_expands_simple_foreach_wildcard_copy_destinations(self) -> None:
+        proc = self.run_tool(
+            "$(foreach f,$(wildcard $(LOCAL_PATH)/rootdir/etc/init/hw/*.rc),\\\n"
+            "    $(eval PRODUCT_COPY_FILES += $(f):$(TARGET_COPY_OUT_VENDOR)/etc/init/hw/$(notdir $(f))))\n",
+            "PRODUCT_COPY_FILES += \\\n"
+            "    vendor/red/hydrogenone/proprietary/vendor/etc/init/hw/init.alpha.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/hw/init.alpha.rc\n",
+            device_files={
+                "rootdir/etc/init/hw/init.alpha.rc": "on boot\n",
+                "rootdir/etc/init/hw/init.beta.rc": "on boot\n",
+            },
+        )
+        self.assertEqual(proc.returncode, 1, proc.stderr)
+        payload = json.loads(proc.stdout)
+        self.assertIn("vendor/etc/init/hw/init.alpha.rc", payload["copy_destination_collisions"])
+        self.assertIn("vendor/etc/init/hw/init.beta.rc", payload["device_copy_destinations"])
+        self.assertNotIn("vendor/etc/init/hw/$(notdir", payload["device_copy_destinations"])
 
     def test_red118_vendor_owned_configs_are_not_active_device_copies(self) -> None:
         text = DEVICE_MK.read_text(encoding="utf-8")

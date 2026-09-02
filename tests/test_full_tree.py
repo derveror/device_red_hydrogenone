@@ -120,13 +120,19 @@ for needle in (
     if needle not in device:
         errors.append('missing device.mk wiring: '+needle)
 
-# Vendor hooks must be future-safe, not mandatory for source-only stage.
+# A real LineageOS build requires the verified RED .118 vendor tree. Match
+# maintained Lineage device trees and fail early if generated vendor makefiles
+# are absent instead of silently configuring a source-only product.
 board=(ROOT/'BoardConfig.mk').read_text(errors='ignore') if (ROOT/'BoardConfig.mk').exists() else ''
 prod=(ROOT/'lineage_hydrogenone.mk').read_text(errors='ignore') if (ROOT/'lineage_hydrogenone.mk').exists() else ''
-if '-include vendor/red/hydrogenone/BoardConfigVendor.mk' not in board:
-    errors.append('missing optional BoardConfigVendor hook')
-if 'inherit-product-if-exists, vendor/red/hydrogenone/hydrogenone-vendor.mk' not in prod:
-    errors.append('missing optional vendor product hook')
+if not re.search(r'(?m)^\s*include\s+vendor/red/hydrogenone/BoardConfigVendor\.mk\s*$', board):
+    errors.append('missing mandatory RED BoardConfigVendor include')
+if re.search(r'(?m)^\s*-include\s+vendor/red/hydrogenone/BoardConfigVendor\.mk\s*$', board):
+    errors.append('RED BoardConfigVendor must not be optional')
+if '$(call inherit-product, vendor/red/hydrogenone/hydrogenone-vendor.mk)' not in prod:
+    errors.append('missing mandatory RED vendor product inheritance')
+if 'inherit-product-if-exists, vendor/red/hydrogenone/hydrogenone-vendor.mk' in prod:
+    errors.append('RED vendor product inheritance must not be optional')
 
 # MSM8998 generic policy is a real LineageOS dependency, pinned to its 22.2 legacy-um branch.
 deps=json.loads((ROOT/'lineage.dependencies').read_text()) if (ROOT/'lineage.dependencies').exists() else []

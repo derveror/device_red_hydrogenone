@@ -10,6 +10,7 @@ from typing import Any, Iterable
 RADIO_KEY_RE = re.compile(r"(?:radio|ril|ims|multisim|dsds|dsda|phone_count|sim_count|telephony)", re.I)
 RADIO_INIT_RE = re.compile(r"(?:qcril|rild|radio|ims)", re.I)
 PROPERTY_NAMES = {"build.prop", "default.prop", "vendor.prop"}
+ACTIVATION_VERBS = {"start", "enable", "restart", "ctl.start"}
 
 
 def _read_text(path: Path) -> str:
@@ -59,9 +60,10 @@ def scan_init_files(root: Path) -> dict[str, list[dict[str, Any]]]:
     services: list[dict[str, Any]] = []
     starts: list[dict[str, Any]] = []
     stops: list[dict[str, Any]] = []
+    controls: list[dict[str, Any]] = []
     imports: list[dict[str, Any]] = []
     if not root.exists():
-        return {"services": services, "starts": starts, "stops": stops, "imports": imports}
+        return {"services": services, "starts": starts, "stops": stops, "controls": controls, "imports": imports}
 
     for path in sorted(root.rglob("*.rc")):
         rel = path.relative_to(root).as_posix()
@@ -115,19 +117,40 @@ def scan_init_files(root: Path) -> dict[str, list[dict[str, Any]]]:
                 current_service["disabled"] = True
                 continue
 
-            for verb, bucket in (("start ", starts), ("stop ", stops)):
-                if stripped.startswith(verb):
-                    target = stripped[len(verb) :].strip().split()[0]
+            for prefix, bucket, verb in (("start ", starts, "start"), ("stop ", stops, "stop")):
+                if stripped.startswith(prefix):
+                    target = stripped[len(prefix) :].strip().split()[0]
                     if RADIO_INIT_RE.search(target):
-                        bucket.append({"path": rel, "line": line_no, "trigger": current_trigger, "target": target})
+                        row = {"path": rel, "line": line_no, "trigger": current_trigger, "target": target}
+                        bucket.append(row)
+                        controls.append({**row, "verb": verb})
+
+            for prefix, verb in (("enable ", "enable"), ("restart ", "restart")):
+                if stripped.startswith(prefix):
+                    target = stripped[len(prefix) :].strip().split()[0]
+                    if RADIO_INIT_RE.search(target):
+                        controls.append(
+                            {"path": rel, "line": line_no, "trigger": current_trigger, "target": target, "verb": verb}
+                        )
+
+            if stripped.startswith("setprop ctl.start ") or stripped.startswith("setprop ctl.stop "):
+                parts = stripped.split()
+                if len(parts) >= 3:
+                    prop = parts[1]
+                    target = parts[2]
+                    if RADIO_INIT_RE.search(target):
+                        controls.append(
+                            {"path": rel, "line": line_no, "trigger": current_trigger, "target": target, "verb": prop}
+                        )
 
         finish_service()
 
     services.sort(key=lambda row: (row["name"], row["path"], row["line"]))
     starts.sort(key=lambda row: (row["target"], row["path"], row["line"]))
     stops.sort(key=lambda row: (row["target"], row["path"], row["line"]))
+    controls.sort(key=lambda row: (row["target"], row["verb"], row["path"], row["line"]))
     imports.sort(key=lambda row: (row["path"], row["line"]))
-    return {"services": services, "starts": starts, "stops": stops, "imports": imports}
+    return {"services": services, "starts": starts, "stops": stops, "controls": controls, "imports": imports}
 
 
 def derive_summary(evidence: dict[str, Any]) -> dict[str, Any]:
@@ -135,6 +158,7 @@ def derive_summary(evidence: dict[str, Any]) -> dict[str, Any]:
     init = evidence.get("init", {})
     services = init.get("services", [])
     starts = init.get("starts", [])
+    controls = init.get("controls", [])
 
     multisim_values = sorted(
         {
@@ -147,15 +171,24 @@ def derive_summary(evidence: dict[str, Any]) -> dict[str, Any]:
     explicit_qcrild_start_targets = sorted(
         {row["target"] for row in starts if "qcril" in row.get("target", "").lower()}
     )
-    unstarted = sorted(set(qcrild_services) - set(explicit_qcrild_start_targets))
+    qcrild_activation_targets = sorted(
+        {
+            row["target"]
+            for row in controls
+            if row.get("verb") in ACTIVATION_VERBS and "qcril" in row.get("target", "").lower()
+        }
+        | set(explicit_qcrild_start_targets)
+    )
+    unstarted = sorted(set(qcrild_services) - set(qcrild_activation_targets))
 
     return {
         "multisim_values": multisim_values,
         "defined_qcrild_services": qcrild_services,
         "explicit_qcrild_start_targets": explicit_qcrild_start_targets,
+        "qcrild_activation_targets": qcrild_activation_targets,
         "unstarted_defined_qcrild_services": unstarted,
-        "recommended_runtime_instances_from_evidence": explicit_qcrild_start_targets,
-        "note": "Runtime recommendation is limited to instances explicitly started by stock init evidence; service definitions alone do not prove an instance should be started.",
+        "recommended_runtime_instances_from_evidence": qcrild_activation_targets,
+        "note": "Runtime recommendation is limited to stock init activation evidence (start/enable/restart/ctl.start); service definitions alone do not prove an instance should be started.",
     }
 
 
@@ -173,7 +206,8 @@ def render_markdown(evidence: dict[str, Any]) -> str:
         f"- Multi-SIM property values observed: `{summary['multisim_values']}`",
         f"- qcrild services defined by stock init: `{summary['defined_qcrild_services']}`",
         f"- qcrild instances explicitly started by stock init: `{summary['explicit_qcrild_start_targets']}`",
-        f"- Defined but not explicitly started: `{summary['unstarted_defined_qcrild_services']}`",
+        f"- qcrild instances activated by stock init controls: `{summary['qcrild_activation_targets']}`",
+        f"- Defined but not activated: `{summary['unstarted_defined_qcrild_services']}`",
         "",
         summary["note"],
         "",
@@ -193,10 +227,12 @@ def render_markdown(evidence: dict[str, Any]) -> str:
     if not evidence["init"]["services"]:
         lines.append("- None found.")
 
-    lines.extend(["", "## Explicit starts", ""])
-    for row in evidence["init"]["starts"]:
-        lines.append(f"- `{row['path']}:{row['line']}` under `{row['trigger']}` — `start {row['target']}`")
-    if not evidence["init"]["starts"]:
+    lines.extend(["", "## Radio/IMS controls", ""])
+    for row in evidence["init"].get("controls", []):
+        lines.append(
+            f"- `{row['path']}:{row['line']}` under `{row['trigger']}` — `{row['verb']} {row['target']}`"
+        )
+    if not evidence["init"].get("controls", []):
         lines.append("- None found.")
     lines.append("")
     return "\n".join(lines)
@@ -216,7 +252,7 @@ def main() -> int:
     properties.sort(key=lambda row: (row["key"], row["path"], row["line"]))
 
     evidence: dict[str, Any] = {
-        "schema_version": 1,
+        "schema_version": 2,
         "authority": {
             "stock_build": "H1A1000.082ho.01.00.10r.118",
             "stock_archive_sha256": args.stock_sha256,

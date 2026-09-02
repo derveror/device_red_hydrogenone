@@ -2,31 +2,36 @@
 
 > **READ THIS FILE FIRST AFTER ANY INTERRUPTION.**
 
-**Marker version:** 3  
-**Last completed action file:** `docs/worklog/2026-09-02/0004-cross-tree-repin-ci-failure.md`  
+**Marker version:** 4  
+**Last completed action file:** `docs/worklog/2026-09-02/0005-build-readiness-roomservice-audit.md`  
 **Logging protocol active:** YES
 
 ## Current repository checkpoints
 
 ### Device
 - Repository: `derveror/device_red_hydrogenone`
-- Branch: `lineage-22.2-stock118-rework`
-- Last non-log project checkpoint before worklog: `4036ecea476c5561001310ec17451cb8bcb18adb`.
-- Cross-tree lock was advanced in commit `5cc099b7fa65ab183476ed403351c82013084974` to vendor `6fef3d7c...`, but the permanent device CI run `33684878692` failed. Treat the repin as **UNVERIFIED/BROKEN until fixed or reverted**.
+- Branch: `lineage-22.2-stock118-rework`.
+- Cross-tree lock currently points to vendor `6fef3d7c6333602d7114aefa0284a03f5aadb454`.
+- The first repin CI failed because the permanent workflow and published cross-tree evidence still referred to `d30ac190...`.
+- `.github/workflows/verify-analysis.yml` has already been updated to checkout `6fef3d7c...`.
+- A one-shot `regenerate-cross-tree-evidence.yml` is active for diagnostics/regeneration; its first attempt showed the live contract tool itself returned nonzero before evidence rewrite, so current device/vendor copy collisions must be diagnosed before declaring the repin GREEN.
 
 ### Vendor
-- Repository: `derveror/proprietary_vendor_red_hydrogenone`
-- Branch: `lineage-22.2-android15-contract`
-- Current vendor head: `6fef3d7c6333602d7114aefa0284a03f5aadb454`.
-- Vendor CI at this head is GREEN.
-- `6fef3d7c...` is one commit ahead of `d30ac190...` and changes only `.github/workflows/verify-vendor-contract.yml`.
+- Repository: `derveror/proprietary_vendor_red_hydrogenone`.
+- Branch: `lineage-22.2-android15-contract`.
+- Current GREEN head: `6fef3d7c6333602d7114aefa0284a03f5aadb454`.
+- Relative to `d30ac190...`, this head changes only the permanent vendor CI workflow; proprietary payload/config is unchanged.
 
 ## Canonical stock authority
 
-- Build: `H1A1000.082ho.01.00.10r.118`
-- Android: 9 / API 28; first API 27
-- Archive SHA-256: `7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e`
-- Exact `.118` boot/kernel, product identity, vendor patch, DSDS/qcrild, fstab migration and major static ownership contracts remain pinned.
+- Build: `H1A1000.082ho.01.00.10r.118`.
+- Android 9 / API 28; first API 27.
+- Archive SHA-256: `7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e`.
+- Exact `.118` boot/kernel, product identity, vendor patch, DSDS/qcrild, fstab migration, camera topology/tuning and major Android 15 ownership contracts are pinned.
+
+## Build-readiness finding already established
+
+LineageOS 22.2 `roomservice.py` resolves ordinary `lineage.dependencies` entries as `LineageOS/<repository>`. Therefore the custom `derveror/proprietary_vendor_red_hydrogenone` cannot be added as a normal dependency entry. A checked-in local-manifest strategy is required for reproducible clean checkout. LineageOS-owned kernel/sepolicy dependencies remain suitable for `lineage.dependencies`.
 
 ## Hard architecture constraints
 
@@ -39,18 +44,12 @@
 
 ## Immediate next action — DO THIS FIRST
 
-Inspect exact failure logs:
+Read the latest run/log of `regenerate-cross-tree-evidence.yml` and obtain the exact `LIVE_COPY_DESTINATION_COLLISIONS` list. Fix ownership collisions based on source/vendor responsibility, then regenerate evidence and restore permanent CI to GREEN.
 
-- device `verify` job: `100429832398`;
-- device `cross_tree` job: `100429832118`;
-- workflow run: `33684878692`.
+## After cross-tree GREEN
 
-Find the first real assertion failures. Do not declare the new vendor pin valid and do not proceed to `m nothing` readiness until this gate is GREEN again.
-
-## After that
-
-Continue build-readiness analysis of `lineage.dependencies` / local-manifest requirements. Current known fact: LineageOS `roomservice.py` resolves normal `lineage.dependencies` GitHub entries under the `LineageOS/` organization, so the custom `derveror/proprietary_vendor_red_hydrogenone` cannot simply be added as a normal dependency entry without a separate local-manifest strategy.
+Create/test the reproducible local-manifest template and make the kernel branch explicit in `lineage.dependencies`, then move to actual clean LineageOS workspace `lunch` + `m nothing`.
 
 ## Recovery rule
 
-After an interruption, do **not** infer state from chat prose. Read this marker, then the last numbered action file, then verify both branch heads from GitHub before continuing.
+After interruption, do **not** infer state from chat prose. Read this marker, then the last numbered action file, then verify both branch heads and any active one-shot workflow from GitHub before continuing.

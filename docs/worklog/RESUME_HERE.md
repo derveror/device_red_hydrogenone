@@ -2,25 +2,26 @@
 
 > **READ THIS FILE FIRST AFTER ANY INTERRUPTION.**
 
-**Marker version:** 4  
-**Last completed action file:** `docs/worklog/2026-09-02/0005-build-readiness-roomservice-audit.md`  
+**Marker version:** 5  
+**Last completed action file:** `docs/worklog/2026-09-02/0006-cross-tree-live-collision-diagnostic.md`  
 **Logging protocol active:** YES
 
 ## Current repository checkpoints
 
 ### Device
-- Repository: `derveror/device_red_hydrogenone`
+- Repository: `derveror/device_red_hydrogenone`.
 - Branch: `lineage-22.2-stock118-rework`.
-- Cross-tree lock currently points to vendor `6fef3d7c6333602d7114aefa0284a03f5aadb454`.
-- The first repin CI failed because the permanent workflow and published cross-tree evidence still referred to `d30ac190...`.
-- `.github/workflows/verify-analysis.yml` has already been updated to checkout `6fef3d7c...`.
-- A one-shot `regenerate-cross-tree-evidence.yml` is active for diagnostics/regeneration; its first attempt showed the live contract tool itself returned nonzero before evidence rewrite, so current device/vendor copy collisions must be diagnosed before declaring the repin GREEN.
+- Cross-tree lock points to vendor `6fef3d7c6333602d7114aefa0284a03f5aadb454`.
+- Permanent cross-tree checkout has been updated to the same vendor commit.
+- Published `cross-tree-copy-contract.json` is stale and still belongs to the earlier zero-collision state.
+- Live diagnostic against the current device tree + vendor `6fef3d7c...` found 49 duplicate install destinations; exact list is preserved in Action 0006.
+- Do NOT declare cross-tree GREEN and do NOT merely rewrite the evidence authority until these ownership collisions are resolved.
 
 ### Vendor
 - Repository: `derveror/proprietary_vendor_red_hydrogenone`.
 - Branch: `lineage-22.2-android15-contract`.
 - Current GREEN head: `6fef3d7c6333602d7114aefa0284a03f5aadb454`.
-- Relative to `d30ac190...`, this head changes only the permanent vendor CI workflow; proprietary payload/config is unchanged.
+- Relative to `d30ac190...`, this head changes only permanent vendor CI; proprietary payload/config is unchanged.
 
 ## Canonical stock authority
 
@@ -31,7 +32,7 @@
 
 ## Build-readiness finding already established
 
-LineageOS 22.2 `roomservice.py` resolves ordinary `lineage.dependencies` entries as `LineageOS/<repository>`. Therefore the custom `derveror/proprietary_vendor_red_hydrogenone` cannot be added as a normal dependency entry. A checked-in local-manifest strategy is required for reproducible clean checkout. LineageOS-owned kernel/sepolicy dependencies remain suitable for `lineage.dependencies`.
+LineageOS 22.2 roomservice resolves ordinary `lineage.dependencies` GitHub entries as `LineageOS/<repository>`. The custom `derveror/proprietary_vendor_red_hydrogenone` therefore needs a local-manifest strategy; do not add it as a normal LineageOS dependency entry.
 
 ## Hard architecture constraints
 
@@ -44,12 +45,16 @@ LineageOS 22.2 `roomservice.py` resolves ordinary `lineage.dependencies` entries
 
 ## Immediate next action — DO THIS FIRST
 
-Read the latest run/log of `regenerate-cross-tree-evidence.yml` and obtain the exact `LIVE_COPY_DESTINATION_COLLISIONS` list. Fix ownership collisions based on source/vendor responsibility, then regenerate evidence and restore permanent CI to GREEN.
+Inspect device/vendor producers for the 49 destinations listed in Action 0006. Classify each group as device/source-owned or vendor/proprietary-owned. Add ownership regression tests first, confirm RED, then prune the losing side. Pay special attention to `init.msm.usb.configfs.rc` and standard NFC permission XMLs, which may be source-owned rather than vendor-owned.
 
-## After cross-tree GREEN
+## After collision cleanup
 
-Create/test the reproducible local-manifest template and make the kernel branch explicit in `lineage.dependencies`, then move to actual clean LineageOS workspace `lunch` + `m nothing`.
+1. Regenerate `cross-tree-copy-contract.json` from the exact current trees.
+2. Remove the one-shot `regenerate-cross-tree-evidence.yml`.
+3. Restore permanent device CI and cross-tree job to GREEN.
+4. Create/test reproducible local-manifest template and explicit kernel dependency branch.
+5. Move to actual clean LineageOS workspace `lunch lineage_hydrogenone-userdebug` + `m nothing`.
 
 ## Recovery rule
 
-After interruption, do **not** infer state from chat prose. Read this marker, then the last numbered action file, then verify both branch heads and any active one-shot workflow from GitHub before continuing.
+After interruption, do **not** infer state from chat prose. Read this marker, then the last numbered action file, then verify both branch heads and active one-shot workflows from GitHub before continuing.

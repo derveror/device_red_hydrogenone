@@ -15,11 +15,26 @@ on late-fs
 
 on post-fs-data
     restorecon_recursive /mnt/vendor/persist
+
+    # RED .118 secure/QCOM state previously addressed through /persist. Keep the
+    # same hardware-owned directories under the Treble vendor persist mount.
+    mkdir /mnt/vendor/persist/data 0700 system system
+    mkdir /mnt/vendor/persist/data/tz 0700 system system
+    mkdir /mnt/vendor/persist/data/app_g 0700 system system
+    mkdir /mnt/vendor/persist/hvdcp_opti 0770 root system
+    mkdir /mnt/vendor/persist/time 0770 system system
+
     mkdir /data/vendor 0771 root root
     mkdir /data/vendor/tombstones 0771 root root
     mkdir /data/vendor/qvr 0770 system system
 
 on boot
+    # RED .118 canonical modem is MPSS.AT and stock is DSDS. Stock
+    # init.class_main.sh therefore selects qcrild instances 1 and 2; qcrild3
+    # is reserved for TSTS and legacy rild is the non-qcrild fallback.
+    start vendor.qcrild
+    start vendor.qcrild2
+
     # FPC side-mounted fingerprint reader / power key
     chown system system /sys/bus/platform/devices/soc:fpc1020/irq
     chown system system /sys/bus/platform/devices/soc:fpc1020/wakeup_enable

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from pathlib import Path
-import hashlib, re, sys, xml.etree.ElementTree as ET
+import hashlib, json, re, sys, xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
 if len(sys.argv) == 2 and not sys.argv[1].startswith('-'):
@@ -18,12 +18,61 @@ required_files = [
     'rootdir/etc/fstab.qcom','rootdir/etc/init/hw/init.qcom.rc','rootdir/etc/init/hw/init.qcom.usb.rc','rootdir/etc/init.recovery.qcom.rc','rootdir/etc/ueventd.rc',
     'audio/audio_policy_configuration.xml','audio/audio_platform_info.xml','audio/default_volume_tables.xml','audio/mixer_paths_tasha.xml',
     'media/media_codecs.xml','media/media_profiles_V1_0.xml',
-    'configs/msm_irqbalance.conf','configs/thermal-engine.conf','configs/public.libraries.txt',
-    'configs/camera/camera_config.xml','configs/nfc/libnfc-nci.conf','configs/nfc/libnfc-nxp.conf',
+    'configs/msm_irqbalance.conf','configs/public.libraries.txt',
+    'configs/camera/camera_config.xml','configs/nfc/libnfc-nxp.conf',
     'gps/etc/gps.conf','gps/etc/flp.conf','gps/izat.conf','wifi/WCNSS_qcom_cfg.ini','wifi/wpa_supplicant_overlay.conf',
     'seccomp/mediacodec.policy','prebuilt/Image.gz-dtb','vendor.prop'
 ]
 errors=[]
+
+# Approved analysis contract for the stock .118 / Android 15 rework.
+required_analysis_files = [
+    'docs/superpowers/specs/2026-09-02-hydrogenone-lineage22.2-design.md',
+    'docs/reference/SUPPLIED_SOURCES.md',
+    'docs/reference/source-lock.json',
+    'docs/reference/archive-inventory.json',
+    'docs/reference/archive-comparisons.json',
+    'docs/reference/full-artifacts.sha256',
+    'docs/reference/README.md',
+    'docs/stock/h1a1000-r118/README.md',
+]
+for analysis_file in required_analysis_files:
+    if not (ROOT/analysis_file).is_file():
+        errors.append('missing analysis contract file: '+analysis_file)
+
+source_lock_path = ROOT/'docs/reference/source-lock.json'
+if source_lock_path.is_file():
+    try:
+        source_lock = json.loads(source_lock_path.read_text(encoding='utf-8'))
+        target = source_lock.get('target_platform', {})
+        expected_target = {
+            'lineage_branch': 'lineage-22.2',
+            'android_release': '15',
+            'android_api_level': 35,
+        }
+        if target != expected_target:
+            errors.append('source-lock target_platform is not LineageOS 22.2 / Android 15 API 35')
+    except Exception as e:
+        errors.append(f'cannot validate source-lock target: {e}')
+
+for forbidden_dir in ('device/red/msm8998-common', 'vendor/red/msm8998-common'):
+    if (ROOT/forbidden_dir).exists():
+        errors.append('forbidden RED common tree exists: '+forbidden_dir)
+
+forbidden_common_paths = ('device/red/msm8998-common', 'vendor/red/msm8998-common')
+build_inputs = set(ROOT.rglob('*.mk')) | set(ROOT.rglob('Android.bp'))
+for relative in ('lineage.dependencies', 'extract-files.py', 'setup-makefiles.py'):
+    candidate = ROOT/relative
+    if candidate.is_file():
+        build_inputs.add(candidate)
+for candidate in sorted(build_inputs):
+    relative = str(candidate.relative_to(ROOT))
+    if relative.startswith(('docs/', 'tests/', 'tools/')):
+        continue
+    content = candidate.read_text(errors='ignore')
+    for forbidden in forbidden_common_paths:
+        if forbidden in content:
+            errors.append(f'forbidden RED common-tree reference in {relative}: {forbidden}')
 for d in required_dirs:
     if not (ROOT/d).is_dir(): errors.append('missing directory: '+d)
 for f in required_files:
@@ -38,12 +87,15 @@ for x in ROOT.rglob('*.json'):
 # No donor device identity/runtime paths.
 for x in ROOT.rglob('*'):
     if x.is_file() and x.suffix.lower() not in {'.dtb','.img','.so','.jar','.apk'} and x.stat().st_size < 2_000_000:
+        relative = str(x.relative_to(ROOT))
+        if relative.startswith(('docs/', 'reference/', 'tests/', 'tools/')):
+            continue
         try: t=x.read_text(errors='ignore')
         except: continue
         if re.search(r'device/(essential/mata|oneplus/dumpling|nubia/nx563j)', t):
-            errors.append(f'donor runtime path in {x.relative_to(ROOT)}')
-        if not str(x.relative_to(ROOT)).startswith(('reference/','tests/')) and re.search(r'(?i)(sidecar_essential|hal_sidecar|neko_device|sysfs_sidecar|essential_camera|hal_fingerprint_essential)', t):
-            errors.append(f'donor-specific source in {x.relative_to(ROOT)}')
+            errors.append(f'donor runtime path in {relative}')
+        if re.search(r'(?i)(sidecar_essential|hal_sidecar|neko_device|sysfs_sidecar|essential_camera|hal_fingerprint_essential)', t):
+            errors.append(f'donor-specific source in {relative}')
 
 
 # First-stage fstab must use the real UFS path; /dev/block/bootdevice is a later compatibility symlink.
@@ -53,11 +105,10 @@ for part in ('system','vendor','userdata','modem','bluetooth','dsp','persist'):
     if expected not in fstab:
         errors.append('fstab does not use real UFS path for '+part)
 
-# Full subsystem wiring: RED camera tuning and NXP NFC configs must be installed.
+# Full subsystem wiring: RED camera tuning and the device-owned NXP HAL config must be installed.
 device=(ROOT/'device.mk').read_text(errors='ignore') if (ROOT/'device.mk').exists() else ''
 for needle in (
     'configs/camera/camera_config.xml:$(TARGET_COPY_OUT_VENDOR)/etc/camera/camera_config.xml',
-    'configs/nfc/libnfc-nci.conf:$(TARGET_COPY_OUT_VENDOR)/etc/libnfc-nci.conf',
     'configs/nfc/libnfc-nxp.conf:$(TARGET_COPY_OUT_VENDOR)/etc/libnfc-nxp.conf',
     'android.hardware.nfc@1.2-service',
     'vendor_bt_firmware_mountpoint',
@@ -68,16 +119,21 @@ for needle in (
     if needle not in device:
         errors.append('missing device.mk wiring: '+needle)
 
-# Vendor hooks must be future-safe, not mandatory for source-only stage.
+# A real LineageOS build requires the verified RED .118 vendor tree. Match
+# maintained Lineage device trees and fail early if generated vendor makefiles
+# are absent instead of silently configuring a source-only product.
 board=(ROOT/'BoardConfig.mk').read_text(errors='ignore') if (ROOT/'BoardConfig.mk').exists() else ''
 prod=(ROOT/'lineage_hydrogenone.mk').read_text(errors='ignore') if (ROOT/'lineage_hydrogenone.mk').exists() else ''
-if '-include vendor/red/hydrogenone/BoardConfigVendor.mk' not in board:
-    errors.append('missing optional BoardConfigVendor hook')
-if 'inherit-product-if-exists, vendor/red/hydrogenone/hydrogenone-vendor.mk' not in prod:
-    errors.append('missing optional vendor product hook')
+if not re.search(r'(?m)^\s*include\s+vendor/red/hydrogenone/BoardConfigVendor\.mk\s*$', board):
+    errors.append('missing mandatory RED BoardConfigVendor include')
+if re.search(r'(?m)^\s*-include\s+vendor/red/hydrogenone/BoardConfigVendor\.mk\s*$', board):
+    errors.append('RED BoardConfigVendor must not be optional')
+if '$(call inherit-product, vendor/red/hydrogenone/hydrogenone-vendor.mk)' not in prod:
+    errors.append('missing mandatory RED vendor product inheritance')
+if 'inherit-product-if-exists, vendor/red/hydrogenone/hydrogenone-vendor.mk' in prod:
+    errors.append('RED vendor product inheritance must not be optional')
 
 # MSM8998 generic policy is a real LineageOS dependency, pinned to its 22.2 legacy-um branch.
-import json
 deps=json.loads((ROOT/'lineage.dependencies').read_text()) if (ROOT/'lineage.dependencies').exists() else []
 want={'repository':'android_device_qcom_sepolicy_vndr','target_path':'device/qcom/sepolicy-legacy-um','branch':'lineage-22.2-legacy-um'}
 if want not in deps:
@@ -131,12 +187,31 @@ if kernel_source_match:
     if kernel_dep not in deps:
         errors.append('missing MSM8998 kernel-source dependency used for header generation')
 
-# Exact stock kernel hash from verified .109 analysis.
-k=ROOT/'prebuilt/Image.gz-dtb'
-if k.exists():
-    h=hashlib.sha256(k.read_bytes()).hexdigest()
-    if h!='6cf3a70ece8b32dcd6bccf9db1a22c1da29b9b37fe67cc0e4ec9b4f87fec2426':
-        errors.append('stock kernel hash mismatch: '+h)
+# Exact bring-up kernel identity comes from the canonical RED .118 boot contract.
+# Cross-check the boot contract against the independently generated stock inventory
+# so changing the prebuilt and its expected hash together cannot silently weaken this audit.
+boot_contract_path=ROOT/'docs/stock/h1a1000-r118/boot-image-contract.json'
+stock_inventory_path=ROOT/'docs/stock/h1a1000-r118/inventory-summary.json'
+try:
+    boot_contract=json.loads(boot_contract_path.read_text(encoding='utf-8'))
+    stock_inventory=json.loads(stock_inventory_path.read_text(encoding='utf-8'))
+    contract_stock_sha=boot_contract.get('authority',{}).get('stock_archive_sha256')
+    inventory_stock_sha=stock_inventory.get('canonical_archive',{}).get('sha256')
+    if not contract_stock_sha or contract_stock_sha != inventory_stock_sha:
+        errors.append('boot contract stock authority does not match canonical inventory')
+    expected_kernel=boot_contract.get('kernel',{})
+    expected_kernel_sha=expected_kernel.get('sha256')
+    expected_kernel_size=expected_kernel.get('size')
+    k=ROOT/'prebuilt/Image.gz-dtb'
+    if k.exists():
+        data=k.read_bytes()
+        h=hashlib.sha256(data).hexdigest()
+        if h != expected_kernel_sha:
+            errors.append('stock kernel hash mismatch: '+h)
+        if len(data) != expected_kernel_size:
+            errors.append(f'stock kernel size mismatch: {len(data)} != {expected_kernel_size}')
+except Exception as e:
+    errors.append(f'cannot validate canonical RED .118 kernel contract: {e}')
 
 # A file owned by device.mk must not also be extracted at the same vendor destination.
 copy_dest_list=[
@@ -286,8 +361,15 @@ if common_pos < 0 or device_pos < 0 or common_pos > device_pos:
     errors.append('lineage_hydrogenone.mk inherits device before common_full_phone')
 
 
-if 'BuildFingerprint=RED/HydrogenONE/HydrogenONE:8.1.0/H1A1000.010ho.01.01.01r.109/109:user/release-keys' not in prod:
-    errors.append('missing exact stock BuildFingerprint override')
+try:
+    fingerprint_contract=json.loads((ROOT/'docs/stock/h1a1000-r118/boot-image-contract.json').read_text(encoding='utf-8'))
+    expected_fingerprint=fingerprint_contract.get('build_properties',{}).get('ro.build.fingerprint')
+    if not expected_fingerprint:
+        errors.append('canonical RED .118 boot contract lacks stock fingerprint')
+    elif f'BuildFingerprint={expected_fingerprint}' not in prod:
+        errors.append('missing exact canonical RED .118 BuildFingerprint override')
+except Exception as e:
+    errors.append(f'cannot validate canonical RED .118 BuildFingerprint: {e}')
 
 
 if 'rootdir/etc/init.recovery.qcom.rc:$(TARGET_COPY_OUT_RECOVERY)/root/init.recovery.qcom.rc' not in device:

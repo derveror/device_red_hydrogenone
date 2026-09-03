@@ -1,0 +1,83 @@
+[
+  {
+    "left": "android_device_nubia_nx563j-lineage-22.2.zip",
+    "right": "android_device_nubia_msm8998-common-lineage-22.2.zip",
+    "left_files": 73,
+    "right_files": 268,
+    "common_paths": 21,
+    "identical_common_paths": 1,
+    "different_common_paths": 20
+  },
+  {
+    "left": "android_device_oneplus_dumpling-lineage-22.2.zip",
+    "right": "android_device_oneplus_msm8998-common-lineage-22.2.zip",
+    "left_files": 27,
+    "right_files": 136,
+    "common_paths": 14,
+    "identical_common_paths": 1,
+    "different_common_paths": 13
+  },
+  {
+    "left": "android_device_oneplus_msm8998-common-lineage-22.2.zip",
+    "right": "android_device_nubia_msm8998-common-lineage-22.2.zip",
+    "left_files": 136,
+    "right_files": 268,
+    "common_paths": 59,
+    "identical_common_paths": 8,
+    "different_common_paths": 51
+  },
+  {
+    "left": "device_red_hydrogenone-main(1).zip",
+    "right": "android_device_essential_mata-lineage-22.2.zip",
+    "left_files": 423,
+    "right_files": 383,
+    "common_paths": 299,
+    "identical_common_paths": 253,
+    "different_common_paths": 46
+  },
+  {
+    "left": "device_red_hydrogenone-main(1).zip",
+    "right": "android_device_nubia_msm8998-common-lineage-22.2.zip",
+    "left_files": 423,
+    "right_files": 268,
+    "common_paths": 139,
+    "identical_common_paths": 22,
+    "different_common_paths": 117
+  },
+  {
+    "left": "device_red_hydrogenone-main(1).zip",
+    "right": "android_device_oneplus_msm8998-common-lineage-22.2.zip",
+    "left_files": 423,
+    "right_files": 136,
+    "common_paths": 50,
+    "identical_common_paths": 3,
+    "different_common_paths": 47
+  },
+  {
+    "left": "device_red_hydrogenone-main(1).zip",
+    "right": "device_red_hydrogenone-fix-lineage-22.2-runtime-contract.zip",
+    "left_files": 423,
+    "right_files": 423,
+    "common_paths": 423,
+    "identical_common_paths": 423,
+    "different_common_paths": 0
+  },
+  {
+    "left": "proprietary_vendor_oneplus_dumpling-lineage-22.2.zip",
+    "right": "proprietary_vendor_oneplus_msm8998-common-lineage-22.2.zip",
+    "left_files": 70,
+    "right_files": 736,
+    "common_paths": 3,
+    "identical_common_paths": 1,
+    "different_common_paths": 2
+  },
+  {
+    "left": "proprietary_vendor_oneplus_msm8998-common-lineage-22.2.zip",
+    "right": "proprietary_vendor_nubia_msm8998-common-lineage-22.2.zip",
+    "left_files": 736,
+    "right_files": 449,
+    "common_paths": 400,
+    "identical_common_paths": 314,
+    "different_common_paths": 86
+  }
+]

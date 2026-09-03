@@ -128,13 +128,31 @@ special_mode_mask values:
       <A3Preview>imx380_main_4k_preview_lc898122</A3Preview>
       <A3Video>imx380_main_4k_video_lc898122</A3Video>
     </ChromatixName>
-    <ChromatixName sensor_resolution_index="1" special_mode_mask = "ARC_3D_MODE">
+    <!--4k for 3d video used when >1080p-->
+    <ChromatixName sensor_resolution_index="1" special_mode_mask = "CM_3D_VIDEO_MODE">
       <ISPPreview>imx380_main_preview</ISPPreview>
       <ISPSnapshot>imx380_main_preview</ISPSnapshot>
       <ISPVideo>imx380_main_default_video</ISPVideo>
       <CPPVideo>imx380_main_cpp_video</CPPVideo>
       <A3Preview>imx380_main_zsl_preview_lc898122_3dmode</A3Preview>
       <A3Video>imx380_main_zsl_video_lc898122</A3Video>
+    </ChromatixName>
+    <ChromatixName sensor_resolution_index="1" special_mode_mask = "CM_3D_SNAPSHOT_MODE">
+      <ISPPreview>imx380_main_preview</ISPPreview>
+      <ISPSnapshot>imx380_main_preview</ISPSnapshot>
+      <ISPVideo>imx380_main_default_video</ISPVideo>
+      <CPPSnapshot>imx380_main_cpp_4k_3d_snapshot</CPPSnapshot>
+      <CPPVideo>imx380_main_cpp_video</CPPVideo>
+      <A3Preview>imx380_main_4k_3d_snapshot_lc898122</A3Preview>
+      <A3Video>imx380_main_zsl_video_lc898122</A3Video>
+    </ChromatixName>
+    <ChromatixName sensor_resolution_index="1" special_mode_mask = "CM_PANORAMA_MODE">
+      <ISPPreview>imx380_main_preview</ISPPreview>
+      <ISPSnapshot>imx380_main_preview</ISPSnapshot>
+      <ISPVideo>imx380_main_default_video</ISPVideo>
+      <CPPVideo>imx380_main_cpp_video</CPPVideo>
+      <A3Preview>imx380_main_4k_panorama_lc898122</A3Preview>
+      <A3Video>imx380_main_4k_video_lc898122</A3Video>
     </ChromatixName>
     <ChromatixName sensor_resolution_index="2">
       <ISPPreview>imx380_main_qhd_hfr_60</ISPPreview>
@@ -172,6 +190,7 @@ special_mode_mask values:
       <A3Preview>imx380_main_480p_hfr_240_lc898122</A3Preview>
       <A3Video>imx380_main_480p_hfr_240_lc898122</A3Video>
     </ChromatixName>
+    <!--360p 30fps for 3d video chat-->
     <ChromatixName sensor_resolution_index="6">
       <ISPPreview>imx380_main_snapshot</ISPPreview>
       <ISPSnapshot>imx380_main_snapshot</ISPSnapshot>
@@ -180,14 +199,18 @@ special_mode_mask values:
       <A3Preview>imx380_main_360p_3d_video_lc898122</A3Preview>
       <A3Video>imx380_main_zsl_video_lc898122</A3Video>
     </ChromatixName>
+    <!--1080p 30fps for 3d video, used default-->
     <ChromatixName sensor_resolution_index="7">
       <ISPPreview>imx380_main_snapshot</ISPPreview>
       <ISPSnapshot>imx380_main_snapshot</ISPSnapshot>
       <ISPVideo>imx380_main_default_video</ISPVideo>
+      <CPPPreview>imx380_main_cpp_1080p_3d_video</CPPPreview>
+      <CPPSnapshot>imx380_main_cpp_1080p_3d_video</CPPSnapshot>
       <CPPVideo>imx380_main_cpp_video</CPPVideo>
       <A3Preview>imx380_main_1080p_3d_video_lc898122</A3Preview>
       <A3Video>imx380_main_zsl_video_lc898122</A3Video>
     </ChromatixName>
+    <!--720p 30fps for 3d video, no used-->
     <ChromatixName sensor_resolution_index="8">
       <ISPPreview>imx380_main_snapshot</ISPPreview>
       <ISPSnapshot>imx380_main_snapshot</ISPSnapshot>

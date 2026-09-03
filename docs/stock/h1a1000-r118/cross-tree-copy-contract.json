@@ -1,0 +1,554 @@
+{
+  "authority": {
+    "device_branch": "lineage-22.2-stock118-rework",
+    "stock_archive_sha256": "7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e",
+    "stock_build": "H1A1000.082ho.01.00.10r.118",
+    "vendor_commit": "6fef3d7c6333602d7114aefa0284a03f5aadb454"
+  },
+  "copy_destination_collisions": [],
+  "device_copy_destinations": {
+    "recovery/root/first_stage_ramdisk/fstab.qcom": [
+      "device.mk"
+    ],
+    "recovery/root/init.recovery.qcom.rc": [
+      "device.mk"
+    ],
+    "recovery/root/system/lib64/libvndksupport.so": [
+      "device.mk"
+    ],
+    "vendor/etc/a2dp_audio_policy_configuration.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/audio_effects.conf": [
+      "device.mk"
+    ],
+    "vendor/etc/audio_output_policy.conf": [
+      "device.mk"
+    ],
+    "vendor/etc/audio_platform_info.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/audio_policy_configuration.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/audio_policy_volumes.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/bluetooth_audio_policy_configuration.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/camera_config.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/csidtg_camera.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/csidtg_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/imx214_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/imx230_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/imx230_qc2002_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/imx230_qc2002_with_gyro_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/imx258_bear_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/imx258_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/imx258_lc898217xc_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/imx258_mono_bear_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/imx258_mono_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/imx268_main_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/imx268_sub_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/imx298_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/imx298_gt24c64_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/imx318_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/imx332_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/imx362_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/imx362_chromatix_bear.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/imx362_gt24c64a_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/imx376_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/imx378_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/imx380_main_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/imx380_sub_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/ov12a10_bear_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/ov12a10_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/ov13850_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/ov13850_q13v06k_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/ov13855_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/ov13880_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/ov2281_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/ov2680_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/ov4688_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/ov5670_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/ov5670_f5670bq_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/ov5695_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/ov7251_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/ov8856_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/ov8858_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/ov8865_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/s5k2l7_8953_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/s5k2l7_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/s5k2l7sx_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/s5k2t7sp_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/s5k3l8_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/s5k3l8_f3l8yam_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/s5k3l8_mono_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/s5k3m2xm_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/s5k3m2xm_chromatix_bear.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/s5k3m2xx_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/s5k3m3sm_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/s5k3p3sm_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/camera/s5k3p8sp_chromatix.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/cgroups.json": [
+      "device.mk"
+    ],
+    "vendor/etc/default_volume_tables.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/fstab.qcom": [
+      "device.mk"
+    ],
+    "vendor/etc/init/hw/init.qcom.rc": [
+      "device.mk"
+    ],
+    "vendor/etc/init/hw/init.qcom.usb.rc": [
+      "device.mk"
+    ],
+    "vendor/etc/init/hw/init.target.rc": [
+      "device.mk"
+    ],
+    "vendor/etc/izat.conf": [
+      "device.mk"
+    ],
+    "vendor/etc/libnfc-nxp.conf": [
+      "device.mk"
+    ],
+    "vendor/etc/listen_platform_info.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/lowi.conf": [
+      "device.mk"
+    ],
+    "vendor/etc/media_codecs.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/media_codecs_google_audio.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/media_codecs_google_telephony.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/media_codecs_google_video.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/media_codecs_performance.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/media_codecs_vendor_audio.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/media_profiles_V1_0.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/mixer_paths_tasha.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/mixer_paths_tasha_tfa.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/mixer_paths_tasha_tfa_a3d.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/msm_irqbalance.conf": [
+      "device.mk"
+    ],
+    "vendor/etc/permissions/android.hardware.audio.low_latency.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/permissions/android.hardware.bluetooth.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/permissions/android.hardware.bluetooth_le.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/permissions/android.hardware.camera.flash-autofocus.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/permissions/android.hardware.camera.front.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/permissions/android.hardware.camera.full.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/permissions/android.hardware.camera.raw.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/permissions/android.hardware.fingerprint.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/permissions/android.hardware.location.gps.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/permissions/android.hardware.nfc.hce.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/permissions/android.hardware.nfc.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/permissions/android.hardware.opengles.aep.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/permissions/android.hardware.sensor.accelerometer.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/permissions/android.hardware.sensor.compass.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/permissions/android.hardware.sensor.gyroscope.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/permissions/android.hardware.sensor.light.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/permissions/android.hardware.sensor.proximity.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/permissions/android.hardware.telephony.cdma.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/permissions/android.hardware.telephony.gsm.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/permissions/android.hardware.touchscreen.multitouch.jazzhand.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/permissions/android.hardware.usb.accessory.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/permissions/android.hardware.usb.host.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/permissions/android.hardware.vulkan.compute.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/permissions/android.hardware.vulkan.level.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/permissions/android.hardware.vulkan.version.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/permissions/android.hardware.wifi.direct.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/permissions/android.hardware.wifi.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/permissions/android.software.midi.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/powerhint.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/public.libraries.txt": [
+      "device.mk"
+    ],
+    "vendor/etc/r_submix_audio_policy_configuration.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/sap.conf": [
+      "device.mk"
+    ],
+    "vendor/etc/sec_config": [
+      "device.mk"
+    ],
+    "vendor/etc/seccomp_policy/mediacodec.policy": [
+      "device.mk"
+    ],
+    "vendor/etc/seccomp_policy/mediaextractor.policy": [
+      "device.mk"
+    ],
+    "vendor/etc/sound_trigger_mixer_paths.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/sound_trigger_platform_info.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/task_profiles.json": [
+      "device.mk"
+    ],
+    "vendor/etc/ueventd.rc": [
+      "device.mk"
+    ],
+    "vendor/etc/usb_audio_policy_configuration.xml": [
+      "device.mk"
+    ],
+    "vendor/etc/wifi/p2p_supplicant_overlay.conf": [
+      "device.mk"
+    ],
+    "vendor/etc/wifi/wifi_concurrency_cfg.txt": [
+      "device.mk"
+    ],
+    "vendor/etc/wifi/wpa_supplicant_overlay.conf": [
+      "device.mk"
+    ],
+    "vendor/etc/xtwifi.conf": [
+      "device.mk"
+    ],
+    "vendor/firmware/wlan/qca_cld/WCNSS_qcom_cfg.ini": [
+      "device.mk"
+    ],
+    "vendor/usr/keylayout/gpio-keys.kl": [
+      "device.mk"
+    ]
+  },
+  "device_root": ".",
+  "schema_version": 2,
+  "status": "zero_expanded_copy_destination_collisions",
+  "vendor_copy_destinations": {
+    "vendor/bin/init.qcom.sensors.sh": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/bin/init.qti.ims.sh": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/etc/hbtp/qtc800h.bin": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/etc/hbtp/qtc800h_8998_660.bin": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/etc/hbtp/qtc800s_dsp.bin": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/etc/init/android.hardware.biometrics.fingerprint@2.1-service.rc": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/etc/init/android.hardware.bluetooth@1.0-service-qti.rc": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/etc/init/android.hardware.media.omx@1.0-service.rc": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/etc/init/com.qualcomm.qti.wifidisplayhal@1.0-service.rc": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/etc/init/hw/init.msm.usb.configfs.rc": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/etc/init/qcrild.rc": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/etc/init/rild.rc": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/etc/init/vendor.cm.hardware.thermal3d@1.0-service.cm.rc": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/etc/init/vendor.leia.hardware.leiadisp@1.0-service.rc": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/etc/init/vendor.qti.esepowermanager@1.0-service.rc": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/etc/init/vendor.rild.rc": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/etc/libnfc-mtp-NQ3XX.conf": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/etc/libnfc-mtp-NQ4XX.conf": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/etc/libnfc-mtp_default.conf": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/etc/libnfc-mtp_rf1.conf": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/etc/libnfc-mtp_rf2.conf": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/etc/libnfc-nci.conf": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/etc/libnfc-nci_NCI2_0.conf": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/etc/libnfc-nxp_default.conf": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/etc/libnfc-qrd-NQ3XX.conf": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/etc/libnfc-qrd-NQ4XX.conf": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/etc/libnfc-qrd_default.conf": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/etc/libnfc-qrd_rf1.conf": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/etc/libnfc-qrd_rf2.conf": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/etc/permissions/android.hardware.nfc.hcef.xml": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/etc/permissions/com.android.nfc_extras.xml": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/etc/thermal-engine-3d.conf": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/etc/thermal-engine.conf": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/firmware/a530_pfp.fw": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/firmware/a530_pm4.fw": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/firmware/a530_zap.b00": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/firmware/a530_zap.b01": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/firmware/a530_zap.b02": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/firmware/a530_zap.elf": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/firmware/a530_zap.mdt": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/firmware/a540_gpmu.fw2": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/firmware/a540_zap.b00": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/firmware/a540_zap.b01": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/firmware/a540_zap.b02": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/firmware/a540_zap.elf": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/firmware/a540_zap.mdt": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/firmware/leia_pfp_470.fw": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/firmware/leia_pm4_470.fw": [
+      "hydrogenone-vendor.mk"
+    ]
+  },
+  "vendor_root": "/home/runner/work/_temp/vendor-tree"
+}

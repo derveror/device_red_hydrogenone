@@ -1,0 +1,43 @@
+name: Export exact worktree snapshot
+
+on:
+  push:
+    branches:
+      - lineage-22.2-stock118-rework
+    paths:
+      - .github/workflows/export-worktree.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Record and package exact snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD > "$RUNNER_TEMP/WORKTREE_COMMIT"
+          tar \
+            --exclude=.git \
+            -I 'zstd -19 -T0' \
+            -cf "$RUNNER_TEMP/worktree.tar.zst" .
+          (
+            cd "$RUNNER_TEMP"
+            sha256sum worktree.tar.zst > worktree.tar.zst.sha256
+          )
+
+      - name: Upload snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: hydrogenone-device-worktree
+          path: |
+            ${{ runner.temp }}/worktree.tar.zst
+            ${{ runner.temp }}/worktree.tar.zst.sha256
+            ${{ runner.temp }}/WORKTREE_COMMIT
+          if-no-files-found: error
+          retention-days: 1

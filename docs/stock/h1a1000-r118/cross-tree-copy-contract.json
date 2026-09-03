@@ -3,7 +3,7 @@
     "device_branch": "lineage-22.2-stock118-rework",
     "stock_archive_sha256": "7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e",
     "stock_build": "H1A1000.082ho.01.00.10r.118",
-    "vendor_commit": "6fef3d7c6333602d7114aefa0284a03f5aadb454"
+    "vendor_commit": "266c8f95d0212c9cc5c91a200363276d45e045b1"
   },
   "copy_destination_collisions": [],
   "device_copy_destinations": {

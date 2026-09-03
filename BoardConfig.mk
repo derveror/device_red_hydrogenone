@@ -143,6 +143,10 @@ WIFI_DRIVER_FW_PATH_P2P := "p2p"
 WIFI_HIDL_FEATURE_DUAL_INTERFACE := true
 WIFI_HIDL_UNIFIED_SUPPLICANT_SERVICE_RC_ENTRY := true
 
-# Generated from canonical RED .118 proprietary blobs; fail fast if the
-# verified vendor tree is not present in the build checkout.
-include vendor/red/hydrogenone/BoardConfigVendor.mk
+# Do not include the generated vendor BoardConfig here.  The current generated
+# file requests PRODUCT_EXTRA_VNDK_VERSIONS=28, but LineageOS 22.2 no longer
+# ships prebuilts/vndk/v28 and Android's board parser has already made that
+# product variable read-only by this point.  Legacy blob compatibility is
+# handled by the explicit v32 compatibility library in device.mk instead.
+# The required proprietary checkout still fails fast through the unconditional
+# hydrogenone-vendor.mk product inheritance in lineage_hydrogenone.mk.

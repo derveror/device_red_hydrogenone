@@ -124,10 +124,10 @@ for needle in (
 # are absent instead of silently configuring a source-only product.
 board=(ROOT/'BoardConfig.mk').read_text(errors='ignore') if (ROOT/'BoardConfig.mk').exists() else ''
 prod=(ROOT/'lineage_hydrogenone.mk').read_text(errors='ignore') if (ROOT/'lineage_hydrogenone.mk').exists() else ''
-if not re.search(r'(?m)^\s*include\s+vendor/red/hydrogenone/BoardConfigVendor\.mk\s*$', board):
-    errors.append('missing mandatory RED BoardConfigVendor include')
-if re.search(r'(?m)^\s*-include\s+vendor/red/hydrogenone/BoardConfigVendor\.mk\s*$', board):
-    errors.append('RED BoardConfigVendor must not be optional')
+if re.search(r'(?m)^\s*-?include\s+vendor/red/hydrogenone/BoardConfigVendor\.mk\s*$', board):
+    errors.append('vendor BoardConfig must not inject product variables during board parsing')
+if re.search(r'(?m)^\s*PRODUCT_EXTRA_VNDK_VERSIONS\s*[:+?]?=', board):
+    errors.append('unsupported PRODUCT_EXTRA_VNDK_VERSIONS request in device BoardConfig')
 if '$(call inherit-product, vendor/red/hydrogenone/hydrogenone-vendor.mk)' not in prod:
     errors.append('missing mandatory RED vendor product inheritance')
 if 'inherit-product-if-exists, vendor/red/hydrogenone/hydrogenone-vendor.mk' in prod:

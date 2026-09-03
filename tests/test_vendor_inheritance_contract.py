@@ -39,6 +39,13 @@ class VendorInheritanceContractTest(unittest.TestCase):
         self.assertGreaterEqual(device_pos, 0)
         self.assertLess(vendor_pos, device_pos)
 
+    def test_legacy_vndk_is_declared_in_product_configuration(self) -> None:
+        text = PRODUCT.read_text(encoding="utf-8")
+        self.assertRegex(
+            text,
+            r"(?m)^PRODUCT_EXTRA_VNDK_VERSIONS\s*\+=\s*28\s*$",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

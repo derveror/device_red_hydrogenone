@@ -4,6 +4,11 @@ $(call inherit-product, vendor/lineage/config/common_full_phone.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base_telephony.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/product_launched_with_o_mr1.mk)
 
+# Keep the Android 9 vendor ABI available for the stock RED .118 blobs. This is
+# a product variable and must be set before product configuration becomes
+# readonly; assigning it from BoardConfigVendor.mk breaks Android 15 dumpvars.
+PRODUCT_EXTRA_VNDK_VERSIONS += 28
+
 # Verified RED .118 proprietary vendor output is required for a real build.
 $(call inherit-product, vendor/red/hydrogenone/hydrogenone-vendor.mk)
 

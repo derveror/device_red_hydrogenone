@@ -146,3 +146,10 @@ WIFI_HIDL_UNIFIED_SUPPLICANT_SERVICE_RC_ENTRY := true
 # Generated from canonical RED .118 proprietary blobs; fail fast if the
 # verified vendor tree is not present in the build checkout.
 include vendor/red/hydrogenone/BoardConfigVendor.mk
+
+# Android 15 no longer ships the VNDK 28 snapshot requested by the legacy
+# vendor configuration. Keep the verified stock shipping API level above, but
+# do not ask the build system to package a snapshot that is not in
+# prebuilts/vndk; the recovery-only compatibility shim uses the available v32
+# snapshot explicitly in device.mk.
+PRODUCT_EXTRA_VNDK_VERSIONS := $(filter-out 28,$(PRODUCT_EXTRA_VNDK_VERSIONS))

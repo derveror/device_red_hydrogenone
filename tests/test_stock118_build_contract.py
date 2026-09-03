@@ -71,6 +71,14 @@ class Stock118BuildContractTest(unittest.TestCase):
         )
         self.assertNotIn(".109", active_lines)
 
+    def test_unsupported_android_9_vndk_snapshot_is_removed_after_vendor_config(self) -> None:
+        vendor_include = "include vendor/red/hydrogenone/BoardConfigVendor.mk"
+        removal = "PRODUCT_EXTRA_VNDK_VERSIONS := $(filter-out 28,$(PRODUCT_EXTRA_VNDK_VERSIONS))"
+
+        self.assertIn(vendor_include, self.board)
+        self.assertIn(removal, self.board)
+        self.assertGreater(self.board.index(removal), self.board.index(vendor_include))
+
 
 if __name__ == "__main__":
     unittest.main()

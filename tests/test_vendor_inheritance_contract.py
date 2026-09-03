@@ -31,6 +31,17 @@ class VendorInheritanceContractTest(unittest.TestCase):
             text,
         )
 
+    def test_unavailable_stock_vndk_snapshot_is_removed_after_vendor_include(self) -> None:
+        text = BOARD.read_text(encoding="utf-8")
+        include = "include vendor/red/hydrogenone/BoardConfigVendor.mk"
+        remove_v28 = (
+            "PRODUCT_EXTRA_VNDK_VERSIONS := "
+            "$(filter-out 28,$(PRODUCT_EXTRA_VNDK_VERSIONS))"
+        )
+
+        self.assertIn(remove_v28, text)
+        self.assertLess(text.index(include), text.index(remove_v28))
+
     def test_vendor_is_inherited_before_device_definition(self) -> None:
         text = PRODUCT.read_text(encoding="utf-8")
         vendor_pos = text.find("vendor/red/hydrogenone/hydrogenone-vendor.mk")

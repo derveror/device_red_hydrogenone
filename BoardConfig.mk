@@ -146,3 +146,11 @@ WIFI_HIDL_UNIFIED_SUPPLICANT_SERVICE_RC_ENTRY := true
 # Generated from canonical RED .118 proprietary blobs; fail fast if the
 # verified vendor tree is not present in the build checkout.
 include vendor/red/hydrogenone/BoardConfigVendor.mk
+
+# The pinned vendor tree records the stock Android 9 VNDK version (28) in
+# PRODUCT_EXTRA_VNDK_VERSIONS. LineageOS 22.2 no longer ships a v28 snapshot,
+# so asking the Android 15 build system to materialize it makes product config
+# fail before lunch can select this device. Keep the vendor include mandatory,
+# but discard that unavailable platform snapshot; legacy blob compatibility is
+# supplied explicitly by the device product instead.
+PRODUCT_EXTRA_VNDK_VERSIONS := $(filter-out 28,$(PRODUCT_EXTRA_VNDK_VERSIONS))

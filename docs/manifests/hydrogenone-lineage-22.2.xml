@@ -19,7 +19,7 @@
         name="proprietary_vendor_red_hydrogenone"
         path="vendor/red/hydrogenone"
         remote="derveror"
-        revision="6fef3d7c6333602d7114aefa0284a03f5aadb454" />
+        revision="46761d796d5f312b15815bb22ca92fb3254848bd" />
 
     <project
         name="android_kernel_essential_msm8998"

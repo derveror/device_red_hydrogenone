@@ -2,7 +2,7 @@
 
 > **READ THIS FILE FIRST AFTER ANY INTERRUPTION.**
 
-**Marker version:** 12  
+**Marker version:** 13
 **Last completed action file:** `docs/worklog/2026-09-02/0018-bootstrap-regression-green.md`  
 **Logging protocol active:** YES
 
@@ -11,7 +11,8 @@
 ### Device
 - Repository: `derveror/device_red_hydrogenone`.
 - Branch: `lineage-22.2-stock118-rework`.
-- Cross-tree lock pins vendor `6fef3d7c6333602d7114aefa0284a03f5aadb454`.
+- Working branch: `test/lineage-22.2-bringup`.
+- Cross-tree lock pins vendor `46761d796d5f312b15815bb22ca92fb3254848bd`.
 - Fresh zero-collision cross-tree evidence is pinned to that exact vendor commit.
 - Production local-manifest template: `docs/manifests/hydrogenone-lineage-22.2.xml`.
 - Fresh-workspace bootstrap: `docs/manifests/README.md`.
@@ -21,8 +22,8 @@
 
 ### Vendor
 - Repository: `derveror/proprietary_vendor_red_hydrogenone`.
-- Branch: `lineage-22.2-android15-contract`.
-- Current GREEN head and device pin: `6fef3d7c6333602d7114aefa0284a03f5aadb454`.
+- Working branch: `test/lineage-22.2-bringup` (based on `lineage-22.2-android15-contract`).
+- Current payload-equivalent documentation head and device pin: `46761d796d5f312b15815bb22ca92fb3254848bd`.
 
 ## Canonical stock authority
 

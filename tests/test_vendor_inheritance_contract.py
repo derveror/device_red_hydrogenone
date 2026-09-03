@@ -9,15 +9,15 @@ PRODUCT = ROOT / "lineage_hydrogenone.mk"
 
 
 class VendorInheritanceContractTest(unittest.TestCase):
-    def test_boardconfig_requires_generated_vendor_boardconfig(self) -> None:
+    def test_boardconfig_does_not_import_product_variables_from_vendor(self) -> None:
         text = BOARD.read_text(encoding="utf-8")
-        self.assertRegex(
+        self.assertNotRegex(
             text,
-            r"(?m)^\s*include\s+vendor/red/hydrogenone/BoardConfigVendor\.mk\s*$",
+            r"(?m)^\s*-?include\s+vendor/red/hydrogenone/BoardConfigVendor\.mk\s*$",
         )
         self.assertNotRegex(
             text,
-            r"(?m)^\s*-include\s+vendor/red/hydrogenone/BoardConfigVendor\.mk\s*$",
+            r"(?m)^\s*PRODUCT_EXTRA_VNDK_VERSIONS\s*[:+?]?=",
         )
 
     def test_product_requires_generated_vendor_makefile(self) -> None:

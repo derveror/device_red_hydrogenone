@@ -121,7 +121,7 @@ The exact compatible vendor commit is pinned by:
 docs/reference/cross-tree-lock.json
 ```
 
-Device CI checks out that exact vendor revision and runs the live cross-tree contract. `BoardConfigVendor.mk` and `hydrogenone-vendor.mk` are inherited fail-fast; a build checkout without the required RED vendor tree is not considered a valid full build configuration.
+Device CI checks out that exact vendor revision and runs the live cross-tree contract. `hydrogenone-vendor.mk` is inherited fail-fast, so a build checkout without the required RED vendor tree is not considered a valid full build configuration. The generated `BoardConfigVendor.mk` is deliberately not included: its obsolete Android 9 VNDK-28 request is invalid in LineageOS 22.2, while the required recovery compatibility library is selected explicitly from the available VNDK v32 prebuilts.
 
 The vendor tree is generated from verified `.118` blobs and has permanent Android 15 contract tests for selected blobs, ELF closure/exceptions, VINTF ownership and P0 daemon requirements.
 

@@ -56,6 +56,13 @@ out/hydrogenone-build-logs/
 
 The first failing `m nothing` log is the authoritative next debugging input. Do not pre-emptively change unrelated HALs or blobs before examining that failure.
 
+Do not use the historical `test/lineage-22.2-bringup`, `work`, or generated
+`codex/*` branches for this gate. Those snapshots contain either a late
+`PRODUCT_EXTRA_VNDK_VERSIONS` assignment or a VNDK-28 request, both of which
+fail before product discovery on LineageOS 22.2. Use the device branch and
+exact vendor revision listed above; no extra release component such as
+`bp1a` is required for the canonical lunch command.
+
 ## Later gates
 
 Do not move to these until `m nothing` is GREEN:

@@ -71,6 +71,16 @@ class Stock118BuildContractTest(unittest.TestCase):
         )
         self.assertNotIn(".109", active_lines)
 
+    def test_boardconfig_does_not_assign_readonly_product_vndk_versions(self) -> None:
+        self.assertIsNone(
+            re.search(
+                r"(?m)^\s*PRODUCT_EXTRA_VNDK_VERSIONS\s*(?::|\+|\?)?=",
+                self.board,
+            ),
+            "Android 15 makes PRODUCT_EXTRA_VNDK_VERSIONS read-only before "
+            "BoardConfig.mk is parsed",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -7,6 +7,10 @@ DEVICE_PATH := device/red/hydrogenone
 # ELF files in PRODUCT_COPY_FILES unless this compatibility exception is set.
 BUILD_BROKEN_ELF_PREBUILT_PRODUCT_COPY_FILES := true
 
+# PRODUCT_EXTRA_VNDK_VERSIONS is finalized by Android 15 before BoardConfig is
+# parsed. Do not set it here: Kati treats the product variable as read-only and
+# aborts product discovery (including lunch) before the device can be selected.
+
 # Architecture / platform
 TARGET_ARCH := arm64
 TARGET_ARCH_VARIANT := armv8-a

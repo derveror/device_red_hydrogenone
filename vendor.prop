@@ -8,8 +8,8 @@ ro.opengles.version=196610
 qcom.bluetooth.soc=cherokee
 vendor.bluetooth.soc=cherokee
 
-# RIL - stock .109 Qualcomm QMI RIL
-vendor.rild.libpath=/vendor/lib64/libril-qc-qmi-1.so
+# Radio - RED .118 canonical MPSS.AT modem + DSDS selects qcrild/qcrild2.
+# Legacy vendor.rild.libpath is intentionally not advertised by this qcrild path.
 
 # NFC
 ro.hardware.nfc_nci=nqx.default

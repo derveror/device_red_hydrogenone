@@ -1,0 +1,249 @@
+{
+  "authority": {
+    "source": "verified RED .118 stock vendor image plus explicitly supplied stock property files",
+    "stock_archive_sha256": "7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e",
+    "stock_build": "H1A1000.082ho.01.00.10r.118"
+  },
+  "init": {
+    "imports": [
+      {
+        "line": 28,
+        "path": "etc/init/hw/init.qcom.rc",
+        "target": "/vendor/etc/init/hw/init.qcom.usb.rc"
+      },
+      {
+        "line": 29,
+        "path": "etc/init/hw/init.qcom.rc",
+        "target": "/vendor/etc/init/hw/init.msm.usb.configfs.rc"
+      },
+      {
+        "line": 30,
+        "path": "etc/init/hw/init.qcom.rc",
+        "target": "/vendor/etc/init/hw/init.target.rc"
+      },
+      {
+        "line": 31,
+        "path": "etc/init/hw/init.qcom.rc",
+        "target": "/vendor/etc/init/hw/init.qcom.factory.rc"
+      },
+      {
+        "line": 32,
+        "path": "etc/init/hw/init.qcom.rc",
+        "target": "/vendor/etc/init/hw/init.qcom.test.rc"
+      }
+    ],
+    "services": [
+      {
+        "disabled": true,
+        "executable": "/system/vendor/bin/exe-ims-regmanagerprocessnative",
+        "line": 1038,
+        "name": "ims_regmanager",
+        "path": "etc/init/hw/init.qcom.rc"
+      },
+      {
+        "disabled": false,
+        "executable": "/system/vendor/bin/ims_rtp_daemon",
+        "line": 441,
+        "name": "vendor.ims_rtp_daemon",
+        "path": "etc/init/hw/init.target.rc"
+      },
+      {
+        "disabled": true,
+        "executable": "/system/vendor/bin/imsdatadaemon",
+        "line": 366,
+        "name": "vendor.imsdatadaemon",
+        "path": "etc/init/hw/init.target.rc"
+      },
+      {
+        "disabled": false,
+        "executable": "/system/vendor/bin/imsqmidaemon",
+        "line": 359,
+        "name": "vendor.imsqmidaemon",
+        "path": "etc/init/hw/init.target.rc"
+      },
+      {
+        "disabled": false,
+        "executable": "/system/vendor/bin/imsrcsd",
+        "line": 446,
+        "name": "vendor.imsrcsservice",
+        "path": "etc/init/hw/init.target.rc"
+      },
+      {
+        "disabled": true,
+        "executable": "/vendor/bin/hw/qcrild",
+        "line": 1,
+        "name": "vendor.qcrild",
+        "path": "etc/init/qcrild.rc"
+      },
+      {
+        "disabled": true,
+        "executable": "/vendor/bin/hw/qcrild -c 2",
+        "line": 8,
+        "name": "vendor.qcrild2",
+        "path": "etc/init/qcrild.rc"
+      },
+      {
+        "disabled": true,
+        "executable": "/vendor/bin/hw/qcrild -c 3",
+        "line": 15,
+        "name": "vendor.qcrild3",
+        "path": "etc/init/qcrild.rc"
+      },
+      {
+        "disabled": true,
+        "executable": "/vendor/bin/hw/rild",
+        "line": 1,
+        "name": "vendor.ril-daemon",
+        "path": "etc/init/rild.rc"
+      },
+      {
+        "disabled": true,
+        "executable": "/vendor/bin/hw/rild",
+        "line": 1,
+        "name": "vendor.ril-daemon",
+        "path": "etc/init/vendor.rild.rc"
+      },
+      {
+        "disabled": true,
+        "executable": "/vendor/bin/hw/rild -c 2",
+        "line": 1055,
+        "name": "vendor.ril-daemon2",
+        "path": "etc/init/hw/init.qcom.rc"
+      },
+      {
+        "disabled": true,
+        "executable": "/vendor/bin/hw/rild -c 3",
+        "line": 1062,
+        "name": "vendor.ril-daemon3",
+        "path": "etc/init/hw/init.qcom.rc"
+      }
+    ],
+    "starts": [
+      {
+        "line": 1044,
+        "path": "etc/init/hw/init.qcom.rc",
+        "target": "ims_regmanager",
+        "trigger": "property:persist.ims.regmanager.mode=1"
+      },
+      {
+        "line": 430,
+        "path": "etc/init/hw/init.target.rc",
+        "target": "vendor.imsdatadaemon",
+        "trigger": "property:vendor.ims.QMI_DAEMON_STATUS=1"
+      }
+    ],
+    "stops": [
+      {
+        "line": 203,
+        "path": "etc/init/hw/init.target.rc",
+        "target": "vendor.ims_rtp_daemon",
+        "trigger": "property:sys.shutdown.requested=*"
+      }
+    ]
+  },
+  "properties": [
+    {
+      "key": "persist.data.iwlan.ims.enable",
+      "line": 99,
+      "path": "extra:build.prop",
+      "value": "1"
+    },
+    {
+      "key": "persist.dbg.allow_ims_off",
+      "line": 103,
+      "path": "extra:build.prop",
+      "value": "1"
+    },
+    {
+      "key": "persist.radio.VT_ENABLE",
+      "line": 96,
+      "path": "extra:build.prop",
+      "value": "1"
+    },
+    {
+      "key": "persist.radio.VT_HYBRID_ENABLE",
+      "line": 97,
+      "path": "extra:build.prop",
+      "value": "1"
+    },
+    {
+      "key": "persist.radio.data_con_rprt",
+      "line": 100,
+      "path": "extra:build.prop",
+      "value": "1"
+    },
+    {
+      "key": "persist.radio.flex_map_inactive",
+      "line": 107,
+      "path": "extra:build.prop",
+      "value": "true"
+    },
+    {
+      "key": "persist.radio.multisim.config",
+      "line": 90,
+      "path": "build.prop",
+      "value": "dsds"
+    },
+    {
+      "key": "persist.vendor.radio.apm_sim_not_pwdn",
+      "line": 47,
+      "path": "build.prop",
+      "value": "1"
+    },
+    {
+      "key": "persist.vendor.radio.custom_ecc",
+      "line": 49,
+      "path": "build.prop",
+      "value": "1"
+    },
+    {
+      "key": "persist.vendor.radio.rat_on",
+      "line": 50,
+      "path": "build.prop",
+      "value": "combine"
+    },
+    {
+      "key": "persist.vendor.radio.sib16_support",
+      "line": 48,
+      "path": "build.prop",
+      "value": "1"
+    },
+    {
+      "key": "rild.libpath",
+      "line": 87,
+      "path": "build.prop",
+      "value": "/system/vendor/lib64/libril-qc-qmi-1.so"
+    },
+    {
+      "key": "ro.telephony.default_network",
+      "line": 64,
+      "path": "extra:build.prop",
+      "value": "22,22"
+    },
+    {
+      "key": "vendor.rild.libpath",
+      "line": 89,
+      "path": "build.prop",
+      "value": "/system/vendor/lib64/libril-qc-qmi-1.so"
+    }
+  ],
+  "schema_version": 1,
+  "summary": {
+    "defined_qcrild_services": [
+      "vendor.qcrild",
+      "vendor.qcrild2",
+      "vendor.qcrild3"
+    ],
+    "explicit_qcrild_start_targets": [],
+    "multisim_values": [
+      "dsds"
+    ],
+    "note": "Runtime recommendation is limited to instances explicitly started by stock init evidence; service definitions alone do not prove an instance should be started.",
+    "recommended_runtime_instances_from_evidence": [],
+    "unstarted_defined_qcrild_services": [
+      "vendor.qcrild",
+      "vendor.qcrild2",
+      "vendor.qcrild3"
+    ]
+  }
+}

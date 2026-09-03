@@ -114,7 +114,7 @@ special_mode_mask values:
       <A3Video>imx268_sub_zsl_video_lc898122</A3Video>
     </ChromatixName>
     <!--wuyh0623@thundersoft.com begin-->
-    <ChromatixName sensor_resolution_index="0" special_mode_mask = "ARC_3D_MODE">
+    <ChromatixName sensor_resolution_index="0" special_mode_mask = "CM_3D_VIDEO_MODE">
       <ISPPreview>imx268_sub_preview</ISPPreview>
       <ISPSnapshot>imx268_sub_preview</ISPSnapshot>
       <ISPVideo>imx268_sub_default_video</ISPVideo>
@@ -140,7 +140,7 @@ special_mode_mask values:
       <A3Video>imx268_sub_zsl_video_lc898122</A3Video>
     </ChromatixName>
     <!--wuyh0623@thundersoft.com begin-->
-    <ChromatixName sensor_resolution_index="1" special_mode_mask = "ARC_3D_MODE">
+    <ChromatixName sensor_resolution_index="1" special_mode_mask = "CM_3D_VIDEO_MODE">
       <ISPPreview>imx268_sub_preview</ISPPreview>
       <ISPSnapshot>imx268_sub_preview</ISPSnapshot>
       <ISPVideo>imx268_sub_default_video</ISPVideo>

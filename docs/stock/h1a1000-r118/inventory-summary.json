@@ -1,0 +1,753 @@
+{
+  "schema_version": 1,
+  "canonical_archive": {
+    "name": "H1A1000.082ho.01.00.10r.118_userdebug_fastboot.rar",
+    "size_bytes": 1850671123,
+    "sha256": "7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e",
+    "regular_files": 74,
+    "directories": 2,
+    "declared_extracted_bytes": 4630918949,
+    "encrypted": false,
+    "archive_test": "passed",
+    "extraction": "passed"
+  },
+  "build": {
+    "android_release": "9",
+    "sdk": 28,
+    "first_api_level": 27,
+    "build_id": "PKQ1.190118.001",
+    "incremental": "118",
+    "system_security_patch": "2019-04-05",
+    "vendor_security_patch": "2018-08-05",
+    "build_type": "userdebug",
+    "tags": "release-keys",
+    "fingerprint": "RED/HydrogenONE/HydrogenONE:9/PKQ1.190118.001/118:userdebug/release-keys",
+    "model": "H1A1000",
+    "device": "HydrogenONE",
+    "platform": "msm8998",
+    "ab_update": true,
+    "system_as_root": true,
+    "treble": true
+  },
+  "filesystem": {
+    "system": {
+      "entry_count": 4828,
+      "regular_file_count": 3951,
+      "directory_count": 620,
+      "symlink_count": 257,
+      "regular_file_bytes": 3701404141,
+      "elf_file_count": 2108
+    },
+    "vendor": {
+      "entry_count": 3666,
+      "regular_file_count": 3314,
+      "directory_count": 130,
+      "symlink_count": 222,
+      "regular_file_bytes": 639476061,
+      "elf_file_count": 2805
+    }
+  },
+  "boot": {
+    "header_version": 1,
+    "page_size": 4096,
+    "kernel_size": 37015950,
+    "ramdisk_size": 9466573,
+    "os_version": "9.0.0",
+    "os_patch_level": "2019-04",
+    "dtb_count": 57,
+    "linux_version": "4.4.153+",
+    "kernel_config_present": true
+  },
+  "partitions": {
+    "count": 81,
+    "rawprogram_entry_count": 203,
+    "sector_size": 4096,
+    "ufs_luns": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "ab": true
+  },
+  "vintf": {
+    "system_framework": {
+      "fqname_rows": 14,
+      "hal_names": 14,
+      "hwbinder": 12,
+      "passthrough": 1
+    },
+    "vendor_device": {
+      "fqname_rows": 95,
+      "hal_names": 73,
+      "hwbinder": 93,
+      "passthrough": 2
+    }
+  },
+  "init_and_properties": {
+    "init": {
+      "action_count": 582,
+      "duplicate_runtime_service_names": {
+        "vendor.audio-hal-2-0": [
+          {
+            "executable": "/vendor/bin/hw/android.hardware.audio@2.0-service",
+            "file": "etc/init/android.hardware.audio@2.0-service.rc",
+            "line": 1,
+            "source": "vendor_image"
+          },
+          {
+            "executable": "/vendor/bin/hw/android.hardware.audio@2.0-service",
+            "file": "etc/init/hw/init.qcom.rc",
+            "line": 1390,
+            "source": "vendor_image"
+          }
+        ],
+        "vendor.ril-daemon": [
+          {
+            "executable": "/vendor/bin/hw/rild",
+            "file": "etc/init/rild.rc",
+            "line": 1,
+            "source": "vendor_image"
+          },
+          {
+            "executable": "/vendor/bin/hw/rild",
+            "file": "etc/init/vendor.rild.rc",
+            "line": 1,
+            "source": "vendor_image"
+          }
+        ],
+        "zygote": [
+          {
+            "executable": "/system/bin/app_process",
+            "file": "init.zygote32.rc",
+            "line": 1,
+            "source": "system_image"
+          },
+          {
+            "executable": "/system/bin/app_process64",
+            "file": "init.zygote64_32.rc",
+            "line": 1,
+            "source": "system_image"
+          }
+        ]
+      },
+      "import_count": 18,
+      "interface_option_count": 12,
+      "rc_file_count": 127,
+      "runtime_exec_status": {
+        "missing": 40,
+        "present": 231
+      },
+      "runtime_missing_exec_count": 40,
+      "runtime_missing_exec_services": [
+        {
+          "disabled": false,
+          "executable": "/system/bin/install-recovery.sh",
+          "file": "init.rc",
+          "line": 783,
+          "name": "flash_recovery",
+          "source": "system_image"
+        },
+        {
+          "disabled": true,
+          "executable": "/system/vendor/bin/iop",
+          "file": "etc/init/hw/init.qcom.rc",
+          "line": 460,
+          "name": "iop",
+          "source": "vendor_image"
+        },
+        {
+          "disabled": true,
+          "executable": "/system/bin/btsnoop",
+          "file": "etc/init/hw/init.qcom.rc",
+          "line": 648,
+          "name": "vendor.btsnoop",
+          "source": "vendor_image"
+        },
+        {
+          "disabled": true,
+          "executable": "/system/bin/qmiproxy",
+          "file": "etc/init/hw/init.qcom.rc",
+          "line": 676,
+          "name": "qmiproxy",
+          "source": "vendor_image"
+        },
+        {
+          "disabled": true,
+          "executable": "/system/vendor/bin/qmuxd",
+          "file": "etc/init/hw/init.qcom.rc",
+          "line": 683,
+          "name": "vendor.qmuxd",
+          "source": "vendor_image"
+        },
+        {
+          "disabled": true,
+          "executable": "/vendor/bin/sscrpcd",
+          "file": "etc/init/hw/init.qcom.rc",
+          "line": 718,
+          "name": "vendor.sensors",
+          "source": "vendor_image"
+        },
+        {
+          "disabled": true,
+          "executable": "/system/bin/dhcpcd",
+          "file": "etc/init/hw/init.qcom.rc",
+          "line": 823,
+          "name": "dhcpcd_wlan0",
+          "source": "vendor_image"
+        },
+        {
+          "disabled": true,
+          "executable": "/system/bin/dhcpcd",
+          "file": "etc/init/hw/init.qcom.rc",
+          "line": 828,
+          "name": "dhcpcd_bond0",
+          "source": "vendor_image"
+        },
+        {
+          "disabled": true,
+          "executable": "/system/bin/dhcpcd",
+          "file": "etc/init/hw/init.qcom.rc",
+          "line": 833,
+          "name": "dhcpcd_p2p",
+          "source": "vendor_image"
+        },
+        {
+          "disabled": true,
+          "executable": "/system/bin/dhcpcd",
+          "file": "etc/init/hw/init.qcom.rc",
+          "line": 838,
+          "name": "dhcpcd_wigig0",
+          "source": "vendor_image"
+        },
+        {
+          "disabled": true,
+          "executable": "/system/bin/dhcpcd",
+          "file": "etc/init/hw/init.qcom.rc",
+          "line": 843,
+          "name": "iprenew_wlan0",
+          "source": "vendor_image"
+        },
+        {
+          "disabled": true,
+          "executable": "/system/bin/dhcpcd",
+          "file": "etc/init/hw/init.qcom.rc",
+          "line": 848,
+          "name": "iprenew_bond0",
+          "source": "vendor_image"
+        },
+        {
+          "disabled": true,
+          "executable": "/system/bin/dhcpcd",
+          "file": "etc/init/hw/init.qcom.rc",
+          "line": 853,
+          "name": "iprenew_p2p",
+          "source": "vendor_image"
+        },
+        {
+          "disabled": true,
+          "executable": "/system/bin/dhcpcd",
+          "file": "etc/init/hw/init.qcom.rc",
+          "line": 858,
+          "name": "iprenew_wigig0",
+          "source": "vendor_image"
+        },
+        {
+          "disabled": false,
+          "executable": "/system/vendor/bin/ptt_socket_app",
+          "file": "etc/init/hw/init.qcom.rc",
+          "line": 863,
+          "name": "ptt_socket_app",
+          "source": "vendor_image"
+        },
+        {
+          "disabled": true,
+          "executable": "/system/vendor/bin/ptt_socket_app",
+          "file": "etc/init/hw/init.qcom.rc",
+          "line": 870,
+          "name": "ptt_ffbm",
+          "source": "vendor_image"
+        },
+        {
+          "disabled": true,
+          "executable": "/system/vendor/bin/wifi_ftmd",
+          "file": "etc/init/hw/init.qcom.rc",
+          "line": 876,
+          "name": "wifi_ftmd",
+          "source": "vendor_image"
+        },
+        {
+          "disabled": true,
+          "executable": "/system/bin/dhcpcd",
+          "file": "etc/init/hw/init.qcom.rc",
+          "line": 907,
+          "name": "dhcpcd_bt-pan",
+          "source": "vendor_image"
+        },
+        {
+          "disabled": true,
+          "executable": "/system/bin/dhcpcd",
+          "file": "etc/init/hw/init.qcom.rc",
+          "line": 912,
+          "name": "iprenew_bt-pan",
+          "source": "vendor_image"
+        },
+        {
+          "disabled": true,
+          "executable": "/system/vendor/bin/drmdiagapp",
+          "file": "etc/init/hw/init.qcom.rc",
+          "line": 949,
+          "name": "drmdiag",
+          "source": "vendor_image"
+        },
+        {
+          "disabled": false,
+          "executable": "/vendor/bin/qvop-daemon",
+          "file": "etc/init/hw/init.qcom.rc",
+          "line": 1010,
+          "name": "qvop-daemon",
+          "source": "vendor_image"
+        },
+        {
+          "disabled": true,
+          "executable": "/system/vendor/bin/exe-ims-regmanagerprocessnative",
+          "file": "etc/init/hw/init.qcom.rc",
+          "line": 1038,
+          "name": "ims_regmanager",
+          "source": "vendor_image"
+        },
+        {
+          "disabled": true,
+          "executable": "/system/bin/battery_monitor",
+          "file": "etc/init/hw/init.qcom.rc",
+          "line": 1050,
+          "name": "battery_monitor",
+          "source": "vendor_image"
+        },
+        {
+          "disabled": true,
+          "executable": "/system/bin/profiler_daemon",
+          "file": "etc/init/hw/init.qcom.rc",
+          "line": 1069,
+          "name": "profiler_daemon",
+          "source": "vendor_image"
+        },
+        {
+          "disabled": true,
+          "executable": "/system/bin/hvdcp",
+          "file": "etc/init/hw/init.qcom.rc",
+          "line": 1092,
+          "name": "hvdcp",
+          "source": "vendor_image"
+        },
+        {
+          "disabled": true,
+          "executable": "/system/bin/charger_monitor",
+          "file": "etc/init/hw/init.qcom.rc",
+          "line": 1103,
+          "name": "charger_monitor",
+          "source": "vendor_image"
+        },
+        {
+          "disabled": true,
+          "executable": "/vendor/bin/vm_bms",
+          "file": "etc/init/hw/init.qcom.rc",
+          "line": 1141,
+          "name": "vm_bms",
+          "source": "vendor_image"
+        },
+        {
+          "disabled": true,
+          "executable": "/vendor/bin/LKCore",
+          "file": "etc/init/hw/init.qcom.rc",
+          "line": 1165,
+          "name": "vendor.LKCore-dbg",
+          "source": "vendor_image"
+        },
+        {
+          "disabled": true,
+          "executable": "/vendor/bin/LKCore",
+          "file": "etc/init/hw/init.qcom.rc",
+          "line": 1173,
+          "name": "vendor.LKCore-rel",
+          "source": "vendor_image"
+        },
+        {
+          "disabled": false,
+          "executable": "/system/vendor/bin/qseeproxydaemon",
+          "file": "etc/init/hw/init.qcom.rc",
+          "line": 1180,
+          "name": "qseeproxydaemon",
+          "source": "vendor_image"
+        },
+        {
+          "disabled": false,
+          "executable": "/system/vendor/bin/esepmdaemon",
+          "file": "etc/init/hw/init.qcom.rc",
+          "line": 1185,
+          "name": "esepmdaemon",
+          "source": "vendor_image"
+        },
+        {
+          "disabled": true,
+          "executable": "/system/vendor/bin/poweroffhandler",
+          "file": "etc/init/hw/init.qcom.rc",
+          "line": 1196,
+          "name": "poweroffhandler",
+          "source": "vendor_image"
+        },
+        {
+          "disabled": false,
+          "executable": "/vendor/bin/vppservice",
+          "file": "etc/init/hw/init.qcom.rc",
+          "line": 1218,
+          "name": "vendor.vppservice",
+          "source": "vendor_image"
+        },
+        {
+          "disabled": false,
+          "executable": "/vendor/bin/chre",
+          "file": "etc/init/hw/init.qcom.rc",
+          "line": 1315,
+          "name": "chre",
+          "source": "vendor_image"
+        },
+        {
+          "disabled": false,
+          "executable": "/system/vendor/bin/wifilearner",
+          "file": "etc/init/hw/init.qcom.rc",
+          "line": 1346,
+          "name": "vendor.wifilearner",
+          "source": "vendor_image"
+        },
+        {
+          "disabled": false,
+          "executable": "/system/bin/spmdaemon",
+          "file": "etc/init/hw/init.qcom.rc",
+          "line": 1363,
+          "name": "spmdaemon",
+          "source": "vendor_image"
+        },
+        {
+          "disabled": false,
+          "executable": "/system/bin/spmclient",
+          "file": "etc/init/hw/init.qcom.rc",
+          "line": 1368,
+          "name": "spmclient",
+          "source": "vendor_image"
+        },
+        {
+          "disabled": false,
+          "executable": "/system/vendor/bin/audiod",
+          "file": "etc/init/hw/init.target.rc",
+          "line": 291,
+          "name": "audiod",
+          "source": "vendor_image"
+        },
+        {
+          "disabled": false,
+          "executable": "/system/vendor/bin/mdtpd",
+          "file": "etc/init/hw/init.target.rc",
+          "line": 507,
+          "name": "mdtpd",
+          "source": "vendor_image"
+        },
+        {
+          "disabled": false,
+          "executable": "/system/bin/qvrservice",
+          "file": "etc/init/hw/init.target.rc",
+          "line": 517,
+          "name": "qvrd",
+          "source": "vendor_image"
+        }
+      ],
+      "runtime_service_definition_count": 271,
+      "service_count": 286,
+      "services_by_source": {
+        "recovery_ramdisk": 4,
+        "standalone_ramdisk": 11,
+        "system_image": 60,
+        "vendor_image": 211
+      }
+    },
+    "properties": {
+      "conflicting_value_key_count": 7,
+      "definition_count": 594,
+      "file_count": 8,
+      "import_count": 3,
+      "multi_definition_key_count": 207,
+      "unique_key_count": 289
+    }
+  },
+  "elf": {
+    "regular_elf_files": 4913,
+    "elf32": 2997,
+    "elf64": 1916,
+    "dt_needed_edges": 37285,
+    "readelf_errors": 0,
+    "unresolved_edges": 10,
+    "unresolved_note": "all libgcc.so references are inside ADSP RFSA payloads, not conventional Android runtime executables"
+  },
+  "packages": {
+    "abi_counts": {
+      "arm64-v8a": 21,
+      "armeabi": 2,
+      "armeabi-v7a": 14,
+      "mips": 2,
+      "mips64": 1,
+      "x86": 5,
+      "x86_64": 4
+    },
+    "apk_count": 195,
+    "by_partition": {
+      "system": 175,
+      "vendor": 20
+    },
+    "error_count": 0,
+    "errors": [],
+    "manifest_error_count": 0,
+    "manifest_success": 195,
+    "native_apk_count": 27,
+    "no_v1_certificate_count": 0,
+    "privileged_count": 76,
+    "shared_user_ids": {
+      "android.media": 4,
+      "android.uid.bluetooth": 2,
+      "android.uid.calendar": 1,
+      "android.uid.nfc": 1,
+      "android.uid.phone": 23,
+      "android.uid.se": 1,
+      "android.uid.shared": 4,
+      "android.uid.shell": 1,
+      "android.uid.system": 36,
+      "android.uid.systemui": 1,
+      "com.android.emergency.uid": 1,
+      "com.google.android.apps.maps": 1,
+      "com.google.android.calendar.uid.shared": 1,
+      "com.google.android.marvin.feedback": 1,
+      "com.google.ar.core": 1,
+      "com.google.uid.shared": 3
+    },
+    "signed_v1_count": 195,
+    "target_sdk_counts": {
+      "10": 1,
+      "14": 1,
+      "16": 1,
+      "22": 1,
+      "23": 11,
+      "24": 5,
+      "25": 2,
+      "26": 10,
+      "27": 15,
+      "28": 147,
+      "None": 1
+    },
+    "unique_certificates": [
+      "0131326fe2e78de96fc84cd0b5866343b90fc2094df3b7c38dc431bdd6a31b0b",
+      "10b47c16cff368b8dc2278c3f6a3739c4c11a96cdc34c4360fae968c4254edd1",
+      "197f667ae126af53a8a891b5d5c81d7c0e48223b3e828e51870a4aeadd9e8d9d",
+      "1d47e51f53eb11c38b699400f518bdb6d6d27a1d61cc51e2a69ea828c3a2dbe8",
+      "211b4a7400e7e7db18097a35352c34cdd964d4f165d0010a8aceed57927e2916",
+      "277c40999fa8a4ef16afeee48a669db03d23cd49c2e7e4bde7db3352dc39aed9",
+      "2ff3936f2dafee31c69aa7b784b5f9874df55d7bbe4a195fcdd65cad842f7343",
+      "31dd72d5a7519a684f796210019900ea383eb97872aea27088d573882c7be0b0",
+      "3931f1aeb91fedb8f32728f93ae50952c72023c8659d298826dc87de0fbc5db6",
+      "3a448f6bd416ffb5e5fac29103a8c123131ba86347420c881dc32f215860ad53",
+      "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a",
+      "4b1c650d001393596100c836da3b5592b20a059d23050b7b899f16bd68a9c287",
+      "56be132b780656fe2444cd34326eb5d7aac91d2096abf0fe673a99270622ec87",
+      "5f3e50f435583c9ae626302a71f7340044087a7e2c60adacfc254205a993e305",
+      "6e913f65ea53321ead6932ff777e1b7f94bbba7e2b0dafdd8494b100101e3797",
+      "6faf3c4140407473400934d117815a21af1cfefc5c0bee61c858bc3d72ba6fe5",
+      "7b5ad55180a48a1f30f35377c0f9e5f911bf942fb4cf83eba255a0ebf580beef",
+      "7caab6e6ba700e0ddcf75cca52b8c3b19a3c7d23308f7eb177a64eb2476197bd",
+      "7ef3eedb4f48ecf11e3170ce2ff42dfc0de47cdc024576133275adef34afade2",
+      "90e8b84c91ae47530018af7fc35a943716fc8d2271f03548a1833be0166e2066",
+      "a40da80a59d170caa950cf15c18c454d47a39b26989d8b640ecd745ba71bf5dc",
+      "afee62fb653c9d863d1a6d6046b35225bf6380dd4657b105e8331a1de49f9f91",
+      "b92109b59095955ccaaf5ecbcf0f153ec9640a4658c101667ad96b7e499a4092",
+      "c25d5afacb6783109d6136d79353fad4f6541c3545d25228a18703d043ca783f",
+      "cc75526d6c0f80ac3b3a84eb44838440dbbe6b124443a7c7d7bd19182ac022c9",
+      "d14a5a7cea1e26b88a1ef0731c9bea61d0cf6cf30748af31edd22ec8762702c6",
+      "d5cede4075beab3585dd77c71ffbe62221299bd85eff74f37449830cc702ad53",
+      "da0f83cb0dbd3342e7551b66d62717930a2e998fb38270778859e42cce25cbbf",
+      "e3f9e1e0cf99d0e56a055ba65e241b3399f7cea524326b0cdd6ec1327ed0fdc1",
+      "f001a28839a3b438f83644e2dd733160bf00f5caee29c87d4aa7992a9a79054d",
+      "f0fd6c5b410f25cb25c3b53346c8972fae30f8ee7411df910480ad6b2d60db83"
+    ]
+  },
+  "firmware_and_configs": {
+    "configs": {
+      "by_partition": {
+        "boot_ramdisk": 5,
+        "fastboot": 20,
+        "normal_ramdisk": 8,
+        "system": 328,
+        "vendor": 309
+      },
+      "config_file_count": 670,
+      "total_bytes": 11296262
+    },
+    "firmware": {
+      "by_partition": {
+        "fastboot": 17,
+        "system": 2,
+        "vendor": 66
+      },
+      "firmware_file_count": 85,
+      "red_specific_named_files": [
+        "vendor:etc/hbtp/qtc800h.bin",
+        "vendor:etc/hbtp/qtc800h_8998_660.bin",
+        "vendor:etc/hbtp/qtc800s_dsp.bin",
+        "vendor:firmware/leia_pfp_470.fw",
+        "vendor:firmware/leia_pm4_470.fw"
+      ],
+      "total_bytes": 136691149
+    },
+    "kernel_modules": {
+      "by_partition": {
+        "system": 11,
+        "vendor": 3
+      },
+      "duplicate_hash_groups": {
+        "52d64ca995e01f50c52e926ce959dbe2bb5c003cc7eddcc39ee4589949085a92": [
+          "system:system/lib/modules/qca_cld3_wlan.ko",
+          "vendor:lib/modules/qca_cld3_wlan.ko"
+        ],
+        "6e9d84fa1b5d4635b064f2d473e9ee2014317d4551e25bac99aafca3f9dc4445": [
+          "system:system/lib/modules/wil6210.ko",
+          "vendor:lib/modules/wil6210.ko"
+        ],
+        "c91b00c5129a3d6a6bcd6ba42951664457f386c47abcdb41bfe12f0f573e8692": [
+          "system:system/lib/modules/msm_11ad_proxy.ko",
+          "vendor:lib/modules/msm_11ad_proxy.ko"
+        ]
+      },
+      "module_path_count": 14,
+      "signed_count": 14,
+      "unique_module_hash_count": 11,
+      "vermagic_values": {
+        "4.4.153+ SMP preempt mod_unload modversions aarch64": 14
+      }
+    },
+    "packages": {
+      "apk_count": 195,
+      "by_partition": {
+        "system": 292,
+        "vendor": 21
+      },
+      "errors": [],
+      "jar_count": 118,
+      "note": "Package names and manifest attributes require binary AXML decoding and are not inferred from directory names.",
+      "package_count": 313,
+      "total_bytes": 1732343894,
+      "with_certificate_entries": 195,
+      "with_native_libraries": 27,
+      "zip_valid_count": 313
+    },
+    "selinux": {
+      "android15_rule": "Compiled Android 9 policy is evidence only. Android 15 source policy must be recreated and validated against current neverallows.",
+      "compiled_policy_files": [
+        "system:system/etc/selinux/plat_and_mapping_sepolicy.cil.sha256",
+        "vendor:etc/selinux/precompiled_sepolicy",
+        "vendor:etc/selinux/precompiled_sepolicy.plat_and_mapping.sha256",
+        "boot_ramdisk:sepolicy"
+      ],
+      "context_entry_count": 4250,
+      "context_file_count": 14,
+      "file_count": 33,
+      "malformed_context_entry_count": 47,
+      "unique_context_type_count": 1195
+    }
+  },
+  "current_tree_audit": {
+    "classifications": {
+      "identical_moved_path_donor_device": 1,
+      "identical_same_path_donor_device": 248,
+      "identical_to_stock_r118": 70,
+      "same_path_modified_from_donor": 42,
+      "unique_or_generated": 62
+    },
+    "current_files": 423,
+    "proprietary_entries": 93,
+    "proprietary_exact_in_r118": 91,
+    "proprietary_missing_in_r118": 2
+  },
+  "donor_common_evidence": {
+    "by_category_and_donor_count": {
+      "audio": {
+        "1": 1,
+        "2": 1
+      },
+      "camera": {
+        "1": 8,
+        "2": 2,
+        "3": 2
+      },
+      "dsp_compute": {
+        "1": 9,
+        "2": 4,
+        "3": 5,
+        "4": 5
+      },
+      "firmware": {
+        "3": 4
+      },
+      "gnss_location": {
+        "1": 3
+      },
+      "graphics_display": {
+        "1": 7,
+        "3": 3,
+        "4": 2
+      },
+      "init_policy_config": {
+        "1": 2,
+        "3": 1,
+        "4": 1
+      },
+      "other": {
+        "1": 15,
+        "2": 8
+      },
+      "power_thermal_perf": {
+        "1": 6,
+        "2": 10
+      },
+      "radio_ims": {
+        "4": 32
+      },
+      "security_drm": {
+        "1": 5,
+        "2": 5,
+        "3": 1
+      },
+      "sensors_fingerprint_nfc": {
+        "1": 2,
+        "2": 1
+      },
+      "wifi_bluetooth": {
+        "1": 2
+      }
+    },
+    "by_donor_count": {
+      "1": 60,
+      "2": 31,
+      "3": 16,
+      "4": 40
+    },
+    "high_confidence_common_files": 56,
+    "medium_confidence_common_files": 31,
+    "unique_stock_files_matching_any_donor": 147
+  },
+  "analysis_evidence": {
+    "filename": "hydrogenone-r118-analysis-evidence-2026-09-02.tar.zst",
+    "size_bytes": 2085673,
+    "sha256": "c3a1ef6be4a8f67220cb7252344ef38d4a41c36fdc8cd4ac8c9492b6444b7527",
+    "member_count": 81,
+    "contains_proprietary_images_or_payload": false,
+    "purpose": "reproducible inventories, dependency graphs, reports, and analysis scripts"
+  }
+}

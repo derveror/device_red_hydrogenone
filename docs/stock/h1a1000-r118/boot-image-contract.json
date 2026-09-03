@@ -1,0 +1,112 @@
+{
+  "authority": {
+    "boot_image_sha256": "8e120a2920f5d4eec65cb5929d31fe271738af85b218d5adb96035eb28806af6",
+    "boot_image_size": 46495016,
+    "stock_archive_sha256": "7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e",
+    "stock_build": "H1A1000.082ho.01.00.10r.118"
+  },
+  "build_properties": {
+    "ro.build.fingerprint": "RED/HydrogenONE/HydrogenONE:9/PKQ1.190118.001/118:userdebug/release-keys",
+    "ro.build.version.release": "9",
+    "ro.build.version.sdk": "28",
+    "ro.build.version.security_patch": "2019-04-05"
+  },
+  "header": {
+    "cmdline": "console=ttyMSM0,115200,n8 androidboot.console=ttyMSM0 earlycon=msm_serial_dm,0xc1b0000 androidboot.hardware=qcom user_debug=31 msm_rtb.filter=0x37 ehci-hcd.park=3 lpm_levels.sleep_disabled=1 sched_enable_hmp=1 sched_enable_power_aware=1 service_locator.enable=1 swiotlb=2048 androidboot.configfs=true androidboot.usbcontroller=a800000.dwc3 firmware_class.path=/vendor/firmware_mnt/image loop.max_part=7 buildvariant=userdebug veritykeyid=id:7e4333f9bba00adfe0ede979e28ed1920492b40f",
+    "header_size": 1648,
+    "header_version": 1,
+    "kernel_addr": "0x00008000",
+    "kernel_size": 37015950,
+    "name": "",
+    "os_patch_level": "2019-04",
+    "os_version": "9.0.0",
+    "page_size": 4096,
+    "ramdisk_addr": "0x01000000",
+    "ramdisk_size": 9466573,
+    "recovery_dtbo_offset": 0,
+    "recovery_dtbo_size": 0,
+    "second_addr": "0x00f00000",
+    "second_size": 0,
+    "tags_addr": "0x00000100"
+  },
+  "kernel": {
+    "linux_version_strings": [],
+    "sha256": "584ed86bab46bf57c2cd6b6b48ac4026c5d24a70d57bcdd04472d39c5591064d",
+    "size": 37015950
+  },
+  "layout": {
+    "kernel_offset": 4096,
+    "ramdisk_offset": 37023744,
+    "second_offset": 46493696
+  },
+  "partition_xml_records": [
+    {
+      "attributes": {
+        "bootable": "false",
+        "filename": "system.img",
+        "label": "system_a",
+        "readonly": "false",
+        "size_in_kb": "4194304",
+        "sparse": "true",
+        "type": "97D7B011-54DA-4835-B3C4-917AD6E73D74"
+      },
+      "tag": "partition",
+      "text": ""
+    },
+    {
+      "attributes": {
+        "bootable": "false",
+        "filename": "vendor.img",
+        "label": "vendor_a",
+        "readonly": "false",
+        "size_in_kb": "1048576",
+        "sparse": "true",
+        "type": "97D7B011-54DA-4835-B3C4-917AD6E73D74"
+      },
+      "tag": "partition",
+      "text": ""
+    },
+    {
+      "attributes": {
+        "bootable": "false",
+        "filename": "userdata.img",
+        "label": "userdata",
+        "readonly": "false",
+        "size_in_kb": "12582912",
+        "sparse": "true",
+        "type": "1B81E7E6-F50D-419B-A739-2AEEF8DA3335"
+      },
+      "tag": "partition",
+      "text": ""
+    },
+    {
+      "attributes": {
+        "bootable": "false",
+        "filename": "boot.img",
+        "label": "boot_a",
+        "readonly": "false",
+        "size_in_kb": "65536",
+        "type": "20117F86-E985-4357-B9EE-374BC1D8487D"
+      },
+      "tag": "partition",
+      "text": ""
+    },
+    {
+      "attributes": {
+        "bootable": "false",
+        "filename": "boot.img",
+        "label": "boot_b",
+        "readonly": "false",
+        "size_in_kb": "65536",
+        "type": "77036CD4-03D5-42BB-8ED1-37E5A88BAA34"
+      },
+      "tag": "partition",
+      "text": ""
+    }
+  ],
+  "ramdisk": {
+    "sha256": "7be9e9c0eedcb38aa8829ccd94a8813b082d7760de93a56b9b35e7175a070767",
+    "size": 9466573
+  },
+  "schema_version": 1
+}

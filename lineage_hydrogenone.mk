@@ -4,8 +4,8 @@ $(call inherit-product, vendor/lineage/config/common_full_phone.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base_telephony.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/product_launched_with_o_mr1.mk)
 
-# Proprietary output is optional during the source-only compile stage.
-$(call inherit-product-if-exists, vendor/red/hydrogenone/hydrogenone-vendor.mk)
+# Verified RED .118 proprietary vendor output is required for a real build.
+$(call inherit-product, vendor/red/hydrogenone/hydrogenone-vendor.mk)
 
 # Device definition is inherited last, matching maintained Lineage device trees.
 $(call inherit-product, device/red/hydrogenone/device.mk)
@@ -13,7 +13,7 @@ $(call inherit-product, device/red/hydrogenone/device.mk)
 PRODUCT_NAME := lineage_hydrogenone
 PRODUCT_DEVICE := hydrogenone
 PRODUCT_BRAND := RED
-PRODUCT_MODEL := Hydrogen One
+PRODUCT_MODEL := H1A1000
 PRODUCT_MANUFACTURER := RED
 PRODUCT_RELEASE_NAME := hydrogenone
 
@@ -21,8 +21,7 @@ PRODUCT_ACTIONABLE_COMPATIBLE_PROPERTY_DISABLE := true
 PRODUCT_COMPATIBLE_PROPERTY_OVERRIDE := true
 PRODUCT_CHARACTERISTICS := nosdcard
 
-# Stock identity for proprietary compatibility and complete partition fingerprints.
+# Canonical RED .118 identity used for proprietary compatibility.
 PRODUCT_BUILD_PROP_OVERRIDES += \
-    BuildDesc="hamberger_verizon-user 8.1.0 H1A1000.010ho.01.01.01r.109 109 release-keys" \
-    BuildFingerprint=RED/HydrogenONE/HydrogenONE:8.1.0/H1A1000.010ho.01.01.01r.109/109:user/release-keys \
+    BuildFingerprint=RED/HydrogenONE/HydrogenONE:9/PKQ1.190118.001/118:userdebug/release-keys \
     DeviceName=HydrogenONE

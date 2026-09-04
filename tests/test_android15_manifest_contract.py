@@ -18,6 +18,8 @@ EXPECTED_SOURCE_FQINSTANCES = {
     "android.hardware.graphics.composer@2.1::IComposer/default",
     "android.hardware.graphics.mapper@2.1::IMapper/default",
     "android.hardware.keymaster@3.0::IKeymasterDevice/default",
+    "android.hardware.media.omx@1.0::IOmx/default",
+    "android.hardware.media.omx@1.0::IOmxStore/default",
     "android.hardware.nfc@1.2::INfc/default",
     "android.hardware.sensors@1.0::ISensors/default",
     "android.hardware.soundtrigger@2.2::ISoundTriggerHw/default",
@@ -28,7 +30,6 @@ EXPECTED_SOURCE_FQINSTANCES = {
 PROPRIETARY_HAL_NAMES = {
     "android.hardware.biometrics.fingerprint",
     "android.hardware.bluetooth",
-    "android.hardware.media.omx",
     "android.hardware.radio",
     "android.hardware.radio.config",
     "android.hardware.secure_element",
@@ -49,8 +50,9 @@ PROPRIETARY_HAL_NAMES = {
     "vendor.qti.hardware.radio.uim_remote_server",
 }
 
-# The cheryl-compatible QTI GNSS 1.0 source service has no VINTF fragment;
-# its IGnss/default instance is therefore owned by the device manifest above.
+# The cheryl-compatible QTI GNSS 1.0 source service and the Lineage media OMX
+# source service have no proprietary VINTF fragments; their default instances
+# are therefore owned by the device manifest above.
 SELF_FRAGMENTED_SOURCE_HAL_NAMES: set[str] = set()
 
 

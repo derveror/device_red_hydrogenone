@@ -1,0 +1,73 @@
+name: Import cheryl GNSS ABI closure
+
+on:
+  push:
+    branches:
+      - codex/gnss-cheryl-import-work2
+
+permissions:
+  contents: write
+
+jobs:
+  import-gnss:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Hydrogen One work branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Checkout pinned cheryl LineageOS 22.2 donor
+        uses: actions/checkout@v4
+        with:
+          repository: LineageOS/android_device_razer_cheryl
+          ref: e7990dd5b94c16574c45bd241a23f1abc76b9638
+          path: .donor/cheryl
+          fetch-depth: 1
+
+      - name: Verify RED test fails before import
+        shell: bash
+        run: |
+          set -euo pipefail
+          if python3 -m unittest -v tests.test_gnss_cheryl_abi_contract; then
+            echo "GNSS ABI regression test unexpectedly passed before import" >&2
+            exit 1
+          fi
+          echo "Expected RED state confirmed"
+
+      - name: Import pinned cheryl GPS source closure
+        run: |
+          python3 tools/import_cheryl_gnss.py \
+            --root "$GITHUB_WORKSPACE" \
+            --cheryl "$GITHUB_WORKSPACE/.donor/cheryl"
+          rm -rf .donor
+
+      - name: Verify focused GNSS and VINTF contracts
+        run: |
+          python3 -m unittest -v \
+            tests.test_gnss_cheryl_abi_contract \
+            tests.test_android15_manifest_contract
+
+      - name: Verify complete device static contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          export TERM=xterm
+          python3 tests/test_full_tree.py
+          modules=$(find tests -maxdepth 1 -name 'test_*.py' ! -name 'test_full_tree.py' \
+            -printf '%f\n' | sed 's/\.py$//' | tr '\n' ' ')
+          PYTHONPATH=tests python3 -m unittest -v $modules
+
+      - name: Commit imported closure
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Importer produced no changes" >&2
+            exit 1
+          fi
+          git commit -m "device: use cheryl-compatible GNSS source ABI"
+          git push origin HEAD:${GITHUB_REF_NAME}

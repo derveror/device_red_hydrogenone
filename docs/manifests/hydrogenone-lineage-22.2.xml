@@ -3,8 +3,8 @@
     <!--
         Clean-checkout template for RED Hydrogen One / LineageOS 22.2.
         Copy this file to .repo/local_manifests/hydrogenone.xml after repo init.
-        The RED vendor revision is intentionally pinned to the exact commit
-        verified by docs/reference/cross-tree-lock.json.
+        The RED device branch and vendor revision are pinned to the pair
+        verified by docs/reference/cross-tree-lock.json and the Android 15 gates.
     -->
     <remote name="derveror" fetch="https://github.com/derveror/" />
     <remote name="lineageos" fetch="https://github.com/LineageOS/" />
@@ -13,13 +13,13 @@
         name="device_red_hydrogenone"
         path="device/red/hydrogenone"
         remote="derveror"
-        revision="lineage-22.2-stock118-rework" />
+        revision="codex/lineage-22.2-bringup-audit" />
 
     <project
         name="proprietary_vendor_red_hydrogenone"
         path="vendor/red/hydrogenone"
         remote="derveror"
-        revision="6fef3d7c6333602d7114aefa0284a03f5aadb454" />
+        revision="105aae6fda2361defd0ab16fcd558fc08673e9dc" />
 
     <project
         name="android_kernel_essential_msm8998"

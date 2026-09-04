@@ -26,48 +26,53 @@ jobs:
 
           manifest = Path('manifest.xml')
           text = manifest.read_text()
-          media_block = '''    <hal format="hidl">
-              <name>android.hardware.media.omx</name>
-              <transport>hwbinder</transport>
-              <version>1.0</version>
-              <interface>
-                  <name>IOmx</name>
-                  <instance>default</instance>
-              </interface>
-              <interface>
-                  <name>IOmxStore</name>
-                  <instance>default</instance>
-              </interface>
-          </hal>
-          '''
+          media_block = (
+              '    <hal format="hidl">\n'
+              '        <name>android.hardware.media.omx</name>\n'
+              '        <transport>hwbinder</transport>\n'
+              '        <version>1.0</version>\n'
+              '        <interface>\n'
+              '            <name>IOmx</name>\n'
+              '            <instance>default</instance>\n'
+              '        </interface>\n'
+              '        <interface>\n'
+              '            <name>IOmxStore</name>\n'
+              '            <instance>default</instance>\n'
+              '        </interface>\n'
+              '    </hal>\n'
+          )
           if '<name>android.hardware.media.omx</name>' not in text:
-              anchor = '''    <hal format="hidl">
-              <name>android.hardware.nfc</name>
-          '''
-              if text.count(anchor) != 1:
-                  raise SystemExit('cannot locate unique NFC manifest anchor')
-              text = text.replace(anchor, media_block + anchor, 1)
+              nfc_name = '<name>android.hardware.nfc</name>'
+              if text.count(nfc_name) != 1:
+                  raise SystemExit('cannot locate unique NFC HAL name')
+              nfc_pos = text.index(nfc_name)
+              hal_pos = text.rfind('    <hal format="hidl">', 0, nfc_pos)
+              if hal_pos < 0:
+                  raise SystemExit('cannot locate NFC HAL block start')
+              text = text[:hal_pos] + media_block + text[hal_pos:]
               manifest.write_text(text)
 
           device_mk = Path('device.mk')
           mk = device_mk.read_text()
-          old = '''# OMX source glue, proprietary codecs remain in vendor
-          PRODUCT_PACKAGES += \\
-              libc2dcolorconvert \\
-              libOmxCore \\
-              libOmxVdec \\
-              libOmxVenc \\
-              libstagefrighthw
-          '''
-          new = '''# OMX source frontend/service; proprietary codecs remain in vendor
-          PRODUCT_PACKAGES += \\
-              android.hardware.media.omx@1.0-service \\
-              libc2dcolorconvert \\
-              libOmxCore \\
-              libOmxVdec \\
-              libOmxVenc \\
-              libstagefrighthw
-          '''
+          old = (
+              '# OMX source glue, proprietary codecs remain in vendor\n'
+              'PRODUCT_PACKAGES += \\\n'
+              '    libc2dcolorconvert \\\n'
+              '    libOmxCore \\\n'
+              '    libOmxVdec \\\n'
+              '    libOmxVenc \\\n'
+              '    libstagefrighthw\n'
+          )
+          new = (
+              '# OMX source frontend/service; proprietary codecs remain in vendor\n'
+              'PRODUCT_PACKAGES += \\\n'
+              '    android.hardware.media.omx@1.0-service \\\n'
+              '    libc2dcolorconvert \\\n'
+              '    libOmxCore \\\n'
+              '    libOmxVdec \\\n'
+              '    libOmxVenc \\\n'
+              '    libstagefrighthw\n'
+          )
           if old in mk:
               mk = mk.replace(old, new, 1)
               device_mk.write_text(mk)

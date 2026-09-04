@@ -1,0 +1,84 @@
+name: Repin media OMX vendor
+
+on:
+  push:
+    branches:
+      - codex/lineage-22.2-bringup-audit
+
+permissions:
+  contents: write
+
+jobs:
+  repin:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout device tree
+        uses: actions/checkout@v4
+        with:
+          path: device-tree
+          fetch-depth: 0
+
+      - name: Checkout verified vendor tree
+        uses: actions/checkout@v4
+        with:
+          repository: derveror/proprietary_vendor_red_hydrogenone
+          ref: 0dd08b89174556753d8e8e87b7ebc49286aea040
+          path: vendor-tree
+          fetch-depth: 1
+
+      - name: Regenerate zero-collision evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 device-tree/tools/analysis/cross_tree_contract.py \
+            --device-root device-tree \
+            --vendor-root vendor-tree \
+            --json > "$RUNNER_TEMP/cross-tree-live.json"
+
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          vendor_commit = "0dd08b89174556753d8e8e87b7ebc49286aea040"
+          root = Path("device-tree")
+          live = json.loads((Path(os.environ["RUNNER_TEMP"]) / "cross-tree-live.json").read_text())
+
+          assert live["schema_version"] == 2, live["schema_version"]
+          assert live["copy_destination_collisions"] == [], live["copy_destination_collisions"]
+          print("CROSS_TREE_COLLISION_COUNT=0")
+
+          evidence_path = root / "docs/stock/h1a1000-r118/cross-tree-copy-contract.json"
+          evidence = json.loads(evidence_path.read_text())
+          for key in ("device_copy_destinations", "vendor_copy_destinations", "copy_destination_collisions"):
+              assert live[key] == evidence[key], f"cross-tree ownership changed unexpectedly: {key}"
+
+          evidence["authority"]["vendor_commit"] = vendor_commit
+          evidence["authority"]["device_branch"] = "codex/lineage-22.2-bringup-audit"
+          evidence["status"] = "zero_expanded_copy_destination_collisions"
+          evidence_path.write_text(json.dumps(evidence, indent=2, sort_keys=True) + "\n")
+
+          lock_path = root / "docs/reference/cross-tree-lock.json"
+          lock = json.loads(lock_path.read_text())
+          lock["device_branch"] = "codex/lineage-22.2-bringup-audit"
+          lock["vendor_commit"] = vendor_commit
+          lock_path.write_text(json.dumps(lock, indent=2) + "\n")
+          PY
+
+          cd device-tree
+          git diff --check
+
+      - name: Commit regenerated lock and evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd device-tree
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/reference/cross-tree-lock.json docs/stock/h1a1000-r118/cross-tree-copy-contract.json
+          if git diff --cached --quiet; then
+            echo "media OMX cross-tree evidence already pinned"
+            exit 0
+          fi
+          git commit -m "device: pin media OMX vendor compatibility evidence"
+          git push origin HEAD:${GITHUB_REF_NAME}

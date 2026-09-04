@@ -27,7 +27,7 @@ class LocalManifestContractTest(unittest.TestCase):
             "device/red/hydrogenone": {
                 "name": "device_red_hydrogenone",
                 "remote": "derveror",
-                "revision": "lineage-22.2-stock118-rework",
+                "revision": lock["device_branch"],
             },
             "vendor/red/hydrogenone": {
                 "name": "proprietary_vendor_red_hydrogenone",

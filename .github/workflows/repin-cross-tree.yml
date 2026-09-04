@@ -1,4 +1,4 @@
-name: Diagnose verified cross-tree contract
+name: Repin verified cross-tree contract
 
 on:
   push:
@@ -6,14 +6,17 @@ on:
       - codex/lineage-22.2-bringup-audit
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  diagnose:
+  repin:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout device tree
         uses: actions/checkout@v4
+        with:
+          path: device-tree
+          fetch-depth: 0
 
       - name: Checkout verified vendor tree
         uses: actions/checkout@v4
@@ -23,27 +26,95 @@ jobs:
           path: vendor-tree
           fetch-depth: 1
 
-      - name: Print exact cross-tree ownership collisions
+      - name: Regenerate verified zero-collision contract
         shell: bash
         run: |
           set -euo pipefail
-          set +e
-          python3 tools/analysis/cross_tree_contract.py \
-            --device-root . \
+          python3 device-tree/tools/analysis/cross_tree_contract.py \
+            --device-root device-tree \
             --vendor-root vendor-tree \
             --json > "$RUNNER_TEMP/cross-tree-live.json"
-          RC=$?
-          set -e
+
           python3 - <<'PY'
           import json
           import os
+          import re
           from pathlib import Path
 
+          vendor_commit = "105aae6fda2361defd0ab16fcd558fc08673e9dc"
+          device_branch = "codex/lineage-22.2-bringup-audit"
+          stock_build = "H1A1000.082ho.01.00.10r.118"
+          stock_sha = "7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e"
+          root = Path('device-tree')
+
           report = json.loads((Path(os.environ['RUNNER_TEMP']) / 'cross-tree-live.json').read_text())
-          print(f"CROSS_TREE_COLLISION_COUNT={len(report['copy_destination_collisions'])}")
-          for destination in report['copy_destination_collisions']:
-              print(f"COLLISION {destination}")
-              print(f"  DEVICE {report['device_copy_destinations'][destination]}")
-              print(f"  VENDOR {report['vendor_copy_destinations'][destination]}")
+          assert report['schema_version'] == 2
+          assert report['copy_destination_collisions'] == [], report['copy_destination_collisions']
+          print('CROSS_TREE_COLLISION_COUNT=0')
+          report['device_root'] = '.'
+          report['vendor_root'] = 'vendor/red/hydrogenone'
+          report['authority'] = {
+              'device_branch': device_branch,
+              'stock_archive_sha256': stock_sha,
+              'stock_build': stock_build,
+              'vendor_commit': vendor_commit,
+          }
+          report['status'] = 'zero_expanded_copy_destination_collisions'
+          (root / 'docs/stock/h1a1000-r118/cross-tree-copy-contract.json').write_text(
+              json.dumps(report, indent=2, sort_keys=True) + '\n'
+          )
+
+          lock = {
+              'schema_version': 1,
+              'device_branch': device_branch,
+              'vendor_repository': 'derveror/proprietary_vendor_red_hydrogenone',
+              'vendor_commit': vendor_commit,
+              'stock_build': stock_build,
+              'stock_archive_sha256': stock_sha,
+          }
+          (root / 'docs/reference/cross-tree-lock.json').write_text(
+              json.dumps(lock, indent=2) + '\n'
+          )
+
+          test = root / 'tests/test_cross_tree_lock.py'
+          text = test.read_text()
+          text = text.replace(
+              'self.assertEqual(self.lock["device_branch"], "lineage-22.2-stock118-rework")',
+              'self.assertEqual(self.lock["device_branch"], "codex/lineage-22.2-bringup-audit")',
+          )
+          test.write_text(text)
+
+          workflow = root / '.github/workflows/verify-analysis.yml'
+          text = workflow.read_text()
+          text, count = re.subn(
+              r'(?m)^(\s*ref:\s*)[0-9a-f]{40}(\s*)$',
+              rf'\g<1>{vendor_commit}\2',
+              text,
+              count=1,
+          )
+          assert count == 1, count
+          workflow.write_text(text)
           PY
-          exit "$RC"
+
+          cd device-tree
+          PYTHONPATH="$PWD/tests:$PWD" python3 -m unittest -v tests.test_cross_tree_lock
+          git diff --check
+
+      - name: Commit repinned cross-tree contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd device-tree
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            docs/reference/cross-tree-lock.json \
+            docs/stock/h1a1000-r118/cross-tree-copy-contract.json \
+            tests/test_cross_tree_lock.py \
+            .github/workflows/verify-analysis.yml
+          if git diff --cached --quiet; then
+            echo "cross-tree contract already pinned"
+            exit 0
+          fi
+          git commit -m "device: pin verified vendor compatibility state"
+          git push origin HEAD:${GITHUB_REF_NAME}

@@ -33,26 +33,35 @@ class GnssCherylAbiContractTest(unittest.TestCase):
                         found.append((version, instance.text.strip()))
         self.assertEqual(found, [("1.0", "default")])
 
-    def test_legacy_loc_api_base_abi_required_by_red118_is_present(self) -> None:
+    def test_all_loc_api_base_symbols_missing_in_red118_failure_are_present(self) -> None:
         text = (ROOT / "gps/core/LocApiBase.h").read_text(encoding="utf-8")
+        # This is the complete LocApiBase portion of the 18-symbol checkelf
+        # failure observed when RED .118 libloc_api_v02 was linked against the
+        # newer mata-generation source location core.
         required = (
-            r"LocApiBase\s*\(\s*const MsgTask\*\s+msgTask",
+            r"LocApiBase\s*\(\s*const MsgTask\*\s+msgTask\s*,\s*LOC_API_ADAPTER_EVENT_MASK_T\s+excludedMask",
             r"enableData\s*\(\s*int\s+enable\s*\)",
             r"setAPN\s*\(\s*char\*\s+apn\s*,\s*int\s+len\s*\)",
             r"requestATL\s*\(\s*int\s+connHandle\s*,\s*LocAGpsType\s+agps_type\s*\)",
             r"requestSuplES\s*\(\s*int\s+connHandle\s*\)",
+            r"reportPosition\s*\(\s*UlpLocation&\s+location\s*,\s*GpsLocationExtended&\s+locationExtended\s*,\s*enum\s+loc_sess_status\s+status",
+            r"requestNiNotify\s*\(\s*GnssNiNotification\s*&\s*notify\s*,\s*const void\*\s+data\s*\)",
+            r"reportOdcpiRequest\s*\(\s*OdcpiRequestInfo&\s*request\s*\)",
+            r"reportSvMeasurement\s*\(\s*GnssSvMeasurementSet\s*&\s*svMeasurementSet\s*\)",
             r"reportDataCallOpened\s*\(\s*\)",
             r"reportDataCallClosed\s*\(\s*\)",
             r"saveSupportedMsgList\s*\(\s*uint64_t\s+supportedMsgList\s*\)",
             r"saveSupportedFeatureList\s*\(\s*uint8_t\s*\*\s*featureList\s*\)",
+            r"reportGnssMeasurementData\s*\(\s*GnssMeasurementsNotification&\s+measurements\s*,\s*int\s+msInWeek\s*\)",
         )
         for pattern in required:
             self.assertRegex(text, pattern)
 
-    def test_legacy_gps_utils_symbols_required_by_red118_are_declared(self) -> None:
+    def test_all_gps_utils_symbols_missing_in_red118_failure_are_present(self) -> None:
         cfg = (ROOT / "gps/utils/loc_cfg.h").read_text(encoding="utf-8")
         msg = (ROOT / "gps/utils/MsgTask.h").read_text(encoding="utf-8")
         log = (ROOT / "gps/utils/loc_log.h").read_text(encoding="utf-8")
+        # Remaining four symbols from the same 18-symbol libloc_api_v02 failure.
         self.assertRegex(cfg, r"\bloc_read_conf\s*\(")
         self.assertRegex(log, r"\bloc_get_name_from_val\s*\(")
         self.assertRegex(msg, r"sendMsg\s*\(\s*const LocMsg\*\s+msg\s*\)\s+const")
@@ -64,6 +73,19 @@ class GnssCherylAbiContractTest(unittest.TestCase):
         android_bp = (ROOT / "gps/android/Android.bp").read_text(encoding="utf-8")
         self.assertIn('name: "android.hardware.gnss@1.0-impl-qti"', android_bp)
         self.assertIn('name: "android.hardware.gnss@1.0-service-qti"', android_bp)
+
+    def test_imported_gps_source_does_not_carry_razer_device_identity(self) -> None:
+        conflicts: list[str] = []
+        for path in sorted((ROOT / "gps").rglob("*")):
+            if not path.is_file():
+                continue
+            try:
+                text = path.read_text(encoding="utf-8")
+            except UnicodeDecodeError:
+                continue
+            if re.search(r"(?i)\b(?:cheryl|razer)\b", text):
+                conflicts.append(str(path.relative_to(ROOT)))
+        self.assertEqual(conflicts, [], f"Razer donor identity leaked into active GPS sources: {conflicts}")
 
 
 if __name__ == "__main__":

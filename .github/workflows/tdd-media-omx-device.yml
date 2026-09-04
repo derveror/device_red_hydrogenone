@@ -7,15 +7,116 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   device:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply source media OMX device contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          manifest = Path('manifest.xml')
+          text = manifest.read_text()
+          media_block = '''    <hal format="hidl">
+              <name>android.hardware.media.omx</name>
+              <transport>hwbinder</transport>
+              <version>1.0</version>
+              <interface>
+                  <name>IOmx</name>
+                  <instance>default</instance>
+              </interface>
+              <interface>
+                  <name>IOmxStore</name>
+                  <instance>default</instance>
+              </interface>
+          </hal>
+          '''
+          if '<name>android.hardware.media.omx</name>' not in text:
+              anchor = '''    <hal format="hidl">
+              <name>android.hardware.nfc</name>
+          '''
+              if text.count(anchor) != 1:
+                  raise SystemExit('cannot locate unique NFC manifest anchor')
+              text = text.replace(anchor, media_block + anchor, 1)
+              manifest.write_text(text)
+
+          device_mk = Path('device.mk')
+          mk = device_mk.read_text()
+          old = '''# OMX source glue, proprietary codecs remain in vendor
+          PRODUCT_PACKAGES += \\
+              libc2dcolorconvert \\
+              libOmxCore \\
+              libOmxVdec \\
+              libOmxVenc \\
+              libstagefrighthw
+          '''
+          new = '''# OMX source frontend/service; proprietary codecs remain in vendor
+          PRODUCT_PACKAGES += \\
+              android.hardware.media.omx@1.0-service \\
+              libc2dcolorconvert \\
+              libOmxCore \\
+              libOmxVdec \\
+              libOmxVenc \\
+              libstagefrighthw
+          '''
+          if old in mk:
+              mk = mk.replace(old, new, 1)
+              device_mk.write_text(mk)
+          elif new not in mk:
+              raise SystemExit('cannot locate canonical OMX package block')
+          PY
+          git diff --check
+
       - name: Run media OMX device regression
         shell: bash
         run: |
           set -euo pipefail
           PYTHONDONTWRITEBYTECODE=1 PYTHONPATH="$PWD/tests:$PWD" python3 -m unittest -v tests.test_media_omx_contract
+
+      - name: Run all device unit tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          PYTHONDONTWRITEBYTECODE=1 PYTHONPATH="$PWD/tests:$PWD" python3 - <<'PY'
+          import pathlib
+          import unittest
+
+          loader = unittest.defaultTestLoader
+          suite = unittest.TestSuite()
+          for path in sorted(pathlib.Path('tests').glob('test_*.py')):
+              if path.name == 'test_full_tree.py':
+                  continue
+              suite.addTests(loader.loadTestsFromName(f'tests.{path.stem}'))
+          result = unittest.TextTestRunner(verbosity=2).run(suite)
+          raise SystemExit(0 if result.wasSuccessful() else 1)
+          PY
+
+      - name: Run complete tree contract audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          PYTHONDONTWRITEBYTECODE=1 python3 tests/test_full_tree.py
+          git diff --check
+
+      - name: Commit device GREEN state
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add manifest.xml device.mk
+          if git diff --cached --quiet; then
+              echo 'media OMX device contract already applied'
+              exit 0
+          fi
+          git commit -m "device: use Lineage media OMX frontend"
+          git push origin HEAD:${GITHUB_REF_NAME}

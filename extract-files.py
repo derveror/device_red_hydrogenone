@@ -6,15 +6,7 @@ from extract_utils.fixups_blob import blob_fixup, blob_fixups_user_type
 from extract_utils.fixups_lib import lib_fixups
 from extract_utils.main import ExtractUtils, ExtractUtilsModule
 
-# Legacy HIDL fixup groups were derived from older Hydrogen One vendor ELF
-# dependencies. The authoritative payload for the current bring-up is RED .118
-# Android 9; keep these groups only as compatibility-analysis helpers until the
-# full .118 extraction contract is regenerated from the canonical vendor manifest.
-from tools.legacy_hidl_fixup_paths import (
-    HIDL_BASE_ONLY,
-    HIDL_BASE_TRANSPORT,
-    HIDL_BASE_TRANSPORT_HWBINDER,
-)
+from tools.hidlbase_shim_fixup_paths import HIDLBASE_SHIM_FIXUP_PATHS
 
 namespace_imports = [
     'device/red/hydrogenone',
@@ -24,10 +16,13 @@ namespace_imports = [
     'vendor/qcom/opensource/dataservices',
 ]
 
-# Legacy split-HIDL transport compatibility. The rare binaries that reference
-# transport/hwbinder without libhidlbase are intentionally not auto-fixed here;
-# handle them only from linker evidence instead of guessing.
+# Canonical RED .118 Android 9 HIDL interfaces still reference the removed
+# android::hardware::details::gBnConstructorMap ABI. LineageOS 22.2 provides
+# the narrow compatibility implementation through libhidlbase_shim. Apply the
+# exact readelf-proven path set during extraction so regenerating vendor/red/
+# hydrogenone does not lose the Android 15 compatibility fix.
 blob_fixups: blob_fixups_user_type = {
+    HIDLBASE_SHIM_FIXUP_PATHS: blob_fixup().add_needed('libhidlbase_shim.so'),
 }
 
 module = ExtractUtilsModule(

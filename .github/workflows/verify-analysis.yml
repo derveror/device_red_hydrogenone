@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - lineage-22.2-stock118-rework
+      - codex/lineage-22.2-bringup-audit
   workflow_dispatch:
 
 permissions:

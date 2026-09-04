@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "device_branch": "lineage-22.2-stock118-rework",
+  "device_branch": "codex/lineage-22.2-bringup-audit",
   "vendor_repository": "derveror/proprietary_vendor_red_hydrogenone",
-  "vendor_commit": "6fef3d7c6333602d7114aefa0284a03f5aadb454",
+  "vendor_commit": "105aae6fda2361defd0ab16fcd558fc08673e9dc",
   "stock_build": "H1A1000.082ho.01.00.10r.118",
   "stock_archive_sha256": "7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e"
 }

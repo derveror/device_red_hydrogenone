@@ -1,9 +1,9 @@
 {
   "authority": {
-    "device_branch": "lineage-22.2-stock118-rework",
+    "device_branch": "codex/lineage-22.2-bringup-audit",
     "stock_archive_sha256": "7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e",
     "stock_build": "H1A1000.082ho.01.00.10r.118",
-    "vendor_commit": "6fef3d7c6333602d7114aefa0284a03f5aadb454"
+    "vendor_commit": "105aae6fda2361defd0ab16fcd558fc08673e9dc"
   },
   "copy_destination_collisions": [],
   "device_copy_destinations": {
@@ -420,13 +420,7 @@
     "vendor/etc/hbtp/qtc800s_dsp.bin": [
       "hydrogenone-vendor.mk"
     ],
-    "vendor/etc/init/android.hardware.biometrics.fingerprint@2.1-service.rc": [
-      "hydrogenone-vendor.mk"
-    ],
     "vendor/etc/init/android.hardware.bluetooth@1.0-service-qti.rc": [
-      "hydrogenone-vendor.mk"
-    ],
-    "vendor/etc/init/android.hardware.media.omx@1.0-service.rc": [
       "hydrogenone-vendor.mk"
     ],
     "vendor/etc/init/com.qualcomm.qti.wifidisplayhal@1.0-service.rc": [
@@ -550,5 +544,5 @@
       "hydrogenone-vendor.mk"
     ]
   },
-  "vendor_root": "/home/runner/work/_temp/vendor-tree"
+  "vendor_root": "vendor/red/hydrogenone"
 }

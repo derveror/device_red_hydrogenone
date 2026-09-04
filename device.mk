@@ -179,29 +179,24 @@ PRODUCT_PACKAGES += \
     android.hardware.keymaster@3.0-impl \
     android.hardware.keymaster@3.0-service
 
-# GNSS - Qualcomm MSM8998 source stack with RED .109 configuration
+# GNSS - Qualcomm MSM8998 legacy ABI source stack.
+# Razer cheryl is the primary source-ABI donor here because its maintained
+# LineageOS 22.2 tree preserves the Pie-era Qualcomm LocApiBase ABI required
+# by RED .118 libloc_api_v02/libizat_core/liblbs_core while adapting the HAL
+# frontend to Android 15 build rules. RED stock remains configuration truth.
 PRODUCT_PACKAGES += \
-    android.hardware.gnss@2.1-impl-qti \
-    android.hardware.gnss@2.1-service-qti \
-    gnss@2.0-base.policy \
-    gnss@2.0-xtra-daemon.policy \
-    gnss@2.0-xtwifi-client.policy \
-    gnss@2.0-xtwifi-inet-agent.policy \
-    libbatching \
-    libgeofencing \
+    android.hardware.gnss@1.0-impl-qti \
+    android.hardware.gnss@1.0-service-qti \
     libgnss \
     libgnsspps
 
-# GNSS configuration modules.  Their prebuilt_etc definitions install the
-# verified RED .109 files from gps/etc exactly once.
+# RED GNSS configuration modules. gps.conf/flp.conf/antenna info stay owned by
+# the local prebuilt_etc definitions; RED-specific Izat/LOWI/SAP/XTWiFi files
+# are copied directly and are not replaced with Razer configuration.
 PRODUCT_PACKAGES += \
     flp.conf \
     gnss_antenna_info.conf \
     gps.conf
-
-# The optional SS5 libsynergy_loc_api backend is not selected by RED .109 and
-# also needs proprietary libqmi_cci/libqmi_common_so modules. Keep its blueprint
-# inactive unless stock/runtime evidence later proves that the SS5 path is used.
 
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/gps/izat.conf:$(TARGET_COPY_OUT_VENDOR)/etc/izat.conf \

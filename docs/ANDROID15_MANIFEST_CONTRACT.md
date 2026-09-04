@@ -14,6 +14,7 @@ The device manifest currently declares exactly these source-owned interfaces:
 - Bluetooth audio 2.1 / `IBluetoothAudioProvidersFactory/default`;
 - camera provider 2.4 / `ICameraProvider/legacy/0`;
 - gatekeeper 1.0 / `IGatekeeper/default`;
+- GNSS 1.0 / `IGnss/default`;
 - graphics allocator 2.0 / `IAllocator/default`;
 - graphics composer 2.1 / `IComposer/default`;
 - graphics mapper 2.1 / `IMapper/default` as `passthrough`, `arch="32+64"`;
@@ -22,18 +23,18 @@ The device manifest currently declares exactly these source-owned interfaces:
 - sensors 1.0 / `ISensors/default`;
 - soundtrigger 2.2 / `ISoundTriggerHw/default`.
 
-The versions follow the actual LineageOS 22.2 packages selected by `device.mk` and the current official MSM8998/mata pattern where applicable.
+The versions follow the actual LineageOS 22.2 packages selected by `device.mk`. GNSS is the intentional exception to the newer `mata` frontend: Hydrogen One uses the maintained `cheryl` LineageOS 22.2 Qualcomm GPS closure because RED `.118` proprietary location consumers require the older Pie-era `LocApiBase` ABI.
 
-## Self-fragmented source HAL
+## GNSS source HAL ownership
 
-GNSS is deliberately absent from the monolithic device manifest. The local source service:
+The active source service is:
 
 ```text
-gps/android/2.1/Android.bp
-android.hardware.gnss@2.1-service-qti
+gps/android/Android.bp
+android.hardware.gnss@1.0-service-qti
 ```
 
-owns `android.hardware.gnss@2.1-service-qti.xml` through its `vintf_fragments` property. Declaring GNSS again in `manifest.xml` would create duplicate ownership.
+Unlike the removed 2.1 frontend, it has no private VINTF fragment, so `manifest.xml` owns `android.hardware.gnss@1.0::IGnss/default`. Vendor tests continue to forbid the retained Android 9 stock GNSS wrapper from registering the same default instance.
 
 ## Vendor-owned HALs
 

@@ -13,6 +13,7 @@ EXPECTED_SOURCE_FQINSTANCES = {
     "android.hardware.bluetooth.audio@2.1::IBluetoothAudioProvidersFactory/default",
     "android.hardware.camera.provider@2.4::ICameraProvider/legacy/0",
     "android.hardware.gatekeeper@1.0::IGatekeeper/default",
+    "android.hardware.gnss@1.0::IGnss/default",
     "android.hardware.graphics.allocator@2.0::IAllocator/default",
     "android.hardware.graphics.composer@2.1::IComposer/default",
     "android.hardware.graphics.mapper@2.1::IMapper/default",
@@ -48,9 +49,9 @@ PROPRIETARY_HAL_NAMES = {
     "vendor.qti.hardware.radio.uim_remote_server",
 }
 
-# The local QTI GNSS source service owns its own XML through vintf_fragments in
-# gps/android/2.1/Android.bp, so duplicating GNSS here would create two owners.
-SELF_FRAGMENTED_SOURCE_HAL_NAMES = {"android.hardware.gnss"}
+# The cheryl-compatible QTI GNSS 1.0 source service has no VINTF fragment;
+# its IGnss/default instance is therefore owned by the device manifest above.
+SELF_FRAGMENTED_SOURCE_HAL_NAMES: set[str] = set()
 
 
 def normalized_instances(root: ET.Element) -> set[str]:

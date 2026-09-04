@@ -8,7 +8,6 @@ cc_library_shared {
 
     //# Libs
     shared_libs: [
-        "libdl",
         "libutils",
         "libcutils",
         "liblog",
@@ -28,7 +27,6 @@ cc_library_shared {
         "loc_misc_utils.cpp",
         "loc_nmea.cpp",
         "LocIpc.cpp",
-        "LogBuffer.cpp",
     ],
 
     cflags: [

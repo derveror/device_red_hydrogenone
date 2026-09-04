@@ -31,7 +31,7 @@ class CrossTreeLockContractTest(unittest.TestCase):
         self.assertEqual(self.lock["schema_version"], 1)
         self.assertEqual(self.lock["vendor_repository"], "derveror/proprietary_vendor_red_hydrogenone")
         self.assertRegex(self.lock["vendor_commit"], r"^[0-9a-f]{40}$")
-        self.assertEqual(self.lock["device_branch"], "lineage-22.2-stock118-rework")
+        self.assertEqual(self.lock["device_branch"], "codex/lineage-22.2-bringup-audit")
 
     def test_permanent_ci_rechecks_pinned_vendor_tree(self) -> None:
         commit = re.escape(self.lock["vendor_commit"])

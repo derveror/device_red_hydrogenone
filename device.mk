@@ -247,8 +247,9 @@ PRODUCT_PACKAGES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/nfc/libnfc-nxp.conf:$(TARGET_COPY_OUT_VENDOR)/etc/libnfc-nxp.conf
 
-# OMX source glue, proprietary codecs remain in vendor
+# OMX source frontend/service; proprietary codecs remain in vendor
 PRODUCT_PACKAGES += \
+    android.hardware.media.omx@1.0-service \
     libc2dcolorconvert \
     libOmxCore \
     libOmxVdec \

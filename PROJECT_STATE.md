@@ -1,6 +1,6 @@
 # RED Hydrogen One LineageOS 22.2 project state
 
-Last updated: 2026-09-03.
+Last updated: 2026-09-04.
 
 This is the canonical long-lived status summary for the paired repositories
 `device/red/hydrogenone` and `vendor/red/hydrogenone`. Detailed stock evidence,
@@ -48,8 +48,8 @@ remaining Android 15 product-discovery blocker: importing the generated vendor
 BoardConfig that requests the unavailable VNDK 28 snapshot. It keeps mandatory
 vendor product inheritance and the explicit recovery v32 compatibility library.
 
-Active audit branch:
-`codex/lineage-22.2-bringup-audit`.
+Active bring-up branch:
+`codex/lineage-22.2-bringup`.
 
 ### Vendor repository
 
@@ -67,8 +67,8 @@ Selected vendor base:
 `lineage-22.2-android15-contract` at
 `6fef3d7c6333602d7114aefa0284a03f5aadb454`.
 
-Active audit branch:
-`codex/lineage-22.2-bringup-audit`.
+Active bring-up branch:
+`codex/lineage-22.2-bringup`.
 
 The audit branch removes the obsolete VNDK-28 request while leaving the
 proprietary payload byte-equivalent to the selected Android 15 base.
@@ -129,11 +129,12 @@ Covered areas include camera, audio/media, radio, fingerprint/sensors,
 graphics/DRM, GNSS, Wi-Fi/Bluetooth, NFC, power/thermal, firmware, rootdir,
 partitions and copy-destination ownership.
 
-Current generated copy-contract evidence is payload-oriented and remains pinned
-to vendor `6fef3d7c...`; the audit-branch vendor changes after that point modify
-only VNDK configuration/tests/documentation, not proprietary payload or copy
-destinations. Regenerate the evidence whenever payload or generated package
-ownership changes.
+Current generated copy-contract evidence is pinned to vendor `3dea95e...`
+and device branch `codex/lineage-22.2-bringup`. The Android 15 vendor tree now
+uses the Lineage source-owned `libnbaio_mono`; the obsolete RED Android 9
+32/64-bit prebuilts were removed after they shadowed the source module and
+broke `audio.r_submix.default`. Regenerate the evidence whenever payload or
+generated package ownership changes.
 
 ## Confirmed issues found in this audit
 

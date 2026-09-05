@@ -1,0 +1,92 @@
+name: Apply libgsl vendor repin
+
+on:
+  push:
+    branches:
+      - codex/libgsl-repin-staging
+
+permissions:
+  contents: write
+
+jobs:
+  repin:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout staging branch
+        uses: actions/checkout@v4
+        with:
+          ref: codex/libgsl-repin-staging
+          fetch-depth: 0
+
+      - name: Repin paired vendor state and verify
+        shell: bash
+        run: |
+          set -euo pipefail
+          OLD=3dea95ee9cebd4a536911f6ec72acb93103d4cd6
+          NEW=a77ddbc970bd678ed8d75bca08971b4362182763
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          old = "3dea95ee9cebd4a536911f6ec72acb93103d4cd6"
+          new = "a77ddbc970bd678ed8d75bca08971b4362182763"
+
+          lock = Path("docs/reference/cross-tree-lock.json")
+          obj = json.loads(lock.read_text())
+          assert obj["vendor_commit"] == old, obj["vendor_commit"]
+          obj["vendor_commit"] = new
+          lock.write_text(json.dumps(obj, indent=2) + "\n")
+
+          evidence = Path("docs/stock/h1a1000-r118/cross-tree-copy-contract.json")
+          obj = json.loads(evidence.read_text())
+          assert obj["authority"]["vendor_commit"] == old, obj["authority"]
+          obj["authority"]["vendor_commit"] = new
+          evidence.write_text(json.dumps(obj, indent=2, sort_keys=True) + "\n")
+
+          manifest = Path("docs/manifests/hydrogenone-lineage-22.2.xml")
+          text = manifest.read_text()
+          assert old in text
+          manifest.write_text(text.replace(old, new))
+
+          state = Path("PROJECT_STATE.md")
+          text = state.read_text()
+          state.write_text(text.replace("3dea95e...", "a77ddbc..."))
+
+          workflow = Path(".github/workflows/verify-analysis.yml")
+          text = workflow.read_text()
+          assert old in text
+          workflow.write_text(text.replace(old, new))
+          PY
+
+          python3 -m json.tool docs/reference/cross-tree-lock.json >/dev/null
+          python3 -m json.tool docs/stock/h1a1000-r118/cross-tree-copy-contract.json >/dev/null
+          PYTHONPATH="$PWD/tests:$PWD" python3 - <<'PY'
+          import pathlib
+          import unittest
+
+          loader = unittest.defaultTestLoader
+          suite = unittest.TestSuite()
+          for path in sorted(pathlib.Path('tests').glob('test_*.py')):
+              if path.name == 'test_full_tree.py':
+                  continue
+              suite.addTests(loader.loadTestsFromName(f'tests.{path.stem}'))
+          result = unittest.TextTestRunner(verbosity=1).run(suite)
+          raise SystemExit(0 if result.wasSuccessful() else 1)
+          PY
+          python3 tests/test_full_tree.py
+
+          # GitHub Actions tokens cannot commit workflow-file modifications.
+          # Restore it after verification; the API transport adds that exact
+          # verified change to staging before the final clean commit.
+          git checkout -- .github/workflows/verify-analysis.yml
+
+      - name: Commit verified non-workflow repin
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add PROJECT_STATE.md docs/manifests/hydrogenone-lineage-22.2.xml docs/reference/cross-tree-lock.json docs/stock/h1a1000-r118/cross-tree-copy-contract.json
+          git diff --cached --quiet && { echo "Expected repin changes but found none"; exit 1; }
+          git commit -m "device: repin vendor after libgsl ARM fix"
+          git push origin HEAD:codex/libgsl-repin-staging

@@ -1,9 +1,9 @@
 {
   "authority": {
-    "device_branch": "codex/lineage-22.2-bringup-audit",
+    "device_branch": "codex/lineage-22.2-bringup",
     "stock_archive_sha256": "7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e",
     "stock_build": "H1A1000.082ho.01.00.10r.118",
-    "vendor_commit": "0dd08b89174556753d8e8e87b7ebc49286aea040"
+    "vendor_commit": "3dea95ee9cebd4a536911f6ec72acb93103d4cd6"
   },
   "copy_destination_collisions": [],
   "device_copy_destinations": {

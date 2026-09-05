@@ -49,6 +49,12 @@ PRODUCT_PACKAGES += \
     libhidlbase-v32.recovery \
     libhidlmemory.recovery
 
+# Protobuf - legacy Qualcomm vendor ABI provider.
+# Lineage vendorcompat keeps the runtime SONAME libprotobuf-cpp-full.so
+# required by the retained RED .118 libsettings blobs.
+PRODUCT_PACKAGES += \
+    libprotobuf-cpp-full-vendorcompat
+
 # Audio - Qualcomm msm8998 source HAL with RED stock policy/mixer configuration
 PRODUCT_PACKAGES += \
     android.hardware.audio@6.0-impl:32 \

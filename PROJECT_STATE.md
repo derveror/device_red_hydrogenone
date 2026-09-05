@@ -129,7 +129,7 @@ Covered areas include camera, audio/media, radio, fingerprint/sensors,
 graphics/DRM, GNSS, Wi-Fi/Bluetooth, NFC, power/thermal, firmware, rootdir,
 partitions and copy-destination ownership.
 
-Current generated copy-contract evidence is pinned to vendor `3dea95e...`
+Current generated copy-contract evidence is pinned to vendor `a77ddbc...`
 and device branch `codex/lineage-22.2-bringup`. The Android 15 vendor tree now
 uses the Lineage source-owned `libnbaio_mono`; the obsolete RED Android 9
 32/64-bit prebuilts were removed after they shadowed the source module and

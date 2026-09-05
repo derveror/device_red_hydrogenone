@@ -2,7 +2,7 @@
   "schema_version": 1,
   "device_branch": "codex/lineage-22.2-bringup",
   "vendor_repository": "derveror/proprietary_vendor_red_hydrogenone",
-  "vendor_commit": "3dea95ee9cebd4a536911f6ec72acb93103d4cd6",
+  "vendor_commit": "a77ddbc970bd678ed8d75bca08971b4362182763",
   "stock_build": "H1A1000.082ho.01.00.10r.118",
   "stock_archive_sha256": "7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e"
 }

@@ -99,9 +99,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          mv vendor-tree "$RUNNER_TEMP/vendor-tree"
           python3 tools/analysis/cross_tree_contract.py \
             --device-root . \
-            --vendor-root vendor-tree \
+            --vendor-root "$RUNNER_TEMP/vendor-tree" \
             --json > "$RUNNER_TEMP/cross-tree-live.json"
           python3 - <<'PY'
           import json
@@ -113,7 +114,8 @@ jobs:
           lock = json.loads(Path('docs/reference/cross-tree-lock.json').read_text())
           evidence = json.loads(Path('docs/stock/h1a1000-r118/cross-tree-copy-contract.json').read_text())
           live = json.loads(Path(os.environ['RUNNER_TEMP'], 'cross-tree-live.json').read_text())
-          vendor_head = subprocess.check_output(['git', '-C', 'vendor-tree', 'rev-parse', 'HEAD'], text=True).strip()
+          vendor_root = Path(os.environ['RUNNER_TEMP'], 'vendor-tree')
+          vendor_head = subprocess.check_output(['git', '-C', str(vendor_root), 'rev-parse', 'HEAD'], text=True).strip()
 
           assert vendor_head == expected, (vendor_head, expected)
           assert lock['vendor_commit'] == expected, lock

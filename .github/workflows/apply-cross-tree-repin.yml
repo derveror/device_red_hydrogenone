@@ -1,0 +1,115 @@
+name: Apply cross-tree vendor repin
+
+on:
+  push:
+    branches:
+      - codex/cross-tree-repin-staging
+
+permissions:
+  contents: write
+
+jobs:
+  repin:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout staging branch
+        uses: actions/checkout@v4
+        with:
+          ref: codex/cross-tree-repin-staging
+          fetch-depth: 0
+
+      - name: Repin paired bring-up branches
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          OLD_VENDOR = "0dd08b89174556753d8e8e87b7ebc49286aea040"
+          NEW_VENDOR = "3dea95ee9cebd4a536911f6ec72acb93103d4cd6"
+          OLD_BRANCH = "codex/lineage-22.2-bringup-audit"
+          NEW_BRANCH = "codex/lineage-22.2-bringup"
+
+          lock_path = Path("docs/reference/cross-tree-lock.json")
+          lock = json.loads(lock_path.read_text())
+          lock["device_branch"] = NEW_BRANCH
+          lock["vendor_commit"] = NEW_VENDOR
+          lock_path.write_text(json.dumps(lock, indent=2) + "\n")
+
+          evidence_path = Path("docs/stock/h1a1000-r118/cross-tree-copy-contract.json")
+          evidence = json.loads(evidence_path.read_text())
+          evidence["authority"]["device_branch"] = NEW_BRANCH
+          evidence["authority"]["vendor_commit"] = NEW_VENDOR
+          evidence_path.write_text(json.dumps(evidence, indent=2, sort_keys=True) + "\n")
+
+          manifest_path = Path("docs/manifests/hydrogenone-lineage-22.2.xml")
+          manifest = manifest_path.read_text()
+          manifest = manifest.replace(f'revision="{OLD_BRANCH}"', f'revision="{NEW_BRANCH}"')
+          manifest = manifest.replace(f'revision="{OLD_VENDOR}"', f'revision="{NEW_VENDOR}"')
+          manifest_path.write_text(manifest)
+
+          workflow_path = Path(".github/workflows/verify-analysis.yml")
+          workflow = workflow_path.read_text()
+          if "      - codex/lineage-22.2-bringup\n" not in workflow:
+              workflow = workflow.replace(
+                  "      - codex/lineage-22.2-bringup-audit\n",
+                  "      - codex/lineage-22.2-bringup-audit\n      - codex/lineage-22.2-bringup\n",
+              )
+          workflow = workflow.replace(f"ref: {OLD_VENDOR}", f"ref: {NEW_VENDOR}")
+          workflow_path.write_text(workflow)
+
+          test_path = Path("tests/test_cross_tree_lock.py")
+          test_text = test_path.read_text().replace(f'"{OLD_BRANCH}"', f'"{NEW_BRANCH}"')
+          test_path.write_text(test_text)
+
+          state_path = Path("PROJECT_STATE.md")
+          state = state_path.read_text()
+          state = state.replace("Last updated: 2026-09-03.", "Last updated: 2026-09-04.")
+          state = state.replace(
+              "Active audit branch:\n`codex/lineage-22.2-bringup-audit`.",
+              "Active bring-up branch:\n`codex/lineage-22.2-bringup`.",
+          )
+          state = state.replace(
+              "Current generated copy-contract evidence is payload-oriented and remains pinned\n"
+              "to vendor `6fef3d7c...`; the audit-branch vendor changes after that point modify\n"
+              "only VNDK configuration/tests/documentation, not proprietary payload or copy\n"
+              "destinations. Regenerate the evidence whenever payload or generated package\n"
+              "ownership changes.",
+              "Current generated copy-contract evidence is pinned to vendor `3dea95e...`\n"
+              "and device branch `codex/lineage-22.2-bringup`. The Android 15 vendor tree now\n"
+              "uses the Lineage source-owned `libnbaio_mono`; the obsolete RED Android 9\n"
+              "32/64-bit prebuilts were removed after they shadowed the source module and\n"
+              "broke `audio.r_submix.default`. Regenerate the evidence whenever payload or\n"
+              "generated package ownership changes.",
+          )
+          state_path.write_text(state)
+          PY
+
+          python3 -m json.tool docs/reference/cross-tree-lock.json >/dev/null
+          python3 -m json.tool docs/stock/h1a1000-r118/cross-tree-copy-contract.json >/dev/null
+          PYTHONPATH="$PWD/tests:$PWD" python3 - <<'PY'
+          import pathlib
+          import unittest
+
+          loader = unittest.defaultTestLoader
+          suite = unittest.TestSuite()
+          for path in sorted(pathlib.Path('tests').glob('test_*.py')):
+              if path.name == 'test_full_tree.py':
+                  continue
+              suite.addTests(loader.loadTestsFromName(f'tests.{path.stem}'))
+          result = unittest.TextTestRunner(verbosity=1).run(suite)
+          raise SystemExit(0 if result.wasSuccessful() else 1)
+          PY
+          python3 tests/test_full_tree.py
+
+      - name: Commit verified repin
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add PROJECT_STATE.md .github/workflows/verify-analysis.yml docs/manifests/hydrogenone-lineage-22.2.xml docs/reference/cross-tree-lock.json docs/stock/h1a1000-r118/cross-tree-copy-contract.json tests/test_cross_tree_lock.py
+          git diff --cached --quiet && { echo "Expected repin changes but found none"; exit 1; }
+          git commit -m "device: repin paired vendor bring-up state"
+          git push origin HEAD:codex/cross-tree-repin-staging

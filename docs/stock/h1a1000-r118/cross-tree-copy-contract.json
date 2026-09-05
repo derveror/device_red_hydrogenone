@@ -3,7 +3,7 @@
     "device_branch": "codex/lineage-22.2-bringup",
     "stock_archive_sha256": "7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e",
     "stock_build": "H1A1000.082ho.01.00.10r.118",
-    "vendor_commit": "a77ddbc970bd678ed8d75bca08971b4362182763"
+    "vendor_commit": "201149b75bbc91220e3916ea1b5e4e9f392711a9"
   },
   "copy_destination_collisions": [],
   "device_copy_destinations": {

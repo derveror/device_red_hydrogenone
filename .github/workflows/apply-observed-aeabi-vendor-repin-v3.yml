@@ -1,0 +1,67 @@
+name: Finalize observed AEABI vendor repin staging
+
+on:
+  push:
+    branches:
+      - codex/observed-aeabi-pair-repin-staging
+
+permissions:
+  contents: write
+
+jobs:
+  repin:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/observed-aeabi-pair-repin-staging
+          path: device-tree
+          fetch-depth: 0
+      - uses: actions/checkout@v4
+        with:
+          repository: derveror/proprietary_vendor_red_hydrogenone
+          ref: 678a2c6dbbc82f1a07fb4b70bdfbdf7bdea4e8e9
+          path: vendor-tree
+      - name: Repin, verify, and publish non-workflow files
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd device-tree
+          python3 - <<'PY'
+          from pathlib import Path
+          old='45cfe573941f699283e143aa5d7ba294faa5cbee'; new='678a2c6dbbc82f1a07fb4b70bdfbdf7bdea4e8e9'
+          p=Path('PROJECT_STATE.md'); t=p.read_text();
+          if '45cfe57...' not in t: raise SystemExit('old short pin missing')
+          p.write_text(t.replace('45cfe57...','678a2c6...'))
+          for rel in ('docs/manifests/hydrogenone-lineage-22.2.xml','docs/reference/cross-tree-lock.json','docs/stock/h1a1000-r118/cross-tree-copy-contract.json','.github/workflows/verify-analysis.yml'):
+              p=Path(rel); t=p.read_text()
+              if old not in t: raise SystemExit(f'old pin missing: {rel}')
+              p.write_text(t.replace(old,new))
+          PY
+          PYTHONPATH="$PWD/tests:$PWD" python3 - <<'PY'
+          import pathlib, unittest
+          l=unittest.defaultTestLoader; s=unittest.TestSuite()
+          for p in sorted(pathlib.Path('tests').glob('test_*.py')):
+              if p.name!='test_full_tree.py': s.addTests(l.loadTestsFromName(f'tests.{p.stem}'))
+          r=unittest.TextTestRunner(verbosity=1).run(s); raise SystemExit(0 if r.wasSuccessful() else 1)
+          PY
+          python3 tests/test_full_tree.py
+          python3 tools/analysis/cross_tree_contract.py --device-root . --vendor-root ../vendor-tree --json > "$RUNNER_TEMP/live.json"
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          lock=json.loads(Path('docs/reference/cross-tree-lock.json').read_text())
+          ev=json.loads(Path('docs/stock/h1a1000-r118/cross-tree-copy-contract.json').read_text())
+          live=json.loads(Path(os.environ['RUNNER_TEMP'],'live.json').read_text())
+          expected='678a2c6dbbc82f1a07fb4b70bdfbdf7bdea4e8e9'
+          assert lock['vendor_commit']==expected and ev['authority']['vendor_commit']==expected
+          assert live['schema_version']==2 and live['copy_destination_collisions']==[]
+          for k in ('device_copy_destinations','vendor_copy_destinations','copy_destination_collisions'): assert live[k]==ev[k]
+          PY
+          git checkout -- .github/workflows/verify-analysis.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add PROJECT_STATE.md docs/manifests/hydrogenone-lineage-22.2.xml docs/reference/cross-tree-lock.json docs/stock/h1a1000-r118/cross-tree-copy-contract.json
+          git commit -m "device: repin vendor after observed ARM AEABI pair"
+          git push origin HEAD:codex/observed-aeabi-pair-repin-staging

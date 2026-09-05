@@ -49,6 +49,16 @@ jobs:
           manifest = manifest.replace(f'revision="{OLD_VENDOR}"', f'revision="{NEW_VENDOR}"')
           manifest_path.write_text(manifest)
 
+          workflow_path = Path(".github/workflows/verify-analysis.yml")
+          workflow = workflow_path.read_text()
+          if "      - codex/lineage-22.2-bringup\n" not in workflow:
+              workflow = workflow.replace(
+                  "      - codex/lineage-22.2-bringup-audit\n",
+                  "      - codex/lineage-22.2-bringup-audit\n      - codex/lineage-22.2-bringup\n",
+              )
+          workflow = workflow.replace(f"ref: {OLD_VENDOR}", f"ref: {NEW_VENDOR}")
+          workflow_path.write_text(workflow)
+
           test_path = Path("tests/test_cross_tree_lock.py")
           test_text = test_path.read_text().replace(f'"{OLD_BRANCH}"', f'"{NEW_BRANCH}"')
           test_path.write_text(test_text)
@@ -93,10 +103,11 @@ jobs:
           PY
           python3 tests/test_full_tree.py
 
-      - name: Commit verified repin
+      - name: Commit verified non-workflow repin
         shell: bash
         run: |
           set -euo pipefail
+          git restore .github/workflows/verify-analysis.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add PROJECT_STATE.md docs/manifests/hydrogenone-lineage-22.2.xml docs/reference/cross-tree-lock.json docs/stock/h1a1000-r118/cross-tree-copy-contract.json tests/test_cross_tree_lock.py

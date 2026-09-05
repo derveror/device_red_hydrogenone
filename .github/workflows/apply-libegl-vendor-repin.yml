@@ -1,0 +1,108 @@
+name: Apply libEGL vendor repin
+
+on:
+  push:
+    branches:
+      - codex/libegl-repin-staging
+
+permissions:
+  contents: write
+
+jobs:
+  repin:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout device staging branch
+        uses: actions/checkout@v4
+        with:
+          ref: codex/libegl-repin-staging
+          path: device-tree
+          fetch-depth: 0
+
+      - name: Checkout new vendor commit
+        uses: actions/checkout@v4
+        with:
+          repository: derveror/proprietary_vendor_red_hydrogenone
+          ref: 201149b75bbc91220e3916ea1b5e4e9f392711a9
+          path: vendor-tree
+
+      - name: Repin paired vendor state and verify
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd device-tree
+
+          python3 - <<'PY'
+          from pathlib import Path
+
+          old = 'a77ddbc970bd678ed8d75bca08971b4362182763'
+          new = '201149b75bbc91220e3916ea1b5e4e9f392711a9'
+          files = [
+              Path('PROJECT_STATE.md'),
+              Path('docs/manifests/hydrogenone-lineage-22.2.xml'),
+              Path('docs/reference/cross-tree-lock.json'),
+              Path('docs/stock/h1a1000-r118/cross-tree-copy-contract.json'),
+              Path('.github/workflows/verify-analysis.yml'),
+          ]
+          for path in files:
+              text = path.read_text(encoding='utf-8')
+              if old in text:
+                  text = text.replace(old, new)
+                  path.write_text(text, encoding='utf-8')
+              elif new not in text:
+                  raise SystemExit(f'no old or new vendor SHA in {path}')
+          PY
+
+          PYTHONPATH="$PWD/tests:$PWD" python3 - <<'PY'
+          import pathlib
+          import unittest
+
+          loader = unittest.defaultTestLoader
+          suite = unittest.TestSuite()
+          for path in sorted(pathlib.Path('tests').glob('test_*.py')):
+              if path.name == 'test_full_tree.py':
+                  continue
+              suite.addTests(loader.loadTestsFromName(f'tests.{path.stem}'))
+          result = unittest.TextTestRunner(verbosity=2).run(suite)
+          raise SystemExit(0 if result.wasSuccessful() else 1)
+          PY
+
+          python3 tests/test_full_tree.py
+
+          cd ..
+          python3 device-tree/tools/analysis/cross_tree_contract.py \
+            --device-root device-tree \
+            --vendor-root vendor-tree \
+            --json > "$RUNNER_TEMP/cross-tree-live.json"
+
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path('device-tree')
+          lock = json.loads((root / 'docs/reference/cross-tree-lock.json').read_text())
+          evidence = json.loads((root / 'docs/stock/h1a1000-r118/cross-tree-copy-contract.json').read_text())
+          live = json.loads(Path(os.environ['RUNNER_TEMP'], 'cross-tree-live.json').read_text())
+          expected = '201149b75bbc91220e3916ea1b5e4e9f392711a9'
+          assert lock['vendor_commit'] == expected, lock
+          assert evidence['authority']['vendor_commit'] == expected, evidence['authority']
+          assert live['schema_version'] == 2
+          assert live['copy_destination_collisions'] == []
+          for key in ('device_copy_destinations', 'vendor_copy_destinations', 'copy_destination_collisions'):
+              assert live[key] == evidence[key], f'stale evidence: {key}'
+          PY
+
+      - name: Commit verified non-workflow repin
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd device-tree
+          git checkout -- .github/workflows/verify-analysis.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add PROJECT_STATE.md docs/manifests/hydrogenone-lineage-22.2.xml docs/reference/cross-tree-lock.json docs/stock/h1a1000-r118/cross-tree-copy-contract.json
+          git diff --cached --quiet && { echo "Expected repin changes but found none"; exit 1; }
+          git commit -m "device: repin vendor after libEGL ARM fix"
+          git push origin HEAD:codex/libegl-repin-staging

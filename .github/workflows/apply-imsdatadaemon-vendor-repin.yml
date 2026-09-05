@@ -1,0 +1,145 @@
+name: Apply imsdatadaemon vendor repin
+
+on:
+  push:
+    branches:
+      - codex/imsdatadaemon-repin-staging
+
+permissions:
+  contents: write
+
+jobs:
+  repin:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/imsdatadaemon-repin-staging
+          fetch-depth: 0
+
+      - name: Repin exact verified vendor commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          old = "195d5babdd4a9b433f85c2ee0b5d85a0a02338e9"
+          new = "70c93a255f11d92de14c9498b3150e7e041ede00"
+          replacements = {
+              Path('.github/workflows/verify-analysis.yml'): (old, new),
+              Path('docs/manifests/hydrogenone-lineage-22.2.xml'): (old, new),
+              Path('docs/reference/cross-tree-lock.json'): (old, new),
+              Path('docs/stock/h1a1000-r118/cross-tree-copy-contract.json'): (old, new),
+              Path('PROJECT_STATE.md'): ('195d5ba...', '70c93a2...'),
+          }
+          changed = 0
+          for path, (src, dst) in replacements.items():
+              text = path.read_text()
+              count = text.count(src)
+              if count == 1:
+                  path.write_text(text.replace(src, dst))
+                  changed += 1
+              elif count == 0 and dst in text:
+                  print(f'{path}: already repinned')
+              else:
+                  raise SystemExit(f'{path}: expected exactly one old pin, found {count}')
+          print(f'changed_files={changed}')
+          PY
+
+      - name: Validate JSON and manifest pins
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m json.tool docs/reference/cross-tree-lock.json >/dev/null
+          python3 -m json.tool docs/stock/h1a1000-r118/cross-tree-copy-contract.json >/dev/null
+          grep -Fq '70c93a255f11d92de14c9498b3150e7e041ede00' .github/workflows/verify-analysis.yml
+          grep -Fq '70c93a255f11d92de14c9498b3150e7e041ede00' docs/manifests/hydrogenone-lineage-22.2.xml
+          grep -Fq '70c93a255f11d92de14c9498b3150e7e041ede00' docs/reference/cross-tree-lock.json
+          grep -Fq '70c93a255f11d92de14c9498b3150e7e041ede00' docs/stock/h1a1000-r118/cross-tree-copy-contract.json
+          grep -Fq '70c93a2...' PROJECT_STATE.md
+          ! grep -R -Fq '195d5babdd4a9b433f85c2ee0b5d85a0a02338e9' \
+            .github/workflows/verify-analysis.yml \
+            docs/manifests/hydrogenone-lineage-22.2.xml \
+            docs/reference/cross-tree-lock.json \
+            docs/stock/h1a1000-r118/cross-tree-copy-contract.json
+
+      - name: Run device unit tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          PYTHONPATH="$PWD/tests:$PWD" python3 - <<'PY'
+          import pathlib
+          import unittest
+
+          loader = unittest.defaultTestLoader
+          suite = unittest.TestSuite()
+          for path in sorted(pathlib.Path('tests').glob('test_*.py')):
+              if path.name == 'test_full_tree.py':
+                  continue
+              suite.addTests(loader.loadTestsFromName(f'tests.{path.stem}'))
+          result = unittest.TextTestRunner(verbosity=2).run(suite)
+          raise SystemExit(0 if result.wasSuccessful() else 1)
+          PY
+
+      - name: Run full-tree contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tests/test_full_tree.py
+
+      - name: Checkout exact vendor tree
+        uses: actions/checkout@v4
+        with:
+          repository: derveror/proprietary_vendor_red_hydrogenone
+          ref: 70c93a255f11d92de14c9498b3150e7e041ede00
+          path: vendor-tree
+
+      - name: Verify live cross-tree ownership contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/analysis/cross_tree_contract.py \
+            --device-root . \
+            --vendor-root vendor-tree \
+            --json > "$RUNNER_TEMP/cross-tree-live.json"
+          python3 - <<'PY'
+          import json
+          import os
+          import subprocess
+          from pathlib import Path
+
+          expected = '70c93a255f11d92de14c9498b3150e7e041ede00'
+          lock = json.loads(Path('docs/reference/cross-tree-lock.json').read_text())
+          evidence = json.loads(Path('docs/stock/h1a1000-r118/cross-tree-copy-contract.json').read_text())
+          live = json.loads(Path(os.environ['RUNNER_TEMP'], 'cross-tree-live.json').read_text())
+          vendor_head = subprocess.check_output(['git', '-C', 'vendor-tree', 'rev-parse', 'HEAD'], text=True).strip()
+
+          assert vendor_head == expected, (vendor_head, expected)
+          assert lock['vendor_commit'] == expected, lock
+          assert evidence['authority']['vendor_commit'] == expected, evidence['authority']
+          assert live['schema_version'] == 2, live['schema_version']
+          assert live['copy_destination_collisions'] == [], live['copy_destination_collisions']
+          assert evidence['status'] == 'zero_expanded_copy_destination_collisions', evidence.get('status')
+          for key in ('device_copy_destinations', 'vendor_copy_destinations', 'copy_destination_collisions'):
+              assert live[key] == evidence[key], f'stale cross-tree evidence field: {key}'
+          PY
+
+      - name: Commit verified repin
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            .github/workflows/verify-analysis.yml \
+            PROJECT_STATE.md \
+            docs/manifests/hydrogenone-lineage-22.2.xml \
+            docs/reference/cross-tree-lock.json \
+            docs/stock/h1a1000-r118/cross-tree-copy-contract.json
+          if git diff --cached --quiet; then
+            echo 'No repin changes to commit.'
+          else
+            git commit -m 'device: repin vendor after imsdatadaemon hwbinder fix'
+            git push origin HEAD:codex/imsdatadaemon-repin-staging
+          fi

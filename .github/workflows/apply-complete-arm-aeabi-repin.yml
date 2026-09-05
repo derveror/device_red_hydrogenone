@@ -1,0 +1,113 @@
+name: Apply complete ARM AEABI vendor repin
+
+on:
+  push:
+    branches:
+      - codex/complete-arm-aeabi-device-repin-staging
+
+permissions:
+  contents: write
+
+jobs:
+  repin:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/complete-arm-aeabi-device-repin-staging
+          path: device-tree
+          fetch-depth: 0
+
+      - uses: actions/checkout@v4
+        with:
+          repository: derveror/proprietary_vendor_red_hydrogenone
+          ref: 195d5babdd4a9b433f85c2ee0b5d85a0a02338e9
+          path: vendor-tree
+
+      - name: Repin exact vendor and verify complete paired-tree contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd device-tree
+
+          python3 - <<'PY'
+          from pathlib import Path
+
+          old_full = '18d6c713fa101a9e340a8a4473811eb0a2744647'
+          new_full = '195d5babdd4a9b433f85c2ee0b5d85a0a02338e9'
+          old_short = '18d6c71...'
+          new_short = '195d5ba...'
+
+          project = Path('PROJECT_STATE.md')
+          text = project.read_text(encoding='utf-8')
+          if old_short not in text:
+              raise SystemExit('old short vendor pin missing in PROJECT_STATE.md')
+          project.write_text(text.replace(old_short, new_short), encoding='utf-8')
+
+          for rel in (
+              'docs/manifests/hydrogenone-lineage-22.2.xml',
+              'docs/reference/cross-tree-lock.json',
+              'docs/stock/h1a1000-r118/cross-tree-copy-contract.json',
+              '.github/workflows/verify-analysis.yml',
+          ):
+              path = Path(rel)
+              text = path.read_text(encoding='utf-8')
+              if old_full not in text:
+                  raise SystemExit(f'old full vendor pin missing in {rel}')
+              path.write_text(text.replace(old_full, new_full), encoding='utf-8')
+          PY
+
+          PYTHONPATH="$PWD/tests:$PWD" python3 - <<'PY'
+          import pathlib, unittest
+          loader = unittest.defaultTestLoader
+          suite = unittest.TestSuite()
+          for path in sorted(pathlib.Path('tests').glob('test_*.py')):
+              if path.name == 'test_full_tree.py':
+                  continue
+              suite.addTests(loader.loadTestsFromName(f'tests.{path.stem}'))
+          result = unittest.TextTestRunner(verbosity=2).run(suite)
+          raise SystemExit(0 if result.wasSuccessful() else 1)
+          PY
+
+          python3 tests/test_full_tree.py
+
+          cd ..
+          python3 device-tree/tools/analysis/cross_tree_contract.py \
+            --device-root device-tree \
+            --vendor-root vendor-tree \
+            --json > "$RUNNER_TEMP/cross-tree-live.json"
+
+          python3 - <<'PY'
+          import json, os, subprocess
+          from pathlib import Path
+
+          root = Path('device-tree')
+          lock = json.loads((root / 'docs/reference/cross-tree-lock.json').read_text())
+          evidence = json.loads((root / 'docs/stock/h1a1000-r118/cross-tree-copy-contract.json').read_text())
+          live = json.loads(Path(os.environ['RUNNER_TEMP'], 'cross-tree-live.json').read_text())
+          expected = '195d5babdd4a9b433f85c2ee0b5d85a0a02338e9'
+          vendor_head = subprocess.check_output(['git', '-C', 'vendor-tree', 'rev-parse', 'HEAD'], text=True).strip()
+          assert vendor_head == expected
+          assert lock['vendor_commit'] == expected
+          assert evidence['authority']['vendor_commit'] == expected
+          assert live['schema_version'] == 2
+          assert live['copy_destination_collisions'] == []
+          for key in ('device_copy_destinations', 'vendor_copy_destinations', 'copy_destination_collisions'):
+              assert live[key] == evidence[key], f'stale evidence: {key}'
+          PY
+
+          cd device-tree
+          cp .github/workflows/verify-analysis.yml docs/reference/verify-analysis-next.yml
+          git checkout -- .github/workflows/verify-analysis.yml
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            PROJECT_STATE.md \
+            docs/manifests/hydrogenone-lineage-22.2.xml \
+            docs/reference/cross-tree-lock.json \
+            docs/stock/h1a1000-r118/cross-tree-copy-contract.json \
+            docs/reference/verify-analysis-next.yml
+          git diff --cached --quiet && { echo "Expected repin changes but found none"; exit 1; }
+          git commit -m "device: repin complete ARM AEABI vendor contract"
+          git push origin HEAD:codex/complete-arm-aeabi-device-repin-staging

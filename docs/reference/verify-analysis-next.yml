@@ -1,0 +1,142 @@
+name: Verify stock intake and analysis tooling
+
+on:
+  push:
+    branches:
+      - lineage-22.2-stock118-rework
+      - codex/lineage-22.2-bringup-audit
+      - codex/lineage-22.2-bringup
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate JSON and source lock
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m json.tool docs/reference/source-lock.json >/dev/null
+          python3 -m json.tool docs/reference/archive-inventory.json >/dev/null
+          python3 -m json.tool docs/reference/archive-comparisons.json >/dev/null
+          python3 -m json.tool docs/reference/cross-tree-lock.json >/dev/null
+          python3 -m json.tool docs/stock/h1a1000-r118/inventory-summary.json >/dev/null
+          python3 -m json.tool docs/stock/h1a1000-r118/boot-image-contract.json >/dev/null
+          python3 -m json.tool docs/stock/h1a1000-r118/radio-init-evidence.json >/dev/null
+          python3 -m json.tool docs/stock/h1a1000-r118/radio-all-layers-evidence.json >/dev/null
+          python3 -m json.tool docs/stock/h1a1000-r118/radio-shell-evidence.json >/dev/null
+          python3 -m json.tool docs/stock/h1a1000-r118/cross-tree-copy-contract.json >/dev/null
+          python3 tools/analysis/source_lock.py \
+            --validate \
+            --lock docs/reference/source-lock.json \
+            --inventory docs/reference/archive-inventory.json
+
+      - name: Run all unit-test modules
+        shell: bash
+        run: |
+          set -euo pipefail
+          PYTHONPATH="$PWD/tests:$PWD" python3 - <<'PY'
+          import pathlib
+          import unittest
+
+          loader = unittest.defaultTestLoader
+          suite = unittest.TestSuite()
+          for path in sorted(pathlib.Path('tests').glob('test_*.py')):
+              if path.name == 'test_full_tree.py':
+                  continue
+              suite.addTests(loader.loadTestsFromName(f'tests.{path.stem}'))
+          result = unittest.TextTestRunner(verbosity=2).run(suite)
+          raise SystemExit(0 if result.wasSuccessful() else 1)
+          PY
+
+      - name: Run complete tree contract audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tests/test_full_tree.py
+
+      - name: Verify canonical stock records
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(wc -l < docs/stock/h1a1000-r118/parts.sha256)" -eq 8
+          test "$(wc -l < docs/stock/h1a1000-r118/archive-files.tsv)" -eq 75
+          test "$(wc -l < docs/stock/h1a1000-r118/extracted-files.sha256)" -eq 74
+          grep -Fq '7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e' \
+            docs/stock/h1a1000-r118/original.sha256
+          grep -Fq '"android_release": "15"' docs/reference/source-lock.json
+          grep -Fq '"android_api_level": 35' docs/reference/source-lock.json
+          grep -Fq '"extraction_status": "verified_complete"' docs/reference/source-lock.json
+          grep -Fq '"archive_encrypted": false' docs/reference/source-lock.json
+          grep -Fq 'c3a1ef6be4a8f67220cb7252344ef38d4a41c36fdc8cd4ac8c9492b6444b7527' \
+            docs/stock/h1a1000-r118/analysis-evidence.sha256
+          test -f docs/stock/h1a1000-r118/ANALYSIS_STATUS.md
+          test -f docs/stock/h1a1000-r118/DONOR_STOCK_COMPARISON.md
+          ! find . -type d -path './device/red/msm8998-common' -print -quit | grep -q .
+          ! find . -type d -path './vendor/red/msm8998-common' -print -quit | grep -q .
+
+      - name: Verify canonical RED .118 boot payload
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(stat -c %s prebuilt/Image.gz-dtb)" -eq 37015950
+          echo '584ed86bab46bf57c2cd6b6b48ac4026c5d24a70d57bcdd04472d39c5591064d  prebuilt/Image.gz-dtb' | sha256sum -c -
+          grep -Fq '# Linux/arm64 4.4.153 Kernel Configuration' prebuilt/stock_kernel.config
+          grep -Eq '^BOARD_BOOT_HEADER_VERSION[[:space:]]*:=[[:space:]]*1$' BoardConfig.mk
+          grep -Eq '^VENDOR_SECURITY_PATCH[[:space:]]*:=[[:space:]]*2018-08-05$' BoardConfig.mk
+          grep -Fq 'BuildFingerprint=RED/HydrogenONE/HydrogenONE:9/PKQ1.190118.001/118:userdebug/release-keys' lineage_hydrogenone.mk
+
+  cross_tree:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout device tree
+        uses: actions/checkout@v4
+        with:
+          path: device-tree
+
+      - name: Checkout pinned vendor tree
+        uses: actions/checkout@v4
+        with:
+          repository: derveror/proprietary_vendor_red_hydrogenone
+          ref: 678a2c6dbbc82f1a07fb4b70bdfbdf7bdea4e8e9
+          path: vendor-tree
+
+      - name: Verify pinned cross-tree ownership contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m json.tool device-tree/docs/reference/cross-tree-lock.json >/dev/null
+          python3 -m json.tool device-tree/docs/stock/h1a1000-r118/cross-tree-copy-contract.json >/dev/null
+          python3 device-tree/tools/analysis/cross_tree_contract.py \
+            --device-root device-tree \
+            --vendor-root vendor-tree \
+            --json > "$RUNNER_TEMP/cross-tree-live.json"
+          python3 - <<'PY'
+          import json
+          import subprocess
+          from pathlib import Path
+
+          lock = json.loads(Path('device-tree/docs/reference/cross-tree-lock.json').read_text())
+          evidence = json.loads(Path('device-tree/docs/stock/h1a1000-r118/cross-tree-copy-contract.json').read_text())
+          live = json.loads(Path(Path.home().parent / 'not-used').read_text()) if False else json.loads(Path(__import__('os').environ['RUNNER_TEMP'], 'cross-tree-live.json').read_text())
+
+          vendor_head = subprocess.check_output(
+              ['git', '-C', 'vendor-tree', 'rev-parse', 'HEAD'], text=True
+          ).strip()
+          assert lock['vendor_repository'] == 'derveror/proprietary_vendor_red_hydrogenone', lock
+          assert vendor_head == lock['vendor_commit'], (vendor_head, lock['vendor_commit'])
+          assert live['schema_version'] == 2, live['schema_version']
+          assert live['copy_destination_collisions'] == [], live['copy_destination_collisions']
+          assert evidence['authority']['vendor_commit'] == lock['vendor_commit'], evidence['authority']
+          assert evidence['authority']['stock_build'] == lock['stock_build'], evidence['authority']
+          assert evidence['authority']['stock_archive_sha256'] == lock['stock_archive_sha256'], evidence['authority']
+          assert evidence['status'] == 'zero_expanded_copy_destination_collisions', evidence.get('status')
+
+          for key in ('device_copy_destinations', 'vendor_copy_destinations', 'copy_destination_collisions'):
+              assert live[key] == evidence[key], f'stale cross-tree evidence field: {key}'
+          PY

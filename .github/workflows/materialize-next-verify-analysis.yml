@@ -1,0 +1,37 @@
+name: Materialize next verify-analysis blob
+
+on:
+  push:
+    branches:
+      - codex/observed-aeabi-pair-repin-staging
+
+permissions:
+  contents: write
+
+jobs:
+  materialize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/observed-aeabi-pair-repin-staging
+          fetch-depth: 0
+      - name: Create content-identical non-workflow copy
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          source = Path('.github/workflows/verify-analysis.yml').read_text()
+          old = '45cfe573941f699283e143aa5d7ba294faa5cbee'
+          new = '678a2c6dbbc82f1a07fb4b70bdfbdf7bdea4e8e9'
+          if source.count(old) != 1:
+              raise SystemExit(f'expected exactly one old vendor pin, got {source.count(old)}')
+          Path('docs/reference/verify-analysis-next.yml').write_text(source.replace(old, new))
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/reference/verify-analysis-next.yml
+          git commit -m "staging: materialize next verify-analysis blob"
+          git push origin HEAD:codex/observed-aeabi-pair-repin-staging

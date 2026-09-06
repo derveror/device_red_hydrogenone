@@ -1,0 +1,39 @@
+name: Verify RED recovery-as-boot header v1
+
+on:
+  push:
+    branches:
+      - codex/boot-header-v1-releasetools-staging
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify recovery-as-boot header forwarding
+        run: python3 -m unittest -v tests.test_boot_header_releasetools_contract
+
+      - name: Run all device unit tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          PYTHONPATH="$PWD/tests:$PWD" python3 - <<'PY'
+          import pathlib
+          import unittest
+
+          loader = unittest.defaultTestLoader
+          suite = unittest.TestSuite()
+          for path in sorted(pathlib.Path('tests').glob('test_*.py')):
+              if path.name == 'test_full_tree.py':
+                  continue
+              suite.addTests(loader.loadTestsFromName(f'tests.{path.stem}'))
+          result = unittest.TextTestRunner(verbosity=2).run(suite)
+          raise SystemExit(0 if result.wasSuccessful() else 1)
+          PY
+
+      - name: Run complete tree contract audit
+        run: python3 tests/test_full_tree.py

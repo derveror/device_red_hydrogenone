@@ -3,6 +3,36 @@
     <hal format="hidl" optional="true">
         <name>android.hardware.graphics.mapper</name>
         <version>2.0</version>
-        <interface><name>IMapper</name><instance>default</instance></interface>
+        <interface>
+            <name>IMapper</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="hidl">
+        <name>com.fingerprints.extension</name>
+        <transport>hwbinder</transport>
+        <version>1.0</version>
+        <interface>
+            <name>IFingerprintSensorTest</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="hidl">
+        <name>vendor.cm.hardware.thermal3d</name>
+        <transport>hwbinder</transport>
+        <version>1.0</version>
+        <interface>
+            <name>IThermal3d</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="hidl">
+        <name>vendor.leia.hardware.leiadisp</name>
+        <transport>hwbinder</transport>
+        <version>1.0</version>
+        <interface>
+            <name>ILeiadisp</name>
+            <instance>default</instance>
+        </interface>
     </hal>
 </compatibility-matrix>

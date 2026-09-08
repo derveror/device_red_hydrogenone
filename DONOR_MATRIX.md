@@ -1,20 +1,17 @@
 # MSM8998 donor matrix for H1A1000 / LineageOS 22.2
 
-## Primary: Essential PH-1 (`mata`)
-Use for architecture and build layout, not hardware-specific DTS/blobs.
+## Primary: Razer Phone (`cheryl`)
 
-Matches H1A1000 particularly well:
-- Qualcomm MSM8998
-- A/B OTA
-- Treble split system/vendor
-- recovery-as-boot
-- UFS controller path `soc/1da4000.ufshc`
-- 4096-byte boot page
-- `Image.gz-dtb`
-- current LineageOS 22.2 still uses a 4.4 MSM8998 kernel
-- qcwcn Wi-Fi and legacy Qualcomm sepolicy patterns
+User decision, 2026-09-08: use the maintained LineageOS 22.2 cheryl device AND
+vendor trees as the primary comparison for RED integration. The user's rationale
+is the closer stock Android generation: cheryl 7.1.1 to 9, RED 8.1 to 9, while
+mata received Android 10. Verify actual HAL/blob ABI and kernel interfaces for
+each transfer; release history alone does not establish binary compatibility.
+RED .118 remains the authority for hardware, partitioning, calibration and blobs.
+Essential remains the current UAPI header build dependency only; selecting a
+reference does not replace the actual RED boot kernel or import donor DTBs.
 
-## Primary for GNSS/location ABI: Razer Phone (`cheryl`)
+### GNSS/location ABI
 Use `cheryl` before `mata` for the Qualcomm GNSS/location source ABI. The Razer
 Phone launched on Android 7.1.1 and its final official Android release was 9.0,
 which aligns with RED `.118` Android 9 vendor consumers. Its maintained
@@ -28,6 +25,20 @@ For Hydrogen One GNSS this means:
 - `mata`, OnePlus msm8998 and Nubia remain cross-checks for Android 15 platform
   contracts, ownership and generic msm8998 integration;
 - never copy Razer device identity, partitioning, kernel DTBs, or GPS configs.
+
+## Secondary: Essential PH-1 (`mata`)
+Use for architecture and build layout, not hardware-specific DTS/blobs.
+
+Matches H1A1000 particularly well:
+- Qualcomm MSM8998
+- A/B OTA
+- Treble split system/vendor
+- recovery-as-boot
+- UFS controller path `soc/1da4000.ufshc`
+- 4096-byte boot page
+- `Image.gz-dtb`
+- current LineageOS 22.2 still uses a 4.4 MSM8998 kernel
+- qcwcn Wi-Fi and legacy Qualcomm sepolicy patterns
 
 ## Secondary: OnePlus 5/5T (`cheeseburger`/`dumpling`, `msm8998-common`)
 Use for modern LineageOS 22.2 Qualcomm userspace patterns:

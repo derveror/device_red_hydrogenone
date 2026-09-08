@@ -1,5 +1,8 @@
 # RED Hydrogen One H1A1000 - LineageOS 22.2 bring-up v0.3
 
+> Historical .109 notes. Current .118 status, kernel limitations and boot-log
+> collection are documented in `README.md` and `docs/BOOT_DIAGNOSTICS.md`.
+
 This tree is a reverse-engineered scaffold based on the supplied stock H1A1000 firmware and
 current LineageOS 22.2 MSM8998 devices.
 
@@ -35,8 +38,9 @@ The intended bring-up is therefore:
 5. Once userspace is stable, port RED DTS/drivers into the maintained Lineage MSM8998 4.4.302 kernel.
 
 ## Donors
-See `DONOR_MATRIX.md`. Primary layout donor is Essential PH-1 `mata`; OnePlus 5/5T and Pixel 2/2 XL
-are secondary Qualcomm references.
+The current reference policy is in `DONOR_MATRIX.md`: cheryl device + vendor is
+primary; mata and the other MSM8998 trees are secondary. The discussion below
+is historical .109 analysis, not the current donor selection.
 
 ## Stock kernel module trap
 Stock vendor init unconditionally loads four `msm-vidc*.ko` modules from `/system/lib/modules`.
@@ -47,7 +51,7 @@ See `reference/analysis/stock_kernel_module_requirements.txt`.
 - system partition: **4 GiB** (`4294967296`)
 - vendor partition: **1 GiB** (`1073741824`)
 - these capacities exactly match the maintained Essential PH-1 `mata` LOS 22.2 layout,
-  strengthening `mata` as the primary architectural donor
+  historically motivating a mata comparison; current primary is cheryl
 - stock `/system/etc/ld.config.txt` has `namespace.default.isolated=false` for **both**
   framework and vendor process namespaces; the old vendor is not cross-version-clean
 - stock 32-bit and 64-bit O-MR1 HIDL transport libraries were archived as ABI references
@@ -69,4 +73,4 @@ Exact supplied image capacities:
 - system: 4,294,967,296 bytes (4 GiB)
 - vendor: 1,073,741,824 bytes (1 GiB)
 
-The 4 GiB system + 1 GiB vendor layout exactly matches current LineageOS 22.2 `mata`, reinforcing Essential PH-1 as the primary A/B MSM8998 architecture donor. H1-specific kernel, DTB, display/touch/fingerprint/SmartPort pieces remain RED-derived.
+The 4 GiB system + 1 GiB vendor layout exactly matches current LineageOS 22.2 `mata`, which was an early reason to compare mata; current primary reference is cheryl. H1-specific kernel, DTB, display/touch/fingerprint/SmartPort pieces remain RED-derived.

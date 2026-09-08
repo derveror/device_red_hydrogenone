@@ -18,7 +18,7 @@ Canonical stock archive SHA-256:
 
 RED `.118` controls device-specific facts: boot image layout, partition sizes, stock identity, modem/radio behavior, RED/CloudMinds hardware, firmware and proprietary userspace.
 
-Maintained LineageOS 22.2 MSM8998 trees are architectural references only. Essential PH-1 (`mata`) is the primary reference for MSM8998/A-B/Treble structure; OnePlus 5/5T, Nubia Z17 and Razer Phone are secondary references. Donor-specific hardware payloads are not treated as RED hardware evidence.
+Razer Phone (`cheryl`) device + vendor is the primary LineageOS 22.2 reference, as selected by the user on 2026-09-08. Essential PH-1 (`mata`), OnePlus 5/5T and Nubia Z17 are secondary cross-checks. Each port still requires RED-specific HAL/blob ABI and kernel validation. See `DONOR_MATRIX.md`.
 
 Canonical analysis is recorded under:
 
@@ -27,6 +27,19 @@ docs/stock/h1a1000-r118/
 ```
 
 Important machine-readable contracts include `boot-image-contract.json`, radio evidence, stock inventories and the cross-tree vendor lock.
+
+## Current physical bring-up status — 2026-09-08
+
+The user reports that the existing device/vendor pair builds successfully but
+the ROM does not boot. Static checks do not establish the failing boot stage.
+The missing import of `init.target.rc` has been restored and is regression-tested;
+its 14 proprietary service binaries are present in the pinned vendor tree.
+
+The selected .118 kernel is Linux 4.4.153+ with `CONFIG_BPF_SYSCALL` disabled.
+LineageOS 22.2 netbpfload requires BPF map syscalls and has a reboot-on-failure
+service. This is a concrete kernel compatibility gap; phone logs must establish
+whether it is the failure seen by the user or an earlier stage fails first.
+See [boot evidence collection](docs/BOOT_DIAGNOSTICS.md) before another flash.
 
 ## Current build contract
 
@@ -112,7 +125,7 @@ The current Android 15 vendor contract lives in:
 
 ```text
 derveror/proprietary_vendor_red_hydrogenone
-branch: lineage-22.2-android15-contract
+branch: codex/lineage-22.2-bringup
 ```
 
 The exact compatible vendor commit is pinned by:
@@ -146,11 +159,11 @@ Then from a LineageOS 22.2 checkout:
 
 ```bash
 source build/envsetup.sh
-lunch lineage_hydrogenone-userdebug
+lunch lineage_hydrogenone-bp1a-userdebug
 m nothing
 ```
 
-The two-component lunch form is valid on LineageOS 22.2; when no release component is supplied the build environment resolves the default release configuration. The device product itself declares `lineage_hydrogenone-user`, `lineage_hydrogenone-userdebug` and `lineage_hydrogenone-eng`.
+Use the explicit `bp1a` release component for the user's LineageOS 22.2 workspace. The preflight runner uses this target by default.
 
 After `m nothing` is clean, run the image gates explicitly:
 

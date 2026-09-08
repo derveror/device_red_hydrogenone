@@ -61,6 +61,27 @@ class Android15RootdirContractTest(unittest.TestCase):
     def test_target_declares_only_verified_red_daemons(self) -> None:
         self.assertEqual(services(self.target), EXPECTED_SERVICES)
 
+    def test_proprietary_daemons_are_reachable_from_hardware_init(self) -> None:
+        # Android loads init.${ro.hardware}.rc, then its explicit imports.
+        # /vendor/etc/init is scanned non-recursively, so merely installing
+        # init.target.rc under its hw subdirectory does not register services.
+        pending = [QCOM]
+        visited: set[Path] = set()
+        reachable: dict[str, str] = {}
+        while pending:
+            path = pending.pop()
+            if path in visited:
+                continue
+            visited.add(path)
+            text = path.read_text(encoding="utf-8")
+            reachable.update(services(text))
+            for imported in re.findall(r"(?m)^import\s+(\S+)", text):
+                self.assertTrue(imported.startswith("/vendor/etc/"), imported)
+                pending.append(ROOT / "rootdir/etc" / imported.removeprefix("/vendor/etc/"))
+        missing = {name: exe for name, exe in EXPECTED_SERVICES.items()
+                   if reachable.get(name) != exe}
+        self.assertEqual(missing, {}, f"unreachable proprietary services: {missing}")
+
     def test_target_contains_no_android8_9_control_plane_paths(self) -> None:
         conflicts = [f"{token}: {reason}" for token, reason in LEGACY_TOKENS.items() if token in self.target]
         self.assertEqual(conflicts, [], "legacy rootdir constructs remain:\n" + "\n".join(conflicts))

@@ -262,7 +262,7 @@ PRODUCT_PACKAGES += \
     libOmxVenc \
     libstagefrighthw
 
-# Power/thermal config from stock; stock power HAL itself remains vendor-owned for P0
+# Stock power configuration; an Android Power HAL still needs explicit integration.
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/power/powerhint.xml:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.xml
 
@@ -360,5 +360,6 @@ PRODUCT_SOONG_NAMESPACES += \
     hardware/qcom-caf/bt/libbt-vendor \
     hardware/qcom-caf/common/libqti-perfd-client
 
-# Do not claim a modern kernel VINTF pass while using stock 4.4.78.
+# Stock .118 4.4.153+ is not Android 15 kernel-compatible (BPF_SYSCALL is off).
+# Disabling the OTA check does not add missing runtime kernel functionality.
 PRODUCT_OTA_ENFORCE_VINTF_KERNEL_REQUIREMENTS := false

@@ -2,7 +2,7 @@
 set -euo pipefail
 
 VALIDATE_ONLY=false
-LUNCH_TARGET="${HYDROGENONE_LUNCH_TARGET:-lineage_hydrogenone-userdebug}"
+LUNCH_TARGET="${HYDROGENONE_LUNCH_TARGET:-lineage_hydrogenone-bp1a-userdebug}"
 TOP="${ANDROID_BUILD_TOP:-$(pwd)}"
 LOG_DIR="${HYDROGENONE_LOG_DIR:-}"
 
@@ -16,7 +16,7 @@ clean workspace and preserve a timestamped log.
 Options:
   --validate-only       Verify workspace/revisions but do not source envsetup or build.
   --top PATH            LineageOS source-tree root (default: $ANDROID_BUILD_TOP or cwd).
-  --lunch TARGET        Lunch target (default: lineage_hydrogenone-userdebug).
+  --lunch TARGET        Lunch target (default: lineage_hydrogenone-bp1a-userdebug).
   --log-dir PATH        Log directory (default: <top>/out/hydrogenone-build-logs).
   -h, --help            Show this help.
 

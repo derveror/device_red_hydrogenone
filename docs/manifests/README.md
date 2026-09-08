@@ -36,7 +36,7 @@ repo init \
 mkdir -p .repo/local_manifests
 
 curl --fail --location --retry 3 \
-  https://raw.githubusercontent.com/derveror/device_red_hydrogenone/lineage-22.2-stock118-rework/docs/manifests/hydrogenone-lineage-22.2.xml \
+  https://raw.githubusercontent.com/derveror/device_red_hydrogenone/codex/lineage-22.2-bringup/docs/manifests/hydrogenone-lineage-22.2.xml \
   --output .repo/local_manifests/hydrogenone.xml
 ```
 
@@ -99,7 +99,7 @@ The script runs only:
 
 ```bash
 source build/envsetup.sh
-lunch lineage_hydrogenone-userdebug
+lunch lineage_hydrogenone-bp1a-userdebug
 m nothing
 ```
 

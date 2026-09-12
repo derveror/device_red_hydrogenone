@@ -1,6 +1,6 @@
 {
   "authority": {
-    "device_branch": "lineage-22.2-kernel-302",
+    "device_branch": "118-lineage-22.2-kernel-302",
     "stock_archive_sha256": "7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e",
     "stock_build": "H1A1000.082ho.01.00.10r.118",
     "vendor_commit": "70276f1d7ea9d70b04dd91c04b9a48c13f6795b8"
@@ -88,9 +88,6 @@
     "vendor/etc/camera/imx318_chromatix.xml": [
       "device.mk"
     ],
-    "vendor/etc/camera/imx332_chromatix.xml": [
-      "device.mk"
-    ],
     "vendor/etc/camera/imx362_chromatix.xml": [
       "device.mk"
     ],
@@ -167,9 +164,6 @@
       "device.mk"
     ],
     "vendor/etc/camera/s5k2l7sx_chromatix.xml": [
-      "device.mk"
-    ],
-    "vendor/etc/camera/s5k2t7sp_chromatix.xml": [
       "device.mk"
     ],
     "vendor/etc/camera/s5k3l8_chromatix.xml": [

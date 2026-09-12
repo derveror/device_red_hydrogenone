@@ -4,7 +4,7 @@
 - Added vendor to A/B OTA partition set now that the port builds a vendor image.
 - Confirmed stock `ld.config.txt` has non-isolated default namespaces for both system and vendor.
 - Switched legacy-HIDL plan to LineageOS 22.2 `libhidlbase-v32.vendor`.
-- Archived supplied O-MR1 32/64-bit HIDL libraries as ABI references only.
+- Archived supplied legacy 32/64-bit HIDL libraries as ABI references only.
 - Added supplied `/system/lib/modules` inventory, SHA-256 values and vermagic.
 - Corrected v0.2's MSM VIDC module assumption: VIDC is built into the stock kernel.
 - Confirmed QCE/QCEDEV are also built into the stock kernel; stale factory insmods are nonessential.

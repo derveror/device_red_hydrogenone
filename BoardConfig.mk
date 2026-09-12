@@ -95,7 +95,7 @@ BOARD_FLASH_BLOCK_SIZE := 262144
 TARGET_COPY_OUT_VENDOR := vendor
 TARGET_USERIMAGES_USE_EXT4 := true
 
-# Device launched with Android 8.1 / API 27
+# Canonical RED .118 reports ro.product.first_api_level=27.
 BOARD_SHIPPING_API_LEVEL := 27
 
 # Recovery-as-boot

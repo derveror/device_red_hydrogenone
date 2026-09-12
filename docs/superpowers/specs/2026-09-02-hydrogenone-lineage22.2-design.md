@@ -4,7 +4,7 @@
 
 **Target:** RED Hydrogen One H1A1000 (`hydrogenone`), Qualcomm MSM8998, LineageOS 22.2, Android 15 / API 35
 
-**Existing baseline:** `derveror/device_red_hydrogenone` at commit `a9e9d30959f1844e3e5ef05cb1c51a05ac29b14e`
+**Current base:** `derveror/device_red_hydrogenone`, branch `lineage-22.2-kernel-302`, commit `61a5e36b5103b366fa9a8f2083dfe0ff786f4149`
 
 ## 1. Goal
 
@@ -34,12 +34,12 @@ The first milestone is a clean build and diagnosable first boot. The final miles
 
 ## 3. Version-control safety
 
-The original work remains preserved at commit `a9e9d30959f1844e3e5ef05cb1c51a05ac29b14e`.
+Earlier repository states remain available through normal Git history but are not current source authority.
 
 Two branches define the safety boundary:
 
-- `legacy-pre-stock118-rework`: immutable archival branch for the current tree.
-- `lineage-22.2-stock118-rework`: all stock `.118` analysis, design, and reimplementation work.
+- `lineage-22.2-kernel-302`: source-kernel-integrated base branch.
+- `118-lineage-22.2-kernel-302`: current `.118` device-tree and RED source-kernel integration work.
 
 The development branch must not be force-pushed. Each subsystem is committed independently so a regression can be bisected and reverted without discarding unrelated work.
 
@@ -54,7 +54,7 @@ Evidence is ranked in this order:
 3. RED kernel binary, DTB/DTBO, ramdisk, partition table, firmware, and device nodes.
 4. Current official LineageOS 22.2 source patterns and build-system contracts.
 5. Donor device, common, vendor, and kernel trees at the exact supplied commits.
-6. Existing Hydrogen One tree and older `.109` analysis.
+6. Existing Hydrogen One tree, used only after validation against `.118`.
 
 A lower-ranked source cannot override contradictory higher-ranked RED evidence without a written decision record.
 
@@ -122,7 +122,7 @@ The inventory is complete only when the object count independently calculated fr
 
 ## 7. Partition, boot, and update contract
 
-The following values are measured from `.118`; values inherited only from `.109` are not final:
+The following values are measured from `.118`; unverified inherited values are not final:
 
 - GPT partition names, numbers, sizes, GUIDs, and slot suffixes;
 - sparse versus raw image encoding;
@@ -311,9 +311,9 @@ No proprietary donor blob is used merely because it came from another MSM8998 de
 
 The project uses two explicitly separated phases.
 
-### 12.1 Diagnostic prebuilt phase
+### 12.1 Stock kernel evidence
 
-A verified RED stock kernel may be used temporarily to isolate Android userspace, ramdisk, partition, init, and vendor failures. The device tree must label this as diagnostic bring-up, and the stock kernel must come from the verified `.118` image rather than the older `.109` payload once `.118` is available.
+The canonical `.118` boot image is evidence for header, command-line, DTB ordering and partition constraints only. It is not a device-tree build input; LineageOS uses the source-built RED kernel.
 
 ### 12.2 Source-built final phase
 
@@ -322,7 +322,7 @@ The final tree builds a RED-compatible kernel from source. Work includes:
 - identifying the closest released RED/Qualcomm source lineage;
 - recovering the effective stock config;
 - matching kernel version and required Android compatibility patches;
-- restoring RED DTB/DTBO nodes and panel/touch/fingerprint/audio/haptics/SmartPort hardware descriptions;
+- restoring RED DTB/DTBO nodes and panel/touch/fingerprint/audio/haptics hardware descriptions while excluding the proprietary rear accessory port;
 - validating UFS, USB, WLAN, Bluetooth, modem, sensors, cameras, suspend, charging, thermal control, and ramoops;
 - comparing generated image layout and command line with the verified stock boot contract.
 
@@ -460,7 +460,7 @@ Emergency-call configuration is inspected safely; a real emergency call is not u
 - associated RED display firmware and services;
 - RED-specific media/framework components;
 - haptics behavior beyond standard vibration;
-- SmartPort and other proprietary accessories.
+- proprietary accessories outside the phone's standard runtime feature set.
 
 P2 does not block first boot, but every unavailable P2 component must have a dependency map explaining what is missing.
 
@@ -505,7 +505,7 @@ The project is complete when all of the following are true:
 
 ## 19. Current known risks
 
-- The `.118` archive is not yet available locally because of the Drive per-file limit; no `.118` file-level conclusion is accepted before reconstruction.
+- The canonical `.118` archive has been reconstructed, hash-verified, tested and fully extracted; file-level conclusions must remain traceable to its checked-in evidence.
 - The current tree is heavily derived from mata, so apparent completeness can hide wrong device-specific behavior.
 - Android 9 proprietary services may require Android 15 linker, VINTF, init, and SELinux adaptation.
 - RED-specific kernel source and DTS availability may be incomplete.

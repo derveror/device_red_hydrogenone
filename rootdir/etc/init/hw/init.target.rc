@@ -2,7 +2,7 @@
 #
 # This file owns only RED/Qualcomm proprietary daemons whose executables are
 # intentionally selected from verified .118 stock. Filesystem mounting,
-# /mnt/vendor/persist setup, FPC/SmartPort permissions, and USB control-plane
+# /mnt/vendor/persist setup, FPC permissions, and USB control-plane
 # actions are owned by init.qcom.rc / init.qcom.usb.rc.
 
 # Peripheral manager

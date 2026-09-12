@@ -6,11 +6,10 @@ This directory locks and compares the exact device and vendor archives supplied 
 
 - `SUPPLIED_SOURCES.md` — human-readable source list, embedded commits, archive hashes, and initial conclusions.
 - `source-lock.json` — machine-readable source contract.
-- `archive-inventory.json` — compact deterministic archive-level summary for all 13 locked ZIP files.
+- `archive-inventory.json` — compact deterministic archive-level summary for all 11 locked donor ZIP files.
 - `archive-comparisons.json` — compact exact comparison counts for the selected donor pairs.
-- `full-artifacts.sha256` — hashes and connected-Drive location of the full per-file reports.
 
-The full reports contain every normalized archive path, file size, SHA-256, ZIP mode, and every comparison path classification. They are stored as `hydrogenone-reference-analysis-2026-09-02.tar.xz` in `/Google Drive/gpt/` and are pinned by SHA-256 in `full-artifacts.sha256`. The bundle contains metadata and hashes only; it does not contain proprietary file contents.
+The checked-in summaries contain hashes and counts only; they do not contain proprietary file contents. Historical Hydrogen device-tree snapshots are intentionally excluded from the active lock because current device authority is this branch plus canonical RED `.118` stock evidence.
 
 The authoritative design is `docs/superpowers/specs/2026-09-02-hydrogenone-lineage22.2-design.md`.
 
@@ -28,8 +27,6 @@ python3 tools/analysis/archive_inventory.py \
   /mnt/data/android_device_oneplus_dumpling-lineage-22.2.zip \
   /mnt/data/android_device_oneplus_msm8998-common-lineage-22.2.zip \
   /mnt/data/android_device_razer_cheryl-lineage-22.2.zip \
-  /mnt/data/device_red_hydrogenone-fix-lineage-22.2-runtime-contract.zip \
-  '/mnt/data/device_red_hydrogenone-main(1).zip' \
   /mnt/data/proprietary_vendor_essential_mata-lineage-22.2.zip \
   /mnt/data/proprietary_vendor_nubia_msm8998-common-lineage-22.2.zip \
   /mnt/data/proprietary_vendor_oneplus_dumpling-lineage-22.2.zip \
@@ -46,8 +43,6 @@ python3 tools/analysis/archive_inventory.py \
   /mnt/data/android_device_oneplus_dumpling-lineage-22.2.zip \
   /mnt/data/android_device_oneplus_msm8998-common-lineage-22.2.zip \
   /mnt/data/android_device_razer_cheryl-lineage-22.2.zip \
-  /mnt/data/device_red_hydrogenone-fix-lineage-22.2-runtime-contract.zip \
-  '/mnt/data/device_red_hydrogenone-main(1).zip' \
   /mnt/data/proprietary_vendor_essential_mata-lineage-22.2.zip \
   /mnt/data/proprietary_vendor_nubia_msm8998-common-lineage-22.2.zip \
   /mnt/data/proprietary_vendor_oneplus_dumpling-lineage-22.2.zip \
@@ -63,10 +58,10 @@ python3 tools/analysis/source_lock.py \
 Expected validator result:
 
 ```text
-source lock verified: 13 archives
+source lock verified: 11 archives
 ```
 
-The current inventory indexes 4,810 archive files with a combined uncompressed size of 1,303,453,109 bytes.
+The current inventory indexes 3,964 archive files with a combined uncompressed size of 1,220,702,343 bytes.
 
 ## Reproducing comparisons
 
@@ -74,10 +69,6 @@ The current inventory indexes 4,810 archive files with a combined uncompressed s
 # Full path-level comparison report
 python3 tools/analysis/tree_compare.py \
   --inventory /tmp/archive-inventory.full.json \
-  --pair 'device_red_hydrogenone-main(1).zip:device_red_hydrogenone-fix-lineage-22.2-runtime-contract.zip' \
-  --pair 'device_red_hydrogenone-main(1).zip:android_device_essential_mata-lineage-22.2.zip' \
-  --pair 'device_red_hydrogenone-main(1).zip:android_device_oneplus_msm8998-common-lineage-22.2.zip' \
-  --pair 'device_red_hydrogenone-main(1).zip:android_device_nubia_msm8998-common-lineage-22.2.zip' \
   --pair 'android_device_oneplus_msm8998-common-lineage-22.2.zip:android_device_nubia_msm8998-common-lineage-22.2.zip' \
   --pair 'android_device_oneplus_dumpling-lineage-22.2.zip:android_device_oneplus_msm8998-common-lineage-22.2.zip' \
   --pair 'android_device_nubia_nx563j-lineage-22.2.zip:android_device_nubia_msm8998-common-lineage-22.2.zip' \
@@ -88,10 +79,6 @@ python3 tools/analysis/tree_compare.py \
 # Compact count-only comparison summary checked into GitHub
 python3 tools/analysis/tree_compare.py \
   --inventory /tmp/archive-inventory.full.json \
-  --pair 'device_red_hydrogenone-main(1).zip:device_red_hydrogenone-fix-lineage-22.2-runtime-contract.zip' \
-  --pair 'device_red_hydrogenone-main(1).zip:android_device_essential_mata-lineage-22.2.zip' \
-  --pair 'device_red_hydrogenone-main(1).zip:android_device_oneplus_msm8998-common-lineage-22.2.zip' \
-  --pair 'device_red_hydrogenone-main(1).zip:android_device_nubia_msm8998-common-lineage-22.2.zip' \
   --pair 'android_device_oneplus_msm8998-common-lineage-22.2.zip:android_device_nubia_msm8998-common-lineage-22.2.zip' \
   --pair 'android_device_oneplus_dumpling-lineage-22.2.zip:android_device_oneplus_msm8998-common-lineage-22.2.zip' \
   --pair 'android_device_nubia_nx563j-lineage-22.2.zip:android_device_nubia_msm8998-common-lineage-22.2.zip' \
@@ -105,10 +92,6 @@ Current headline results:
 
 | Left | Right | Shared paths | Byte-identical | Different contents |
 |---|---|---:|---:|---:|
-| Hydrogen main | Hydrogen runtime-contract | 423 | 423 | 0 |
-| Hydrogen main | Essential mata | 299 | 253 | 46 |
-| Hydrogen main | OnePlus MSM8998 common | 50 | 3 | 47 |
-| Hydrogen main | Nubia MSM8998 common | 139 | 22 | 117 |
 | OnePlus MSM8998 common | Nubia MSM8998 common | 59 | 8 | 51 |
 | OnePlus Dumpling | OnePlus MSM8998 common | 14 | 1 | 13 |
 | Nubia NX563J | Nubia MSM8998 common | 21 | 1 | 20 |

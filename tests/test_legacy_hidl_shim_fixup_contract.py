@@ -24,6 +24,24 @@ class LegacyHidlShimFixupContractTest(unittest.TestCase):
         self.assertIn('HIDLBASE_SHIM_FIXUP_PATHS', text)
         self.assertIn("blob_fixup().add_needed('libhidlbase_shim.so')", text)
 
+    def test_extraction_retargets_imsdatadaemon_to_android15_hidlbase(self) -> None:
+        text = (ROOT / 'extract-files.py').read_text(encoding='utf-8')
+        self.assertIn("'vendor/bin/imsdatadaemon':", text)
+        self.assertIn(
+            "blob_fixup().replace_needed('libhwbinder.so', 'libhidlbase.so')",
+            text,
+        )
+
+    def test_extraction_clears_only_verified_faceproc_symbol_versions(self) -> None:
+        text = (ROOT / 'extract-files.py').read_text(encoding='utf-8')
+        self.assertIn("'vendor/lib/libmmcamera_faceproc.so':", text)
+        for symbol in (
+            '__aeabi_memcpy',
+            '__aeabi_memset',
+            '__gnu_Unwind_Find_exidx',
+        ):
+            self.assertIn(f".clear_symbol_version('{symbol}')", text)
+
 
 if __name__ == '__main__':
     unittest.main()

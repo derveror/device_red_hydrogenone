@@ -101,4 +101,4 @@ The repository now has one tested, deterministic entrypoint for the first real f
 
 ## Next action
 
-Replace/redirect the stale historical `BUILD_FIRST.md` instructions, which still reference the old `.109` 4.4.78 kernel and `m bacon`, so there is only one current first-build procedure. Then update `RESUME_HERE.md` and prepare the exact local-workspace commands for validation followed by the first `m nothing` run.
+Replace/redirect the superseded `BUILD_FIRST.md` instructions so there is only one current first-build procedure. Then update `RESUME_HERE.md` and prepare the exact local-workspace commands for validation followed by the first `m nothing` run.

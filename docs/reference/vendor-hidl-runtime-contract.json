@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "vendor_repository": "derveror/proprietary_vendor_red_hydrogenone",
+  "vendor_commit": "70276f1d7ea9d70b04dd91c04b9a48c13f6795b8",
+  "vendor_branch": "lineage-22.2-kernel-302",
+  "stock_build": "H1A1000.082ho.01.00.10r.118",
+  "stock_archive_sha256": "7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e",
+  "selected_file_count": 459,
+  "source_owned_hidl_base_pruned": true,
+  "selected_stock_hidl_base_blobs": [],
+  "android15_hidl_providers": [
+    "libhidlbase",
+    "libhidltransport",
+    "libhwbinder"
+  ],
+  "hidlbase_shim_module": "libhidlbase_shim",
+  "hidlbase_shim_consumer_count": 63,
+  "imsdatadaemon_needed_replacement": {
+    "from": "libhwbinder.so",
+    "to": "libhidlbase.so"
+  },
+  "faceproc_fixup": {
+    "path": "vendor/lib/libmmcamera_faceproc.so",
+    "operation": "clear_symbol_versions",
+    "symbols": [
+      "__aeabi_memcpy",
+      "__aeabi_memset",
+      "__gnu_Unwind_Find_exidx"
+    ]
+  },
+  "verification": {
+    "proprietary_list_entries": 459,
+    "manifest_entries": 459,
+    "on_disk_entries": 459,
+    "vendor_unit_tests": 77
+  }
+}

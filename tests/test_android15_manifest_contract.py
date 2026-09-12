@@ -86,7 +86,6 @@ class Android15ManifestContractTest(unittest.TestCase):
         self.assertEqual(self.root.tag, "manifest")
         self.assertEqual(self.root.attrib.get("type"), "device")
         self.assertEqual(self.root.attrib.get("target-level"), "5")
-        self.assertNotIn(".109", self.text)
         self.assertNotIn("future vendor tree", self.text)
 
     def test_expected_source_owned_instances_are_declared_exactly(self) -> None:

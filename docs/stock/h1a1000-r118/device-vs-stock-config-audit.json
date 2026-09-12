@@ -1,11 +1,11 @@
 {
   "authority": {
-    "device_branch": "lineage-22.2-stock118-rework",
+    "device_branch": "118-lineage-22.2-kernel-302",
     "stock_archive_sha256": "7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e",
     "stock_build": "H1A1000.082ho.01.00.10r.118",
     "stock_vendor_image_size": 593264872
   },
-  "device_root": "device-tree",
+  "device_root": "device/red/hydrogenone",
   "rows": [
     {
       "destination": "vendor/etc/audio_effects.conf",
@@ -31,11 +31,11 @@
     },
     {
       "destination": "vendor/etc/audio_platform_info.xml",
-      "device_sha256": "39d02d782c4d67b5127a4cfd44b47601d862ca957f4a4682737a08e61cc5295f",
-      "device_size": 8740,
+      "device_sha256": "614af67cfec5dc1ad38e70ad04b0e9e323b514c572e7291b8535e6023efbd186",
+      "device_size": 41138,
       "makefile": "device.mk",
       "source": "audio/audio_platform_info.xml",
-      "status": "different",
+      "status": "identical",
       "stock_relative_path": "etc/audio_platform_info.xml",
       "stock_sha256": "614af67cfec5dc1ad38e70ad04b0e9e323b514c572e7291b8535e6023efbd186",
       "stock_size": 41138
@@ -64,11 +64,11 @@
     },
     {
       "destination": "vendor/etc/camera/camera_config.xml",
-      "device_sha256": "93164993489e7ff40e1b8cf9bd0199dadd6e5e4a0ef1020b2fd7cb47035bcda7",
-      "device_size": 10128,
+      "device_sha256": "505796da505af5784891ae2ae3569cbaba69f01814fdbfbdc2a2e219ffc512e5",
+      "device_size": 10137,
       "makefile": "device.mk",
       "source": "configs/camera/camera_config.xml",
-      "status": "different",
+      "status": "identical",
       "stock_relative_path": "etc/camera/camera_config.xml",
       "stock_sha256": "505796da505af5784891ae2ae3569cbaba69f01814fdbfbdc2a2e219ffc512e5",
       "stock_size": 10137
@@ -196,22 +196,22 @@
     },
     {
       "destination": "vendor/etc/camera/imx268_main_chromatix.xml",
-      "device_sha256": "d242a4f0d9a12a4151453b043cc7f31c9c15a55546daa2c05e60b2586a228912",
-      "device_size": 9379,
+      "device_sha256": "f54e448f3761639f58e2a2f179fec01e818d8396c04ee2b6e734637dff0cb960",
+      "device_size": 9389,
       "makefile": "device.mk",
       "source": "configs/camera/imx268_main_chromatix.xml",
-      "status": "different",
+      "status": "identical",
       "stock_relative_path": "etc/camera/imx268_main_chromatix.xml",
       "stock_sha256": "f54e448f3761639f58e2a2f179fec01e818d8396c04ee2b6e734637dff0cb960",
       "stock_size": 9389
     },
     {
       "destination": "vendor/etc/camera/imx268_sub_chromatix.xml",
-      "device_sha256": "ad8f742ec79764e6fc321f9ca96b5a914b4bdfac8f54fd5d694eaae779de35c8",
-      "device_size": 9287,
+      "device_sha256": "81d26e891b9dd566655fc02ca003fa224d4781e6f80bf27f500bb346d878daf3",
+      "device_size": 9297,
       "makefile": "device.mk",
       "source": "configs/camera/imx268_sub_chromatix.xml",
-      "status": "different",
+      "status": "identical",
       "stock_relative_path": "etc/camera/imx268_sub_chromatix.xml",
       "stock_sha256": "81d26e891b9dd566655fc02ca003fa224d4781e6f80bf27f500bb346d878daf3",
       "stock_size": 9297
@@ -248,17 +248,6 @@
       "stock_relative_path": "etc/camera/imx318_chromatix.xml",
       "stock_sha256": "e11e0f24ec7f55b8a8c7cbf76dbfd1bf3959b9275cc88f8fd0376a7122016e69",
       "stock_size": 9769
-    },
-    {
-      "destination": "vendor/etc/camera/imx332_chromatix.xml",
-      "device_sha256": "5b18643a4835c7a6b5f54bbf773174d0533b35c66c5657802f45c773ca359f9b",
-      "device_size": 11417,
-      "makefile": "device.mk",
-      "source": "configs/camera/imx332_chromatix.xml",
-      "status": "missing_in_stock",
-      "stock_relative_path": "etc/camera/imx332_chromatix.xml",
-      "stock_sha256": null,
-      "stock_size": null
     },
     {
       "destination": "vendor/etc/camera/imx362_chromatix.xml",
@@ -317,22 +306,22 @@
     },
     {
       "destination": "vendor/etc/camera/imx380_main_chromatix.xml",
-      "device_sha256": "23b3e0aa42ef7e81d6c2d25fcd11548b6a504d5241fc59b310ac34ddfe22dbfd",
-      "device_size": 8699,
+      "device_sha256": "6aafe4a658400600464f938d2fa6ffc00fcb84fb8e1e8aa0b30dbd4cb23fef04",
+      "device_size": 9941,
       "makefile": "device.mk",
       "source": "configs/camera/imx380_main_chromatix.xml",
-      "status": "different",
+      "status": "identical",
       "stock_relative_path": "etc/camera/imx380_main_chromatix.xml",
       "stock_sha256": "6aafe4a658400600464f938d2fa6ffc00fcb84fb8e1e8aa0b30dbd4cb23fef04",
       "stock_size": 9941
     },
     {
       "destination": "vendor/etc/camera/imx380_sub_chromatix.xml",
-      "device_sha256": "87f7fab10011542a6e1be11b988ca8a6b8e256a0dce910b2d9dd65afc4da3636",
-      "device_size": 8618,
+      "device_sha256": "7a389af8ca1f4bb95135894f538f52436160b613b905206e5fa2481aed598f7d",
+      "device_size": 9667,
       "makefile": "device.mk",
       "source": "configs/camera/imx380_sub_chromatix.xml",
-      "status": "different",
+      "status": "identical",
       "stock_relative_path": "etc/camera/imx380_sub_chromatix.xml",
       "stock_sha256": "7a389af8ca1f4bb95135894f538f52436160b613b905206e5fa2481aed598f7d",
       "stock_size": 9667
@@ -547,17 +536,6 @@
       "stock_size": 5108
     },
     {
-      "destination": "vendor/etc/camera/s5k2t7sp_chromatix.xml",
-      "device_sha256": "d2219c7dce70bab0fcc5594e3ff273f4e4883209bbfed3e74526e1ab2898551a",
-      "device_size": 4251,
-      "makefile": "device.mk",
-      "source": "configs/camera/s5k2t7sp_chromatix.xml",
-      "status": "missing_in_stock",
-      "stock_relative_path": "etc/camera/s5k2t7sp_chromatix.xml",
-      "stock_sha256": null,
-      "stock_size": null
-    },
-    {
       "destination": "vendor/etc/camera/s5k3l8_chromatix.xml",
       "device_sha256": "fdcad3e80eb0bb39762ceed3df10f68a06b5f5122ecec6958e0ea82528a5f530",
       "device_size": 5570,
@@ -691,8 +669,8 @@
     },
     {
       "destination": "vendor/etc/libnfc-nxp.conf",
-      "device_sha256": "32cf64eb4f3a24e0ac16d146ae25853eb8f02a90dfab3051e819a4ec45eab653",
-      "device_size": 20792,
+      "device_sha256": "af152b8705c3a8362fd10ad970ef2213d1f0c97129063c544f03e31d215c726d",
+      "device_size": 14922,
       "makefile": "device.mk",
       "source": "configs/nfc/libnfc-nxp.conf",
       "status": "missing_in_stock",
@@ -757,22 +735,22 @@
     },
     {
       "destination": "vendor/etc/media_profiles_V1_0.xml",
-      "device_sha256": "ed964883deb2d655e5d6b11131e60874559af9750c5cb97b041d4951f0c3c15e",
-      "device_size": 16331,
+      "device_sha256": "a88313e1cccb57c7dd5c22fe11907e04e25425f0764d6b118788f423f4cd9721",
+      "device_size": 32875,
       "makefile": "device.mk",
       "source": "media/media_profiles_V1_0.xml",
-      "status": "different",
+      "status": "identical",
       "stock_relative_path": "etc/media_profiles_V1_0.xml",
       "stock_sha256": "a88313e1cccb57c7dd5c22fe11907e04e25425f0764d6b118788f423f4cd9721",
       "stock_size": 32875
     },
     {
       "destination": "vendor/etc/mixer_paths_tasha.xml",
-      "device_sha256": "e326b61384277d425495af22f1680d74ed311125ad1525f1a65ad2fa326752e3",
-      "device_size": 112140,
+      "device_sha256": "d17baa0cc2866a100cad237a7c057a8f0f2c24cb150be3f4b5bdf85200140fd2",
+      "device_size": 113889,
       "makefile": "device.mk",
       "source": "audio/mixer_paths_tasha.xml",
-      "status": "different",
+      "status": "identical",
       "stock_relative_path": "etc/mixer_paths_tasha.xml",
       "stock_sha256": "d17baa0cc2866a100cad237a7c057a8f0f2c24cb150be3f4b5bdf85200140fd2",
       "stock_size": 113889
@@ -812,22 +790,22 @@
     },
     {
       "destination": "vendor/etc/powerhint.xml",
-      "device_sha256": "84ae45dd1273034d395315e88fdd0b7b9a5c66f74e5a6e883c2bdb70701e3717",
-      "device_size": 11436,
+      "device_sha256": "2e8ad4504f16340763e7cdd22a0ed244f9824871601b550857a018be279e5209",
+      "device_size": 11448,
       "makefile": "device.mk",
       "source": "power/powerhint.xml",
-      "status": "different",
+      "status": "identical",
       "stock_relative_path": "etc/powerhint.xml",
       "stock_sha256": "2e8ad4504f16340763e7cdd22a0ed244f9824871601b550857a018be279e5209",
       "stock_size": 11448
     },
     {
       "destination": "vendor/etc/public.libraries.txt",
-      "device_sha256": "dc8a626b687150f6915a0072b4a0e3f1b8b831bdb6390c942e28dd076dd482d0",
-      "device_size": 123,
+      "device_sha256": "1a9e83ec1152e884ab8d7db338739902620aca0e8540f731511dabee6fa4e025",
+      "device_size": 144,
       "makefile": "device.mk",
       "source": "configs/public.libraries.txt",
-      "status": "different",
+      "status": "identical",
       "stock_relative_path": "etc/public.libraries.txt",
       "stock_sha256": "1a9e83ec1152e884ab8d7db338739902620aca0e8540f731511dabee6fa4e025",
       "stock_size": 144
@@ -900,8 +878,8 @@
     },
     {
       "destination": "vendor/etc/ueventd.rc",
-      "device_sha256": "1ceb6ac27398795f07c3807be8a4636548f66ecc06b9ef233de1211cc1ffba1f",
-      "device_size": 1222,
+      "device_sha256": "a6b34952a107db455c53fd7e97400a56b7e1a4a94843e4574a63197014c6e423",
+      "device_size": 1247,
       "makefile": "device.mk",
       "source": "rootdir/etc/ueventd.rc",
       "status": "missing_in_stock",
@@ -955,8 +933,8 @@
     },
     {
       "destination": "vendor/firmware/wlan/qca_cld/WCNSS_qcom_cfg.ini",
-      "device_sha256": "4fcf46bbb989b2ee23205b9c153054251950d78cb3cfd8cf5855c7ec4c345145",
-      "device_size": 11793,
+      "device_sha256": "e80e07974d5d335c62b60e8742713c083d9a5b726fbab7a40bf457aa752c69ca",
+      "device_size": 11870,
       "makefile": "device.mk",
       "source": "wifi/WCNSS_qcom_cfg.ini",
       "status": "missing_in_stock",
@@ -966,8 +944,8 @@
     },
     {
       "destination": "vendor/usr/keylayout/gpio-keys.kl",
-      "device_sha256": "cea7832673f56ed674ea07ebdac2afd05dfacfdf7af03685651f1437a425da4d",
-      "device_size": 124,
+      "device_sha256": "ef1e59efc273cfe995c91633bc35fdae040318205e777305d7318618f417b4cd",
+      "device_size": 1603,
       "makefile": "device.mk",
       "source": "keylayout/gpio-keys.kl",
       "status": "missing_in_stock",
@@ -977,12 +955,12 @@
     }
   ],
   "schema_version": 1,
-  "stock_vendor_root": "stock-.118-vendor",
+  "stock_vendor_root": "canonical RED .118 vendor.img",
   "summary": {
-    "different": 17,
-    "identical": 64,
+    "different": 7,
+    "identical": 74,
     "missing_device_source": 0,
-    "missing_in_stock": 7,
-    "total": 88
+    "missing_in_stock": 5,
+    "total": 86
   }
 }

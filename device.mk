@@ -43,7 +43,7 @@ PRODUCT_PACKAGES += \
     android.hardware.boot-service.qti.recovery
 $(call soong_config_set,QTI_GPT_UTILS,USE_BSG_FRAMEWORK,false)
 
-# Android 8 vendor HIDL compatibility
+# Legacy vendor HIDL compatibility
 PRODUCT_PACKAGES += \
     android.hidl.allocator@1.0.vendor \
     libhidlbase-v32.recovery \
@@ -96,7 +96,7 @@ PRODUCT_PACKAGES += \
     android.hardware.camera.provider@2.4-service
 
 
-# RED .109 camera module topology and chromatix-selection XMLs.
+# RED .118 camera module topology and chromatix-selection XMLs.
 # Binary sensor/chromatix libraries remain proprietary and are supplied by vendor/red/hydrogenone.
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/camera/camera_config.xml:$(TARGET_COPY_OUT_VENDOR)/etc/camera/camera_config.xml \
@@ -116,7 +116,6 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/camera/imx298_chromatix.xml:$(TARGET_COPY_OUT_VENDOR)/etc/camera/imx298_chromatix.xml \
     $(LOCAL_PATH)/configs/camera/imx298_gt24c64_chromatix.xml:$(TARGET_COPY_OUT_VENDOR)/etc/camera/imx298_gt24c64_chromatix.xml \
     $(LOCAL_PATH)/configs/camera/imx318_chromatix.xml:$(TARGET_COPY_OUT_VENDOR)/etc/camera/imx318_chromatix.xml \
-    $(LOCAL_PATH)/configs/camera/imx332_chromatix.xml:$(TARGET_COPY_OUT_VENDOR)/etc/camera/imx332_chromatix.xml \
     $(LOCAL_PATH)/configs/camera/imx362_chromatix.xml:$(TARGET_COPY_OUT_VENDOR)/etc/camera/imx362_chromatix.xml \
     $(LOCAL_PATH)/configs/camera/imx362_chromatix_bear.xml:$(TARGET_COPY_OUT_VENDOR)/etc/camera/imx362_chromatix_bear.xml \
     $(LOCAL_PATH)/configs/camera/imx362_gt24c64a_chromatix.xml:$(TARGET_COPY_OUT_VENDOR)/etc/camera/imx362_gt24c64a_chromatix.xml \
@@ -143,7 +142,6 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/camera/s5k2l7_8953_chromatix.xml:$(TARGET_COPY_OUT_VENDOR)/etc/camera/s5k2l7_8953_chromatix.xml \
     $(LOCAL_PATH)/configs/camera/s5k2l7_chromatix.xml:$(TARGET_COPY_OUT_VENDOR)/etc/camera/s5k2l7_chromatix.xml \
     $(LOCAL_PATH)/configs/camera/s5k2l7sx_chromatix.xml:$(TARGET_COPY_OUT_VENDOR)/etc/camera/s5k2l7sx_chromatix.xml \
-    $(LOCAL_PATH)/configs/camera/s5k2t7sp_chromatix.xml:$(TARGET_COPY_OUT_VENDOR)/etc/camera/s5k2t7sp_chromatix.xml \
     $(LOCAL_PATH)/configs/camera/s5k3l8_chromatix.xml:$(TARGET_COPY_OUT_VENDOR)/etc/camera/s5k3l8_chromatix.xml \
     $(LOCAL_PATH)/configs/camera/s5k3l8_f3l8yam_chromatix.xml:$(TARGET_COPY_OUT_VENDOR)/etc/camera/s5k3l8_f3l8yam_chromatix.xml \
     $(LOCAL_PATH)/configs/camera/s5k3l8_mono_chromatix.xml:$(TARGET_COPY_OUT_VENDOR)/etc/camera/s5k3l8_mono_chromatix.xml \
@@ -244,7 +242,8 @@ PRODUCT_COPY_FILES += \
     frameworks/av/media/libstagefright/data/media_codecs_google_telephony.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_codecs_google_telephony.xml \
     frameworks/av/media/libstagefright/data/media_codecs_google_video.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_codecs_google_video.xml
 
-# NFC - source service; canonical RED .118 libnfc-nci.conf is vendor-owned
+# NFC - source service. The active NXP filename contains the exact RED .118
+# nqx.default configuration; the remaining stock NFC payload is vendor-owned.
 PRODUCT_PACKAGES += \
     android.hardware.nfc@1.2-service \
     com.android.nfc_extras \
@@ -290,7 +289,7 @@ PRODUCT_PACKAGES += \
     vendor_dsp_mountpoint \
     vendor_firmware_mnt_mountpoint
 
-# Hardware feature declarations verified from stock .109 / physical product
+# Hardware feature declarations verified from RED .118 and the physical product
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.audio.low_latency.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.audio.low_latency.xml \
     frameworks/native/data/etc/android.hardware.bluetooth.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.bluetooth.xml \
@@ -360,5 +359,6 @@ PRODUCT_SOONG_NAMESPACES += \
     hardware/qcom-caf/bt/libbt-vendor \
     hardware/qcom-caf/common/libqti-perfd-client
 
-# Do not claim a modern kernel VINTF pass while using stock 4.4.78.
+# Keep enforcement disabled until the source-built RED 4.4.302 kernel has passed
+# a complete installed VINTF check in a LineageOS 22.2 build.
 PRODUCT_OTA_ENFORCE_VINTF_KERNEL_REQUIREMENTS := false

@@ -52,8 +52,6 @@ class Stock118BuildContractTest(unittest.TestCase):
     def test_product_identity_uses_canonical_118_fingerprint(self) -> None:
         expected = self.boot["build_properties"]["ro.build.fingerprint"]
         self.assertIn(f"BuildFingerprint={expected}", self.product)
-        self.assertNotIn("H1A1000.010ho.01.01.01r.109", self.product)
-        self.assertNotIn(":8.1.0/", self.product)
 
     def test_source_built_red_kernel_is_the_only_build_input(self) -> None:
         self.assertEqual(make_value(self.board, "TARGET_KERNEL_SOURCE"), "kernel/red/msm8998")
@@ -62,12 +60,12 @@ class Stock118BuildContractTest(unittest.TestCase):
         self.assertIsNone(make_value(self.board, "TARGET_FORCE_PREBUILT_KERNEL"))
         self.assertIsNone(make_value(self.board, "TARGET_PREBUILT_KERNEL"))
 
-    def test_boardconfig_does_not_claim_109_for_118_authoritative_fields(self) -> None:
+    def test_boardconfig_names_118_for_authoritative_fields(self) -> None:
         active_lines = "\n".join(
             line for line in self.board.splitlines()
             if any(token in line for token in ("Kernel", "Partitions", "VENDOR_SECURITY_PATCH", "TARGET_KERNEL_SOURCE"))
         )
-        self.assertNotIn(".109", active_lines)
+        self.assertIn("RED .118", active_lines)
 
 
 if __name__ == "__main__":

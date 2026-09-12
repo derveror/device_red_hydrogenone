@@ -1,11 +1,11 @@
 # First LineageOS 22.2 build gate — RED Hydrogen One
 
-This file is the current entrypoint for the first complete-workspace build attempt. It replaces the older `.109` / `m bacon` bring-up instructions.
+This file is the current entrypoint for the first complete-workspace build attempt.
 
 ## Authoritative inputs
 
 - Target: LineageOS `lineage-22.2` / Android 15.
-- Device tree: `device/red/hydrogenone` from branch `lineage-22.2-kernel-302`.
+- Device tree: `device/red/hydrogenone` from branch `118-lineage-22.2-kernel-302`.
 - Vendor tree: `vendor/red/hydrogenone` from branch `lineage-22.2-kernel-302` and the exact commit pinned in `docs/reference/cross-tree-lock.json`.
 - Kernel tree: `kernel/red/msm8998` from `derveror/android_kernel_red_msm8998`, branch `lineage-22.2`, at the exact commit pinned in the same lock.
 - Stock authority: RED `H1A1000.082ho.01.00.10r.118`.

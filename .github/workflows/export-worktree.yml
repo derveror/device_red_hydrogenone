@@ -3,6 +3,7 @@ name: Export exact worktree snapshot
 on:
   push:
     branches:
+      - 118-lineage-22.2-kernel-302
       - lineage-22.2-stock118-rework
     paths:
       - .github/workflows/export-worktree.yml

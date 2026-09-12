@@ -42,13 +42,3 @@ on boot
     chmod 0600 /sys/bus/platform/devices/soc:fpc1020/irq
     chmod 0200 /sys/bus/platform/devices/soc:fpc1020/wakeup_enable
     chmod 0200 /sys/bus/platform/devices/soc:fpc1020/wakeup_feature
-
-    # RED SmartPort access. Optional hardware node: commands are harmless if absent.
-    chown system system /sys/class/smartp/smartctrl/plug_det_n
-    chown system system /sys/class/smartp/smartctrl/ext_gpio2
-    chown system system /sys/class/smartp/smartctrl/vbus_out_en
-    chown system system /sys/class/smartp/smartctrl/dc_in_en
-    chown system system /sys/class/smartp/smartctrl/ext_gpio1
-    chown system system /sys/class/smartp/smartctrl/acc_id_adc
-    chown system system /sys/class/smartp/smartctrl/extswsel
-    chown system system /sys/class/smartp/smartctrl/cam_rstn

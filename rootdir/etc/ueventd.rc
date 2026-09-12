@@ -1,4 +1,4 @@
-# Curated from RED .109 ueventd.rc for Android 15.
+# Curated from RED .118 ueventd.rc plus source-kernel device-node evidence.
 /dev/diag                 0660   system     system
 /dev/wlan                 0660   wifi       wifi
 /dev/kgsl                 0666   system     system

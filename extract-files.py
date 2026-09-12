@@ -23,6 +23,13 @@ namespace_imports = [
 # hydrogenone does not lose the Android 15 compatibility fix.
 blob_fixups: blob_fixups_user_type = {
     HIDLBASE_SHIM_FIXUP_PATHS: blob_fixup().add_needed('libhidlbase_shim.so'),
+    'vendor/bin/imsdatadaemon':
+        blob_fixup().replace_needed('libhwbinder.so', 'libhidlbase.so'),
+    'vendor/lib/libmmcamera_faceproc.so':
+        blob_fixup()
+        .clear_symbol_version('__aeabi_memcpy')
+        .clear_symbol_version('__aeabi_memset')
+        .clear_symbol_version('__gnu_Unwind_Find_exidx'),
 }
 
 module = ExtractUtilsModule(

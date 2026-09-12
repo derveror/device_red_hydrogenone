@@ -1,77 +1,69 @@
-# RED Hydrogen One H1A1000 - LineageOS 22.2 bring-up v0.3
+# RED Hydrogen One LineageOS 22.2 bring-up notes
 
-This tree is a reverse-engineered scaffold based on the supplied stock H1A1000 firmware and
-current LineageOS 22.2 MSM8998 devices.
+The current device-tree branch is `118-lineage-22.2-kernel-302`. Hardware facts
+come from RED build `H1A1000.082ho.01.00.10r.118`; donor MSM8998 trees provide
+only LineageOS adaptation patterns.
 
-## Confirmed from H1A1000 stock files
-- product device `HydrogenONE`, model `H1A1000`
-- Qualcomm MSM8998 / Snapdragon 835, ARM64 + 32-bit secondary ABI
-- shipped Android 8.1 / API 27
-- A/B OTA and system-as-root stock layout
-- separate system/vendor partitions
-- recovery-as-boot
-- UFS controller `soc/1da4000.ufshc`
-- stock kernel evidence, 4096-byte boot pages and an appended-DTB image layout
-- 60 appended DTBs; production PVT variants include TM, TM-CSP, SIM and JDI
-- stock HIDL includes camera 2.4, graphics 2.0/2.1, Wi-Fi 1.0, radio 1.1,
-  fingerprint 2.1, keymaster 3.0 and RED Leia display 1.0
+## Hardware and partition contract
 
-## Important correction from v0.1: stock vendor is too old to be the final LOS 22.2 vendor
-A full ELF scan of the supplied Android 8.1 vendor found:
-- 272 vendor ELFs directly needing `libhidlbase.so`
-- 267 needing old `libhidltransport.so`
-- 172 needing old `libhwbinder.so`
+- RED Hydrogen One H1A1000, Qualcomm MSM8998;
+- ARM64 with 32-bit secondary ABI;
+- A/B update layout and recovery-as-boot;
+- 64 MiB boot, 4 GiB system and 1 GiB vendor partitions;
+- real UFS path `/dev/block/platform/soc/1da4000.ufshc`;
+- Android 15 file-based encryption migration for userdata.
 
-That means keeping the Android 8.1 vendor *completely untouched* is useful only as a diagnostic
-phase, not as the intended final Android 15 setup. Current Lineage MSM8998 ports use compatibility
-libraries/blob fixups for this class of old HIDL binary.
+## Kernel contract
 
-The source-kernel stage is now implemented. The active build uses
-`kernel/red/msm8998` at the commit pinned in `docs/reference/cross-tree-lock.json`,
-with `lineageos_hydrogenone_defconfig` and the four RED production/PVT DTBs. The
-remaining bring-up sequence is:
+LineageOS builds `kernel/red/msm8998` with
+`lineageos_hydrogenone_defconfig`. The tree is Linux 4.4.302 and contains only
+the exact RED TM, TM CSP, SIM and JDI DTB targets. No kernel image stored in the
+device repository is used by the build.
 
-1. Validate the paired device, vendor and kernel revisions in a complete LineageOS workspace.
-2. Fix only demonstrated Android 15 proprietary ABI edges.
-3. Build the kernel and Android images through the documented gates.
-4. Test on physical hardware and iterate from captured kernel/init/userspace logs.
+The canonical `.118` boot image remains immutable evidence for boot header v1,
+page size, load addresses, command line, partition limit and stock DTB order.
 
-## Donors
-See `DONOR_MATRIX.md`. Primary layout donor is Essential PH-1 `mata`; OnePlus 5/5T and Pixel 2/2 XL
-are secondary Qualcomm references.
+SmartPort is excluded from both kernel and init scope. USB, USB-C charging,
+Bluetooth, display/Leia, cameras, fingerprint and the normal phone power paths
+remain required functionality.
 
-## Historical stock module evidence
-Stock vendor init contained stale `msm-vidc*.ko` load lines, but the matching
-video and QCE support was built into the stock kernel. The RED 4.4.302 source
-tree builds the currently selected external modules itself; stock module files
-are not part of the active kernel contract. See
-`reference/analysis/stock_kernel_module_requirements.txt` for the original
-forensic record.
+## Vendor and HIDL contract
 
-## v0.3 facts confirmed from newly supplied stock system files
-- system partition: **4 GiB** (`4294967296`)
-- vendor partition: **1 GiB** (`1073741824`)
-- these capacities exactly match the maintained Essential PH-1 `mata` LOS 22.2 layout,
-  strengthening `mata` as the primary architectural donor
-- stock `/system/etc/ld.config.txt` has `namespace.default.isolated=false` for **both**
-  framework and vendor process namespaces; the old vendor is not cross-version-clean
-- stock 32-bit and 64-bit O-MR1 HIDL transport libraries were archived as ABI references
-- stock `system/lib/modules` confirms WLAN/WiGig external modules, while MSM VIDC and QCE
-  are built into the RED 4.4.78 kernel despite stale init `insmod` lines
+The pinned vendor commit is recorded in
+`docs/reference/cross-tree-lock.json`. It contains 459 selected `.118` files.
+The platform HIDL base libraries come from LineageOS source rather than RED
+prebuilts.
 
-## Next bring-up blocker
-The tree is now dimensioned correctly and has a concrete legacy-HIDL strategy.  The next
-real milestone is a **source-tree build** against LineageOS 22.2.  Build/linker errors will
-tell us which remaining O-MR1 blobs need `libutils-v32`, `libbase`/`libcutils` shims, renamed
-protobuf libraries, or subsystem replacement.  After the image boots far enough for ADB,
-collect `dmesg`, `logcat -b all`, and `lshal` before replacing more HALs.
+Compatibility is limited to evidence-backed transformations:
 
-## v0.3 linker/partition confirmation
-The stock O-MR1 linker configuration is deliberately **reference-only**. Both framework and vendor default namespaces were non-isolated, which allowed vendor processes to resolve libraries directly from `/system`. Android 15 cannot rely on that ABI leak. The LOS 22.2 tree therefore uses modern namespaces and patches old proprietary ELF dependencies toward Lineage compatibility libraries such as `libhidlbase-v32`.
+- 63 retained `.118` interface consumers load `libhidlbase_shim`;
+- `imsdatadaemon` resolves its ProcessState import through Android 15
+  `libhidlbase`;
+- the ARM32 face-processing blob clears exactly three obsolete symbol versions.
 
-Exact supplied image capacities:
-- boot: 67,108,864 bytes (64 MiB)
-- system: 4,294,967,296 bytes (4 GiB)
-- vendor: 1,073,741,824 bytes (1 GiB)
+The extraction script reproduces those transformations when the vendor tree is
+regenerated from stock.
 
-The 4 GiB system + 1 GiB vendor layout exactly matches current LineageOS 22.2 `mata`, reinforcing Essential PH-1 as the primary A/B MSM8998 architecture donor. H1-specific kernel, DTB, display/touch/fingerprint pieces remain RED-derived. SmartPort is deliberately excluded from this port.
+## Runtime ownership
+
+- Device tree: open configuration, rootdir, SELinux and source wrappers.
+- Vendor tree: proprietary RED payload and generated proprietary modules.
+- Kernel tree: RED source kernel, DTBs and modules.
+
+The Android 15 rootdir starts the two `.118` DSDS qcrild instances and uses
+first-stage fstab mounts. Device and vendor copy destinations are checked for
+collisions.
+
+## Build order
+
+From a complete LineageOS 22.2 workspace, first run:
+
+```bash
+bash device/red/hydrogenone/tools/build/run_m_nothing_preflight.sh --validate-only
+bash device/red/hydrogenone/tools/build/run_m_nothing_preflight.sh
+```
+
+After `m nothing` succeeds, build `bootimage`, `vendorimage`, `systemimage`,
+target-files and OTA in that order. A passing repository audit is not a boot
+claim; physical testing must retain a recoverable stock slot and collect kernel,
+init, SELinux, linker and service logs.

@@ -70,12 +70,12 @@ class Android15RootdirContractTest(unittest.TestCase):
         conflicts = sorted(names & REMOVED_STALE_SERVICES)
         self.assertEqual(conflicts, [], f"stale stock services remain: {conflicts}")
 
-    def test_mount_persist_fingerprint_and_smartport_are_owned_by_init_qcom(self) -> None:
+    def test_mount_persist_and_fingerprint_are_owned_by_init_qcom(self) -> None:
         self.assertIn("mount_all /vendor/etc/fstab.qcom --early", self.qcom)
         self.assertIn("mount_all /vendor/etc/fstab.qcom --late", self.qcom)
         self.assertIn("/mnt/vendor/persist", self.qcom)
         self.assertIn("soc:fpc1020", self.qcom)
-        self.assertIn("/sys/class/smartp/smartctrl/", self.qcom)
+        self.assertNotIn("/sys/class/smartp/smartctrl/", self.qcom)
 
         self.assertNotIn("mount_all", self.target)
         self.assertNotIn("soc:fpc1020", self.target)

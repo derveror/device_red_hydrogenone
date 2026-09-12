@@ -32,7 +32,6 @@ required_analysis_files = [
     'docs/reference/source-lock.json',
     'docs/reference/archive-inventory.json',
     'docs/reference/archive-comparisons.json',
-    'docs/reference/full-artifacts.sha256',
     'docs/reference/README.md',
     'docs/stock/h1a1000-r118/README.md',
 ]

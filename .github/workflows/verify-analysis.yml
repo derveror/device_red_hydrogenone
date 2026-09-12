@@ -3,6 +3,7 @@ name: Verify stock intake and analysis tooling
 on:
   push:
     branches:
+      - 118-lineage-22.2-kernel-302
       - lineage-22.2-kernel-302
       - lineage-22.2-stock118-rework
       - codex/lineage-22.2-bringup-audit

@@ -2,9 +2,9 @@
 
 `libsynergy_loc_api` links against proprietary Qualcomm modules
 `libqmi_cci` and `libqmi_common_so`. Those modules are generated only after
-RED `.109` blobs are extracted into `vendor/red/hydrogenone`.
+Canonical RED `.118` blobs are extracted into `vendor/red/hydrogenone`.
 
-The RED `.109` GNSS configuration supplied with this tree does not set
+The RED `.118` GNSS configuration supplied with this tree does not set
 `GNSS_DEPLOYMENT=1` (SS5), so the normal `libloc_api_v02.so` backend is used.
 For the source-only `m nothing` gate, Soong therefore must not parse the
 optional synergy module. Its blueprint is stored as `Android.bp.vendor-ready`

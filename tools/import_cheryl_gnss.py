@@ -45,7 +45,7 @@ def replace_between(text: str, start_marker: str, end_marker: str, replacement: 
 def update_device_mk(root: Path) -> None:
     path = root / "device.mk"
     text = path.read_text(encoding="utf-8")
-    start = "# GNSS - Qualcomm MSM8998 source stack with RED .109 configuration"
+    start = "# GNSS - Qualcomm MSM8998 source stack with RED .118 configuration"
     if start not in text:
         start = "# GNSS - Qualcomm MSM8998 legacy ABI source stack."
     block = """# GNSS - Qualcomm MSM8998 legacy ABI source stack.\n# Razer cheryl is the primary source-ABI donor here because its maintained\n# LineageOS 22.2 tree preserves the Pie-era Qualcomm LocApiBase ABI required\n# by RED .118 libloc_api_v02/libizat_core/liblbs_core while adapting the HAL\n# frontend to Android 15 build rules. RED stock remains configuration truth.\nPRODUCT_PACKAGES += \\\n    android.hardware.gnss@1.0-impl-qti \\\n    android.hardware.gnss@1.0-service-qti \\\n    libgnss \\\n    libgnsspps\n\n# RED GNSS configuration modules. gps.conf/flp.conf/antenna info stay owned by\n# the local prebuilt_etc definitions; RED-specific Izat/LOWI/SAP/XTWiFi files\n# are copied directly and are not replaced with Razer configuration.\nPRODUCT_PACKAGES += \\\n    flp.conf \\\n    gnss_antenna_info.conf \\\n    gps.conf\n\nPRODUCT_COPY_FILES += \\\n    $(LOCAL_PATH)/gps/izat.conf:$(TARGET_COPY_OUT_VENDOR)/etc/izat.conf \\\n    $(LOCAL_PATH)/gps/lowi.conf:$(TARGET_COPY_OUT_VENDOR)/etc/lowi.conf \\\n    $(LOCAL_PATH)/gps/sap.conf:$(TARGET_COPY_OUT_VENDOR)/etc/sap.conf \\\n    $(LOCAL_PATH)/gps/xtwifi.conf:$(TARGET_COPY_OUT_VENDOR)/etc/xtwifi.conf\n\n"""

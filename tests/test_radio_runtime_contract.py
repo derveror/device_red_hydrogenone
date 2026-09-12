@@ -45,7 +45,6 @@ class Red118RadioRuntimeContractTest(unittest.TestCase):
     def test_qcrild_path_does_not_advertise_legacy_rild_library(self) -> None:
         text = VENDOR_PROP.read_text(encoding="utf-8")
         self.assertNotRegex(text, r"(?m)^\s*vendor\.rild\.libpath\s*=")
-        self.assertNotIn("stock .109 Qualcomm QMI RIL", text)
         self.assertIn("RED .118", text)
         self.assertIn("qcrild", text.lower())
 

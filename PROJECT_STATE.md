@@ -2,208 +2,96 @@
 
 Last updated: 2026-09-11.
 
-This is the canonical long-lived status summary for the paired repositories
-`device/red/hydrogenone` and `vendor/red/hydrogenone`. Detailed stock evidence,
-audit outputs and worklogs remain under `docs/`.
+This is the current status for `device/red/hydrogenone`. Detailed stock evidence,
+generated audits and historical worklogs remain under `docs/`.
 
 ## Target and authority
 
-- Device: RED Hydrogen One H1A1000 (`hydrogenone`), MSM8998.
+- Device: RED Hydrogen One H1A1000 (`hydrogenone`), Qualcomm MSM8998.
 - Target: LineageOS 22.2 / Android 15 / API 35.
-- Primary hardware authority: RED stock `H1A1000.082ho.01.00.10r.118`, Android 9.
-- Stock archive SHA-256: `7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e`.
-- Stock fingerprint: `RED/HydrogenONE/HydrogenONE:9/PKQ1.190118.001/118:userdebug/release-keys`.
-- Reference devices (architecture/patterns only): Essential mata, OnePlus dumpling,
-  Razer cheryl and ZTE nx563j. Hardware-specific donor values are not authority.
+- Sole stock authority: `H1A1000.082ho.01.00.10r.118`, Android 9 / API 28.
+- First API level: 27.
+- Stock archive SHA-256:
+  `7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e`.
+- Stock fingerprint:
+  `RED/HydrogenONE/HydrogenONE:9/PKQ1.190118.001/118:userdebug/release-keys`.
+- Donor repositories are architecture and adaptation references only.
 
-## Branch audit and selected bases
+## Selected repositories
 
-### Device repository
+- Device branch: `118-lineage-22.2-kernel-302`.
+- Vendor repository: `derveror/proprietary_vendor_red_hydrogenone`, commit
+  `70276f1d7ea9d70b04dd91c04b9a48c13f6795b8`.
+- Kernel repository: `derveror/android_kernel_red_msm8998`, commit
+  `440e8eb4eea36404d340a2a4ad001cf013304447`.
+- Kernel path: `kernel/red/msm8998`.
+- Kernel config: `lineageos_hydrogenone_defconfig`.
 
-The `.118` integration line is `lineage-22.2-stock118-rework` (`5fb932b`).
-Most older topic branches are TDD/audit/integration branches whose useful work is
-already integrated or superseded. `radio-runtime-tdd` and
-`vendor-inheritance-final` are strict ancestors of the `.118` line; several
-other topic branches diverge because their changes were integrated by later
-commits/rebases rather than by retaining the original topic head.
+No RED `msm8998-common` device or vendor repository is used.
 
-Excluded from bring-up base selection:
+## Kernel state
 
-- `main`, `legacy-pre-stock118-rework`, `fix/lineage-22.2-runtime-contract`:
-  pre-`.118` legacy state.
-- `codex-auth-test`: GitHub authorization test only.
-- `twrp-12.1`: TWRP/recovery task, not LineageOS system bring-up.
-- `tmp-*`: one-shot transport/integration branches.
-- `work` and `codex/fix-vndk-28-config`: attempt to filter VNDK 28 from
-  `BoardConfig.mk` after product variables are already read-only; not suitable.
-- `test/lineage-22.2-bringup`: useful documentation/pinning work, but its paired
-  vendor head still requests VNDK 28.
+The only LineageOS kernel build input is the RED Linux 4.4.302 source tree. It
+builds the four production/PVT variants TM, TM CSP, SIM and JDI with the stock
+board/display identities and ordering. The `.118` boot image remains evidence
+for boot-header, command-line, DTB and partition constraints; it is not copied
+into the product.
 
-Selected device base:
-`codex/fix-vndk-version-assignment-errors` at
-`f65a4262b2633fc6d0678be142aee6a57cdad5ae`.
+SmartPort is excluded. Standard USB, USB-C charging, Bluetooth and normal power
+paths remain in scope. RED Leia/display and the stock multi-camera topology
+remain in scope.
 
-Reason: it is based directly on the complete `.118` rework and removes the
-remaining Android 15 product-discovery blocker: importing the generated vendor
-BoardConfig that requests the unavailable VNDK 28 snapshot. It keeps mandatory
-vendor product inheritance and the explicit recovery v32 compatibility library.
+## Vendor payload and HIDL compatibility
 
-Active kernel-integration branch:
-`lineage-22.2-kernel-302`.
+The pinned Android 15 vendor selection contains 459 files. Its
+`proprietary-files.txt`, `proprietary-manifest.json` and on-disk payload agree
+on all 459 entries.
 
-### Vendor repository
+The platform HIDL base libraries are source-owned and are not selected as RED
+prebuilts. Sixty-three exact `.118` HIDL consumers receive the narrow
+`libhidlbase_shim` dependency. `imsdatadaemon` is patched from a direct
+`libhwbinder.so` dependency to the Android 15 `libhidlbase.so` provider. The
+ARM32 camera face-processing blob has only its three verified obsolete symbol
+versions cleared. These transformations are reproduced by `extract-files.py`
+and pinned in `docs/reference/vendor-hidl-runtime-contract.json`.
 
-`lineage-22.2-android15-contract` is 55 commits ahead of the original
-`lineage-22.2` vendor line and adds the Android 15 ELF, init, VINTF, source/blob
-ownership, daemon-completion and validation contracts.
+## Device/vendor ownership
 
-The later `test/lineage-22.2-bringup` moves
-`PRODUCT_EXTRA_VNDK_VERSIONS += 28` from `BoardConfigVendor.mk` into product
-configuration. That fixes the read-only-variable placement error but still asks
-LineageOS 22.2 to package a VNDK v28 snapshot that is not available. It is not
-used as the base.
+- Open configuration and source HAL wrappers belong in the device tree.
+- Proprietary runtime payload and generated proprietary modules belong in the
+  vendor tree.
+- Device and vendor copy destinations are checked for collisions.
+- Source-owned GNSS, NFC, Wi-Fi, camera and media wrappers must not coexist with
+  conflicting proprietary implementations.
+- The device extraction list mirrors the current 459-file vendor selection.
 
-Selected vendor base:
-`lineage-22.2-android15-contract` at
-`6fef3d7c6333602d7114aefa0284a03f5aadb454`.
+## Confirmed static contracts
 
-Active kernel-integration branch:
-`lineage-22.2-kernel-302`.
+- `.118` product identity, security patch and partition sizes;
+- boot header v1 and recovery-as-boot layout;
+- A/B first-stage mounts and Android 15 FBE migration;
+- RED UFS paths and firmware mount points;
+- DSDS `vendor.qcrild` plus `vendor.qcrild2` startup;
+- source-built 4.4.302 kernel path and exact RED DTB set;
+- stock `.118` camera topology and chromatix selection;
+- exact `.118` audio platform/mixer, six-camera media profiles, NFC base,
+  public-library policy, Wi-Fi firmware configuration and key layout;
+- source/vendor VINTF and init ownership;
+- vendor ELF dependency and fixup registry;
+- absence of SmartPort runtime control and kernel prebuilts from this tree.
 
-The audit branch removes the obsolete VNDK-28 request while leaving the
-proprietary payload byte-equivalent to the selected Android 15 base.
+## Not yet proven
 
-## Recovered project decisions
+Static tests do not prove that the complete ROM builds or boots. Physical-device
+operation of radio, camera, audio, sensors, Leia/display, DRM, GNSS, Wi-Fi,
+Bluetooth, NFC, fingerprint, power, thermal management and OTA remains subject
+to build logs and staged device testing.
 
-Confirmed from stock evidence, current code and permanent tests:
+## Next gates
 
-- The `.118` firmware, not `.109`, is authoritative for hardware behavior.
-- The device is A/B and uses the `.118` boot/fstab/partition contract.
-- The active kernel is the source-built RED Linux 4.4.302 tree at
-  `kernel/red/msm8998`, using `lineageos_hydrogenone_defconfig` and the exact
-  TM/TM-CSP/SIM/JDI DTB set. Its revision is pinned in the cross-tree lock.
-- SmartPort is excluded; RED Leia/display remains in scope.
-- Open/source-owned configuration and HAL wrappers belong in the device tree;
-  proprietary payload/generated prebuilts belong in the vendor tree.
-- No speculative RED `msm8998-common` tree is used.
-- Source-owned GNSS/NFC and other wrappers must not coexist with conflicting
-  stock prebuilts/services.
-- VINTF ownership, init ownership and copy destinations are checked cross-tree.
-- Reference devices provide Android 15/LineageOS adaptation patterns only; their
-  panel, camera, radio, partition, property or HAL values are not copied without
-  Hydrogen One evidence.
-
-Not proven by static evidence:
-
-- that every Android 9 proprietary HIDL/ELF will link and start under Android 15;
-- that the device boots;
-- SELinux runtime completeness;
-- working camera/audio/radio/sensors/display/DRM/GPS/Wi-Fi/BT/NFC/power/thermal;
-- slot switching/OTA behavior.
-
-## Vendor payload state
-
-The canonical Android 15 vendor selection contains 499 files. The generated
-vendor `proprietary-files.txt`, `proprietary-manifest.json` and on-disk
-`proprietary/` payload agree on 499 entries; the manifest hashes/sizes are the
-provenance authority. `SOURCE_LOCK.json` records the same 499-file selection.
-The current contract classification is P0=108, P1=374, P2 RED/Leia=17.
-
-The device repository's historical `proprietary-files.txt` is only a 93-entry
-bootstrap/P0-era subset and is **not** a reproducible description of the current
-499-file vendor tree. Two entries in that subset (`vendor/lib64/libllvm-qgl.so`
-and `vendor/lib64/libsmemlog.so`) are not present in the final Android 15 vendor
-payload. Do not regenerate the production vendor tree from that device-side list
-until it is rebuilt from the canonical `.118` manifest with extraction fixups
-and pruning semantics preserved.
-
-This mismatch is intentionally recorded as outstanding reproducibility debt;
-blindly deleting entries or replacing the list with raw manifest paths would
-lose checkelf/fixup/pruning semantics and is not an acceptable fix.
-
-## Cross-tree status
-
-Static contracts cover the chain:
-
-`DEVICE CONFIG -> PACKAGE/HAL -> VENDOR/SOURCE IMPLEMENTATION -> VINTF/INIT -> RUNTIME EXPECTATION`.
-
-Covered areas include camera, audio/media, radio, fingerprint/sensors,
-graphics/DRM, GNSS, Wi-Fi/Bluetooth, NFC, power/thermal, firmware, rootdir,
-partitions and copy-destination ownership.
-
-Current generated copy-contract evidence is pinned to the vendor commit in
-`docs/reference/cross-tree-lock.json` and device branch
-`lineage-22.2-kernel-302`. The Android 15 vendor tree now
-uses the Lineage source-owned `libnbaio_mono`; the obsolete RED Android 9
-32/64-bit prebuilts were removed after they shadowed the source module and
-broke `audio.r_submix.default`. Regenerate the evidence whenever payload or
-generated package ownership changes.
-
-## Confirmed issues found in this audit
-
-1. Android 15 product discovery / VNDK:
-   the selected vendor base requested VNDK 28 from `BoardConfigVendor.mk`.
-   LineageOS 22.2 cannot package that snapshot. The selected device base stops
-   importing that generated board file; the audit vendor branch removes the
-   obsolete request and has a regression test forbidding it in both board and
-   product vendor configuration.
-2. Vendor README provenance counts were stale (`583 / 137 / 431 / 15`) and were
-   corrected to the actual Android 15 contract (`499 / 108 / 374 / 17`).
-3. Device extraction comments still described the old Android 8.1-era analysis;
-   they now explicitly identify those HIDL groups as legacy helpers and `.118`
-   as the authoritative current payload.
-4. Device `proprietary-files.txt` is a non-canonical 93-entry legacy/bootstrap
-   subset; see the reproducibility debt above.
-5. Static scan finds `libhidlmemory.recovery` listed twice in `device.mk`.
-   This is cleanup debt rather than a second implementation, but should be
-   deduplicated before declaring makefile hygiene complete.
-6. The source-kernel integration supersedes stale 4.4.78/4.4.153 active-build
-   comments. Stock kernel details remain evidence only. The `overlay/` path was
-   rechecked and is a real (currently empty) directory, so it is not treated as
-   a broken reference.
-7. Python bytecode/cache files are tracked in historical tree snapshots. They
-   should be removed and ignored; they are not build inputs.
-8. The standalone `tests/test_full_tree.py` contract passes when invoked as its
-   intended CLI, but naïve `unittest discover` imports it and exits on argument
-   parsing. CI already excludes it from discovery and runs it separately.
-
-## Validation performed
-
-On a local copy reproducing the selected device-base VNDK change:
-
-- 94/94 device unit-test modules pass;
-- standalone `tests/test_full_tree.py <device-root>` reports
-  `full-tree contract: PASS`.
-
-On a local copy reproducing the audit vendor VNDK change and its regression test:
-
-- `python3 -m unittest discover -s tests -v`: 25/25 pass.
-
-Additional static checks:
-
-- vendor proprietary manifest vs on-disk payload: 499/499 paths match and all
-  recorded SHA-256/size checks match;
-- generated vendor Android.bp module set and `PRODUCT_PACKAGES` selection are
-  mutually consistent in the static parser;
-- device explicit vendor proprietary references resolve against the vendor
-  payload;
-- existing stock build, fstab, init, VINTF, camera, radio and cross-tree
-  contracts pass static validation on the selected snapshots.
-
-The RED kernel itself has completed a full source build and its DTB/module/image
-checks. A complete paired LineageOS 22.2 build and physical-device boot remain
-unverified, so no ROM boot claim is made here.
-
-## Next authoritative gates
-
-1. In a clean full LineageOS 22.2 workspace, use the paired audit branches and
-   run product discovery / `m nothing` first.
-2. Fix only the first real build failure; do not pre-emptively replace HALs or
-   hardware values with donor-device values.
-3. Then build `bootimage`, `vendorimage`, `systemimage`, target-files and OTA.
-4. Validate boot and collect kernel/logcat/dmesg/SELinux/linker/service evidence.
-5. Bring up radio, display/graphics, audio, camera, sensors, GNSS, Wi-Fi/BT,
-   fingerprint, DRM, power/thermal and OTA/slots as separately testable gates.
-6. Regenerate a full canonical `.118` extraction list so device-side extraction
-   can reproduce the 499-file Android 15 vendor payload without relying on the
-   already-generated vendor repository.
+1. Run workspace validation and `m nothing` from a complete clean LineageOS
+   22.2 checkout.
+2. Fix only failures produced by that build.
+3. Build `bootimage`, `vendorimage`, `systemimage`, target-files and OTA.
+4. Validate installed VINTF, SELinux, linker namespaces and image sizes.
+5. Proceed to recoverable physical-device boot testing and subsystem bring-up.

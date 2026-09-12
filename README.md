@@ -6,7 +6,7 @@ Device configuration for the RED Hydrogen One H1A1000 (Snapdragon 835 / MSM8998)
 device/red/hydrogenone
 ```
 
-Target userspace is LineageOS 22.2 / Android 15. The canonical hardware and stock-userspace authority for this rework is RED build `H1A1000.082ho.01.00.10r.118` (Android 9), not the older `.109` tree history.
+Target userspace is LineageOS 22.2 / Android 15. The sole hardware and stock-userspace authority for this rework is RED build `H1A1000.082ho.01.00.10r.118` (Android 9).
 
 Canonical stock archive SHA-256:
 
@@ -93,7 +93,7 @@ Canonical `.118` evidence identifies:
 - primary `vendor.qcrild`
 - DSDS second instance `vendor.qcrild2`
 
-The Android 15 rootdir starts those two qcrild instances. It does not start `vendor.qcrild3` or the legacy `vendor.ril-daemon*` path. The stale `.109` `vendor.rild.libpath` property has been removed.
+The Android 15 rootdir starts those two qcrild instances. It does not start `vendor.qcrild3` or the superseded `vendor.ril-daemon*` path, and it does not advertise `vendor.rild.libpath`.
 
 ### Filesystems
 
@@ -137,7 +137,7 @@ The vendor tree is generated from verified `.118` blobs and has permanent Androi
 
 The tree contains Android 15 source-side configuration for audio/media, camera configuration, NFC, GNSS/location, overlays, power, rootdir, SELinux, Wi-Fi and RED-specific hardware paths.
 
-Some configuration originated during the older `.109` bring-up. Such files are retained only where current tests/evidence justify them or are explicitly treated as legacy carry-over pending `.118` validation. A historical filename or comment must not be interpreted as `.118` proof.
+Every retained hardware configuration is now classified against canonical `.118` evidence, the pinned vendor payload, or the RED source kernel. Historical filenames and comments are not accepted as hardware proof.
 
 Narrow `DISABLE_CHECKELF` exceptions in the vendor tree are limited to audited legacy proprietary modules whose ABI behavior cannot be represented by the Android 15 vendor stubs. They are hash/symbol pinned and remain runtime hypotheses until verified on physical hardware; there is no global ELF-check bypass.
 

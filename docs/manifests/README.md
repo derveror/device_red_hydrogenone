@@ -36,7 +36,7 @@ repo init \
 mkdir -p .repo/local_manifests
 
 curl --fail --location --retry 3 \
-  https://raw.githubusercontent.com/derveror/device_red_hydrogenone/lineage-22.2-kernel-302/docs/manifests/hydrogenone-lineage-22.2.xml \
+  https://raw.githubusercontent.com/derveror/device_red_hydrogenone/118-lineage-22.2-kernel-302/docs/manifests/hydrogenone-lineage-22.2.xml \
   --output .repo/local_manifests/hydrogenone.xml
 ```
 

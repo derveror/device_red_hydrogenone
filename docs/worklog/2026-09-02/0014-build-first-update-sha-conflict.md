@@ -7,7 +7,7 @@
 
 Replace the stale first-build instructions that still referenced:
 
-- RED `.109` / kernel 4.4.78;
+- a superseded stock/kernel input;
 - `m bacon` as the first build target.
 
 The intended replacement points to canonical `.118`, the exact `.118` transitional 4.4.153+ prebuilt kernel, the checked-in local manifest, and the tested `run_m_nothing_preflight.sh` workflow.

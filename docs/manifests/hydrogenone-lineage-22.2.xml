@@ -13,7 +13,7 @@
         name="device_red_hydrogenone"
         path="device/red/hydrogenone"
         remote="derveror"
-        revision="lineage-22.2-kernel-302" />
+        revision="118-lineage-22.2-kernel-302" />
 
     <project
         name="proprietary_vendor_red_hydrogenone"

@@ -12,7 +12,7 @@ Updated `BUILD_FIRST.md` after the SHA-conflict attempt recorded in Action 0014.
 
 The previous document incorrectly directed the project to:
 
-- use the old RED `.109` 4.4.78 prebuilt kernel;
+- use a superseded stock prebuilt kernel;
 - run `m bacon` as the first build gate;
 - describe the proprietary vendor state as if it still needed ad-hoc extraction.
 

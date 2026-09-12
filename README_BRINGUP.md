@@ -11,7 +11,7 @@ current LineageOS 22.2 MSM8998 devices.
 - separate system/vendor partitions
 - recovery-as-boot
 - UFS controller `soc/1da4000.ufshc`
-- stock kernel Linux 4.4.78-perf+, 4096-byte boot pages, `Image.gz-dtb`
+- stock kernel evidence, 4096-byte boot pages and an appended-DTB image layout
 - 60 appended DTBs; production PVT variants include TM, TM-CSP, SIM and JDI
 - stock HIDL includes camera 2.4, graphics 2.0/2.1, Wi-Fi 1.0, radio 1.1,
   fingerprint 2.1, keymaster 3.0 and RED Leia display 1.0
@@ -26,22 +26,27 @@ That means keeping the Android 8.1 vendor *completely untouched* is useful only 
 phase, not as the intended final Android 15 setup. Current Lineage MSM8998 ports use compatibility
 libraries/blob fixups for this class of old HIDL binary.
 
-The intended bring-up is therefore:
-1. Keep RED kernel/DTBs initially.
-2. Recreate vendor from the H1A1000 stock files.
-3. Patch only old proprietary ELF ABI edges (initially HIDL base/transport/hwbinder).
-4. Replace standard Qualcomm HAL services with current source-built Lineage/CAF versions subsystem
-   by subsystem, while retaining RED-specific blobs/configs.
-5. Once userspace is stable, port RED DTS/drivers into the maintained Lineage MSM8998 4.4.302 kernel.
+The source-kernel stage is now implemented. The active build uses
+`kernel/red/msm8998` at the commit pinned in `docs/reference/cross-tree-lock.json`,
+with `lineageos_hydrogenone_defconfig` and the four RED production/PVT DTBs. The
+remaining bring-up sequence is:
+
+1. Validate the paired device, vendor and kernel revisions in a complete LineageOS workspace.
+2. Fix only demonstrated Android 15 proprietary ABI edges.
+3. Build the kernel and Android images through the documented gates.
+4. Test on physical hardware and iterate from captured kernel/init/userspace logs.
 
 ## Donors
 See `DONOR_MATRIX.md`. Primary layout donor is Essential PH-1 `mata`; OnePlus 5/5T and Pixel 2/2 XL
 are secondary Qualcomm references.
 
-## Stock kernel module trap
-Stock vendor init unconditionally loads four `msm-vidc*.ko` modules from `/system/lib/modules`.
-Replacing system without copying these stock modules breaks video with the prebuilt RED kernel.
-See `reference/analysis/stock_kernel_module_requirements.txt`.
+## Historical stock module evidence
+Stock vendor init contained stale `msm-vidc*.ko` load lines, but the matching
+video and QCE support was built into the stock kernel. The RED 4.4.302 source
+tree builds the currently selected external modules itself; stock module files
+are not part of the active kernel contract. See
+`reference/analysis/stock_kernel_module_requirements.txt` for the original
+forensic record.
 
 ## v0.3 facts confirmed from newly supplied stock system files
 - system partition: **4 GiB** (`4294967296`)
@@ -69,4 +74,4 @@ Exact supplied image capacities:
 - system: 4,294,967,296 bytes (4 GiB)
 - vendor: 1,073,741,824 bytes (1 GiB)
 
-The 4 GiB system + 1 GiB vendor layout exactly matches current LineageOS 22.2 `mata`, reinforcing Essential PH-1 as the primary A/B MSM8998 architecture donor. H1-specific kernel, DTB, display/touch/fingerprint/SmartPort pieces remain RED-derived.
+The 4 GiB system + 1 GiB vendor layout exactly matches current LineageOS 22.2 `mata`, reinforcing Essential PH-1 as the primary A/B MSM8998 architecture donor. H1-specific kernel, DTB, display/touch/fingerprint pieces remain RED-derived. SmartPort is deliberately excluded from this port.

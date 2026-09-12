@@ -5,12 +5,11 @@ This file is the current entrypoint for the first complete-workspace build attem
 ## Authoritative inputs
 
 - Target: LineageOS `lineage-22.2` / Android 15.
-- Device tree: `device/red/hydrogenone` from branch `lineage-22.2-stock118-rework`.
-- Vendor tree: `vendor/red/hydrogenone` from the exact commit pinned in `docs/reference/cross-tree-lock.json`.
+- Device tree: `device/red/hydrogenone` from branch `lineage-22.2-kernel-302`.
+- Vendor tree: `vendor/red/hydrogenone` from branch `lineage-22.2-kernel-302` and the exact commit pinned in `docs/reference/cross-tree-lock.json`.
+- Kernel tree: `kernel/red/msm8998` from `derveror/android_kernel_red_msm8998`, branch `lineage-22.2`, at the exact commit pinned in the same lock.
 - Stock authority: RED `H1A1000.082ho.01.00.10r.118`.
-- Transitional boot kernel: the exact `.118` 4.4.153+ `Image.gz-dtb` already checked into `prebuilt/Image.gz-dtb` and regression-tested by SHA-256.
-
-The final milestone remains a validated source-built RED kernel; the `.118` prebuilt is intentionally limited to userspace/boot bring-up.
+- Active kernel: source-built RED Linux 4.4.302 with `lineageos_hydrogenone_defconfig` and the exact TM/TM-CSP/SIM/JDI DTB set.
 
 ## Clean checkout
 
@@ -20,7 +19,7 @@ A reproducible local-manifest template is checked in at:
 docs/manifests/hydrogenone-lineage-22.2.xml
 ```
 
-After `repo init` for LineageOS 22.2, install that file as a local manifest before `repo sync`. It pins the custom RED vendor revision and the required LineageOS kernel/sepolicy projects.
+After `repo init` for LineageOS 22.2, install that file as a local manifest before `repo sync`. It pins the custom RED vendor and kernel revisions plus the required LineageOS sepolicy project.
 
 ## First gate: validate the workspace
 
@@ -30,7 +29,7 @@ From the root of the complete LineageOS source tree:
 bash device/red/hydrogenone/tools/build/run_m_nothing_preflight.sh --validate-only
 ```
 
-This verifies the required Git checkouts are present and clean and that the vendor checkout exactly matches the cross-tree lock. It does not sync, reset, clean, or build anything.
+This verifies the required Git checkouts are present and clean and that both the vendor and kernel checkouts exactly match the cross-tree lock. It does not sync, reset, clean, or build anything.
 
 ## Second gate: run `m nothing`
 

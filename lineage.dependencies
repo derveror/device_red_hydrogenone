@@ -5,7 +5,8 @@
     "branch": "lineage-22.2-legacy-um"
   },
   {
-    "repository": "android_kernel_essential_msm8998",
-    "target_path": "kernel/essential/msm8998"
+    "repository": "android_kernel_red_msm8998",
+    "target_path": "kernel/red/msm8998",
+    "branch": "lineage-22.2"
   }
 ]

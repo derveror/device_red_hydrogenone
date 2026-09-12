@@ -48,7 +48,19 @@ Verified stock values include:
 
 ### Boot / kernel
 
-First bring-up deliberately uses the exact kernel extracted from the canonical RED `.118` `boot.img`. This preserves RED DTBs and board wiring while userspace is brought up.
+The device now builds its RED-specific Linux 4.4.302 kernel from source:
+
+```text
+repository: derveror/android_kernel_red_msm8998
+branch: lineage-22.2
+path: kernel/red/msm8998
+config: lineageos_hydrogenone_defconfig
+```
+
+The exact verified kernel commit is recorded in `KERNEL_SOURCE.md` and
+`docs/reference/cross-tree-lock.json`. The build uses only the four production/PVT
+DTBs (TM, TM CSP, SIM and JDI) in their RED order. SmartPort is intentionally
+excluded; RED Leia/display support remains in scope.
 
 Verified boot contract:
 
@@ -61,14 +73,10 @@ Verified boot contract:
 - boot partition 64 MiB
 - system partition 4 GiB
 - vendor partition 1 GiB
-- kernel payload size `37015950`
-- kernel SHA-256 `584ed86bab46bf57c2cd6b6b48ac4026c5d24a70d57bcdd04472d39c5591064d`
 
-`prebuilt/Image.gz-dtb` is regression-tested against that exact size and hash.
-
-`kernel/essential/msm8998` remains a temporary build dependency for generated MSM8998 kernel/UAPI headers used by source-built Qualcomm components. Its Mata kernel image or DTBs are not used as the Hydrogen One boot payload.
-
-The final target remains a source-built RED-capable kernel. The stock prebuilt is a controlled bring-up stage, not the release end state.
+The complete source build, DTB decompilation/order checks, appended-image layout,
+module build and boot-partition budget have passed. This is static/build evidence,
+not a claim that the resulting image has booted on physical hardware.
 
 ### Kernel command line
 
@@ -112,7 +120,7 @@ The current Android 15 vendor contract lives in:
 
 ```text
 derveror/proprietary_vendor_red_hydrogenone
-branch: lineage-22.2-android15-contract
+branch: lineage-22.2-kernel-302
 ```
 
 The exact compatible vendor commit is pinned by:
@@ -140,6 +148,7 @@ Place the repositories at:
 ```text
 device/red/hydrogenone
 vendor/red/hydrogenone
+kernel/red/msm8998
 ```
 
 Then from a LineageOS 22.2 checkout:
@@ -170,7 +179,8 @@ Permanent device CI validates:
 
 - canonical `.118` source locks and stock records
 - unit/contract tests
-- exact `.118` boot/kernel identity
+- stock-authoritative boot geometry and the pinned RED source-kernel identity
+- exact TM/TM-CSP/SIM/JDI DTB selection and source-kernel workspace revision
 - radio DSDS/qcrild behavior
 - Android 15 fstab and kernel-cmdline contracts
 - tree audits and stale-source guards
@@ -188,9 +198,11 @@ The current work is not declared release-complete or device-bootable. Major rema
 4. fix build-system failures only from their actual logs;
 5. perform staged physical bring-up with logs for kernel/init/mounts/SELinux/graphics/touch/radio;
 6. validate P1 hardware (telephony/IMS, Wi-Fi, Bluetooth, GNSS, sensors, fingerprint, camera, NFC, audio, thermal/suspend, A/B OTA/recovery);
-7. validate RED-specific P2 hardware such as Leia display/3D and SmartPort;
-8. replace the transitional prebuilt kernel with a validated source-built RED kernel.
+7. validate RED-specific display/Leia behavior; SmartPort remains explicitly out of scope;
+8. boot-test the pinned RED 4.4.302 source kernel and iterate only from captured evidence.
 
 ## Dependencies
 
-`lineage.dependencies` declares the LineageOS legacy Qualcomm SELinux tree and the maintained Essential MSM8998 kernel source needed for current build plumbing. The RED boot payload remains the exact verified `.118` prebuilt until the source-kernel milestone is completed.
+`lineage.dependencies` declares the LineageOS legacy Qualcomm SELinux tree and
+the RED MSM8998 kernel repository at `kernel/red/msm8998`. The local manifest
+and cross-tree lock pin the exact verified source-kernel revision.

@@ -8,7 +8,7 @@ The canonical project manifest is:
 docs/manifests/hydrogenone-lineage-22.2.xml
 ```
 
-It pins the RED vendor repository to the exact commit verified by the device cross-tree lock and explicitly selects the LineageOS MSM8998 kernel/sepolicy branches required by this bring-up.
+It pins both RED vendor and RED source-kernel repositories to the exact commits verified by the device cross-tree lock and selects the LineageOS MSM8998 sepolicy branch required by this bring-up.
 
 ## 1. Create a fresh source directory
 
@@ -36,7 +36,7 @@ repo init \
 mkdir -p .repo/local_manifests
 
 curl --fail --location --retry 3 \
-  https://raw.githubusercontent.com/derveror/device_red_hydrogenone/lineage-22.2-stock118-rework/docs/manifests/hydrogenone-lineage-22.2.xml \
+  https://raw.githubusercontent.com/derveror/device_red_hydrogenone/lineage-22.2-kernel-302/docs/manifests/hydrogenone-lineage-22.2.xml \
   --output .repo/local_manifests/hydrogenone.xml
 ```
 
@@ -77,11 +77,11 @@ The preflight requires all of these checkouts to exist and be clean:
 ```text
 device/red/hydrogenone
 vendor/red/hydrogenone
-kernel/essential/msm8998
+kernel/red/msm8998
 device/qcom/sepolicy-legacy-um
 ```
 
-It also verifies that the vendor checkout is exactly the SHA in:
+It also verifies that the vendor and kernel checkouts are exactly the SHAs in:
 
 ```text
 device/red/hydrogenone/docs/reference/cross-tree-lock.json

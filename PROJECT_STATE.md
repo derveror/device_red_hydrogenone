@@ -1,6 +1,6 @@
 # RED Hydrogen One LineageOS 22.2 project state
 
-Last updated: 2026-09-04.
+Last updated: 2026-09-11.
 
 This is the canonical long-lived status summary for the paired repositories
 `device/red/hydrogenone` and `vendor/red/hydrogenone`. Detailed stock evidence,
@@ -48,8 +48,8 @@ remaining Android 15 product-discovery blocker: importing the generated vendor
 BoardConfig that requests the unavailable VNDK 28 snapshot. It keeps mandatory
 vendor product inheritance and the explicit recovery v32 compatibility library.
 
-Active bring-up branch:
-`codex/lineage-22.2-bringup`.
+Active kernel-integration branch:
+`lineage-22.2-kernel-302`.
 
 ### Vendor repository
 
@@ -67,8 +67,8 @@ Selected vendor base:
 `lineage-22.2-android15-contract` at
 `6fef3d7c6333602d7114aefa0284a03f5aadb454`.
 
-Active bring-up branch:
-`codex/lineage-22.2-bringup`.
+Active kernel-integration branch:
+`lineage-22.2-kernel-302`.
 
 The audit branch removes the obsolete VNDK-28 request while leaving the
 proprietary payload byte-equivalent to the selected Android 15 base.
@@ -79,8 +79,10 @@ Confirmed from stock evidence, current code and permanent tests:
 
 - The `.118` firmware, not `.109`, is authoritative for hardware behavior.
 - The device is A/B and uses the `.118` boot/fstab/partition contract.
-- The exact RED `.118` 4.4.153+ prebuilt kernel is a transitional bring-up
-  payload. A validated source-built kernel remains a later milestone.
+- The active kernel is the source-built RED Linux 4.4.302 tree at
+  `kernel/red/msm8998`, using `lineageos_hydrogenone_defconfig` and the exact
+  TM/TM-CSP/SIM/JDI DTB set. Its revision is pinned in the cross-tree lock.
+- SmartPort is excluded; RED Leia/display remains in scope.
 - Open/source-owned configuration and HAL wrappers belong in the device tree;
   proprietary payload/generated prebuilts belong in the vendor tree.
 - No speculative RED `msm8998-common` tree is used.
@@ -129,8 +131,9 @@ Covered areas include camera, audio/media, radio, fingerprint/sensors,
 graphics/DRM, GNSS, Wi-Fi/Bluetooth, NFC, power/thermal, firmware, rootdir,
 partitions and copy-destination ownership.
 
-Current generated copy-contract evidence is pinned to vendor `6d80047...`
-and device branch `codex/lineage-22.2-bringup`. The Android 15 vendor tree now
+Current generated copy-contract evidence is pinned to the vendor commit in
+`docs/reference/cross-tree-lock.json` and device branch
+`lineage-22.2-kernel-302`. The Android 15 vendor tree now
 uses the Lineage source-owned `libnbaio_mono`; the obsolete RED Android 9
 32/64-bit prebuilts were removed after they shadowed the source module and
 broke `audio.r_submix.default`. Regenerate the evidence whenever payload or
@@ -154,9 +157,10 @@ generated package ownership changes.
 5. Static scan finds `libhidlmemory.recovery` listed twice in `device.mk`.
    This is cleanup debt rather than a second implementation, but should be
    deduplicated before declaring makefile hygiene complete.
-6. `device.mk` still contains a stale comment saying stock kernel 4.4.78; the
-   `.118` boot contract is 4.4.153+. The `overlay/` path was rechecked and is a
-   real (currently empty) directory, so it is not treated as a broken reference.
+6. The source-kernel integration supersedes stale 4.4.78/4.4.153 active-build
+   comments. Stock kernel details remain evidence only. The `overlay/` path was
+   rechecked and is a real (currently empty) directory, so it is not treated as
+   a broken reference.
 7. Python bytecode/cache files are tracked in historical tree snapshots. They
    should be removed and ignored; they are not build inputs.
 8. The standalone `tests/test_full_tree.py` contract passes when invoked as its
@@ -186,9 +190,9 @@ Additional static checks:
 - existing stock build, fstab, init, VINTF, camera, radio and cross-tree
   contracts pass static validation on the selected snapshots.
 
-A complete LineageOS 22.2 source checkout is not present in this execution
-environment, so no claim of a successful `m nothing`, image build or boot is
-made here.
+The RED kernel itself has completed a full source build and its DTB/module/image
+checks. A complete paired LineageOS 22.2 build and physical-device boot remain
+unverified, so no ROM boot claim is made here.
 
 ## Next authoritative gates
 

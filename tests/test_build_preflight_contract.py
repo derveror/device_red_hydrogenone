@@ -27,15 +27,17 @@ class BuildPreflightContractTest(unittest.TestCase):
             "build/envsetup.sh",
             "device/red/hydrogenone",
             "vendor/red/hydrogenone",
-            "kernel/essential/msm8998",
+            "kernel/red/msm8998",
             "device/qcom/sepolicy-legacy-um",
             "docs/reference/cross-tree-lock.json",
             "vendor_commit",
+            "kernel_commit",
             "git -C",
             "status --porcelain",
             "rev-parse HEAD",
         ):
             self.assertIn(required, text, required)
+        self.assertIn("kernel revision mismatch", text)
 
     def test_script_runs_only_the_first_real_build_gate_and_captures_it(self) -> None:
         text = SCRIPT.read_text(encoding="utf-8")

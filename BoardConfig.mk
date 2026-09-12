@@ -58,8 +58,8 @@ DEVICE_MANIFEST_FILE := $(DEVICE_PATH)/manifest.xml
 DEVICE_MATRIX_FILE := hardware/qcom-caf/common/compatibility_matrix.xml
 PRODUCT_FULL_TREBLE_OVERRIDE := true
 
-# Kernel - exact RED .118 stock 4.4.153+ Image.gz-dtb for first bring-up.
-# Canonical boot image: header v1, 4096-byte pages, kernel load address 0x8000.
+# Kernel - source-built RED MSM8998 Linux 4.4.302.
+# Preserve the stock-authoritative boot container geometry.
 TARGET_KERNEL_VERSION := 4.4
 BOARD_BOOT_HEADER_VERSION := 1
 BOARD_MKBOOTIMG_ARGS += --header_version $(BOARD_BOOT_HEADER_VERSION)
@@ -70,13 +70,9 @@ BOARD_KERNEL_OFFSET := 0x00008000
 BOARD_RAMDISK_OFFSET := 0x01000000
 BOARD_SECOND_OFFSET := 0x00f00000
 BOARD_TAGS_OFFSET := 0x00000100
-# LineageOS native vendor modules consume generated kernel UAPI headers. Use
-# the maintained Essential MSM8998 source tree only for headers while forcing
-# the exact RED .118 Image.gz-dtb as the boot/recovery kernel payload.
-TARGET_KERNEL_SOURCE := kernel/essential/msm8998
-TARGET_KERNEL_CONFIG := lineageos_mata_defconfig
-TARGET_FORCE_PREBUILT_KERNEL := true
-TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/Image.gz-dtb
+# Build the RED-specific tree and its exact TM/TM-CSP/SIM/JDI appended-DTB set.
+TARGET_KERNEL_SOURCE := kernel/red/msm8998
+TARGET_KERNEL_CONFIG := lineageos_hydrogenone_defconfig
 # Keep RED .118 hardware/runtime arguments while leaving build/signing identity
 # to the Android 15 build. androidboot.boot_devices is retained for modern
 # first-stage block-device discovery even though it was not present in stock .118.

@@ -1,51 +1,53 @@
-# Kernel plan: RED 4.4.78 -> maintained MSM8998 4.4
+# RED Hydrogen One source-kernel status
 
-## Phase 1: boot Lineage with exact stock RED kernel
-`prebuilt/Image.gz-dtb` is the exact stock H1A1000 kernel payload from the supplied boot image.
-It contains the kernel plus 60 appended DTBs. This avoids losing RED-specific board support while
-userspace is being modernized.
+## Active tree
 
-Stock kernel identity:
-- Linux 4.4.78-perf+
-- ARM64 / MSM8998
-- binder, hwbinder, vndbinder
-- dm-verity / dm-crypt
-- ext4 ICE encryption support
+The LineageOS 22.2 device configuration builds the RED-specific MSM8998 kernel
+from source:
 
-Important RED-only/RED-selected config found in the stock IKCONFIG includes:
-- `CONFIG_CM_SMARTPORT=y`
-- `CONFIG_TOUCHSCREEN_SYNAPTICS_DSX=y`
-- `CONFIG_TOUCHSCREEN_SYNAPTICS_DSX_I2C=y`
-- `CONFIG_TOUCHSCREEN_ST=y`
-- `CONFIG_TOUCHSCREEN_ST_I2C=y`
-- `CONFIG_INPUT_FPC_FINGERPRINT=y`
-- `CONFIG_AUDIO_EXT_CLK=y`
-- `CONFIG_QPNP_HAPTIC=y`
+```text
+repository: https://github.com/derveror/android_kernel_red_msm8998.git
+branch: lineage-22.2
+path: kernel/red/msm8998
+commit: 440e8eb4eea36404d340a2a4ad001cf013304447
+version: Linux 4.4.302+
+defconfig: lineageos_hydrogenone_defconfig
+output: arch/arm64/boot/Image.gz-dtb
+```
 
-## Phase 2: move to Lineage Essential MSM8998 4.4 tree
-The current `android_kernel_essential_msm8998` lineage-22.2 tree is Linux 4.4.302, so it is a
-much better long-term base than leaving the 2018 RED 4.4.78 kernel permanently.
+`BoardConfig.mk`, the local manifest, workspace preflight and cross-tree lock
+all point to this tree. No donor kernel image or donor DTB is selected.
 
-Port order:
-1. Import/decompile RED production PVT DTS variants (TM, TM-CSP, SIM, JDI).
-2. Bring over panel/backlight/touch/regulator nodes and validate boot/display.
-3. Port Synaptics DSX/ST touch support (generic Qualcomm trees already contain related drivers).
-4. Port FPC fingerprint device wiring/driver changes.
-5. Port audio external-clock changes and RED Tavil routing.
-6. Port QPNP haptics differences.
-7. Port `CM_SMARTPORT` last; it appears to be the most device/vendor-specific driver.
-8. Rebuild external modules and remove stock `/system/lib/modules` dependency.
+## RED device scope
 
-Do not use `mata`/OnePlus DTBs or boot images directly on H1A1000.
+The DTS implementation layers four production/PVT variants over the maintained
+QCOM MSM8998 base:
 
-## Stock external modules verified in v0.3
-The supplied stock module set uses vermagic `4.4.78-perf+ SMP preempt mod_unload modversions aarch64`.
-`qca_cld3_wlan.ko`, `msm_11ad_proxy.ko`, and `wil6210.ko` are byte-identical to vendor copies.
+- TM
+- TM CSP
+- SIM
+- JDI
 
-MSM VIDC is not an external module on this build:
-- `CONFIG_MSM_VIDC_V4L2=y`
-- `CONFIG_MSM_VIDC_VMEM=y`
-- `CONFIG_MSM_VIDC_GOVERNORS=y`
+It preserves the stock board/display IDs and relative appended-DTB order. RED
+Leia/display remains in scope. SmartPort is deliberately excluded because it is
+the proprietary rear accessory interface and is not required for the standard
+USB, charging or Bluetooth paths.
 
-QCE/QCEDEV are also built in.  Do not spend bring-up time hunting the stale `.ko` names referenced
-by old init scripts.
+## Completed static/build validation
+
+- full kernel source compilation;
+- exact four-entry DTB selection in the Hydrogen One defconfig;
+- DTB compilation and reverse decompilation;
+- appended `Image.gz-dtb` order validation;
+- selected external-module build (10 modules);
+- boot partition budget: 26,354,984 bytes used of 67,108,864 bytes.
+
+Detailed evidence is stored in the kernel repository at
+`docs/hydrogenone/runtime-driver-build-evidence.md`.
+
+## Remaining runtime gates
+
+The kernel build result has not yet been boot-tested on a physical H1A1000.
+The next gates are a complete LineageOS 22.2 workspace build, boot-image
+packaging (including resolution of the recorded TFA `.cnt` packaging gap), and
+staged device testing with serial/ADB, `dmesg`, `logcat` and service evidence.

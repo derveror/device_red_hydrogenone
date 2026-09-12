@@ -34,10 +34,10 @@ class LocalManifestContractTest(unittest.TestCase):
                 "remote": "derveror",
                 "revision": lock["vendor_commit"],
             },
-            "kernel/essential/msm8998": {
-                "name": "android_kernel_essential_msm8998",
-                "remote": "lineageos",
-                "revision": "lineage-22.2",
+            "kernel/red/msm8998": {
+                "name": "android_kernel_red_msm8998",
+                "remote": "derveror",
+                "revision": lock["kernel_commit"],
             },
             "device/qcom/sepolicy-legacy-um": {
                 "name": "android_device_qcom_sepolicy_vndr",
@@ -65,12 +65,14 @@ class LocalManifestContractTest(unittest.TestCase):
         dependencies = json.loads(DEPENDENCIES.read_text(encoding="utf-8"))
         by_path = {entry["target_path"]: entry for entry in dependencies}
 
-        # The sepolicy project has a non-default branch and therefore needs an
-        # explicit branch. The kernel follows the active Lineage default branch;
-        # roomservice.py resolves an omitted GitHub dependency branch through
-        # get_default_or_fallback_revision(). The local-manifest template above
-        # still pins the kernel revision explicitly for deterministic clean sync.
-        self.assertNotIn("branch", by_path["kernel/essential/msm8998"])
+        # Both dependencies declare their branch. The custom kernel is already
+        # supplied by the required local manifest, so roomservice only verifies
+        # its target path instead of constructing a LineageOS remote URL.
+        self.assertEqual(by_path["kernel/red/msm8998"], {
+            "repository": "android_kernel_red_msm8998",
+            "target_path": "kernel/red/msm8998",
+            "branch": "lineage-22.2",
+        })
         self.assertEqual(by_path["device/qcom/sepolicy-legacy-um"].get("branch"), "lineage-22.2-legacy-um")
 
     def test_custom_vendor_is_not_misdeclared_as_lineage_dependency(self) -> None:

@@ -5,5 +5,5 @@
 - Scanned all supplied vendor ELF dependencies for Android 8.1 HIDL ABI breakage.
 - Added broad proprietary extraction inventory (excluding old compiled SELinux/VINTF outputs).
 - Added conservative extract-utils HIDL fixup scaffold.
-- Documented stock `/system/lib/modules` dependency of the prebuilt RED kernel.
+- Documented the historical stock `/system/lib/modules` dependency evidence.
 - Added kernel port plan and donor matrix.

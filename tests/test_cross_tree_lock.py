@@ -31,7 +31,16 @@ class CrossTreeLockContractTest(unittest.TestCase):
         self.assertEqual(self.lock["schema_version"], 1)
         self.assertEqual(self.lock["vendor_repository"], "derveror/proprietary_vendor_red_hydrogenone")
         self.assertRegex(self.lock["vendor_commit"], r"^[0-9a-f]{40}$")
-        self.assertEqual(self.lock["device_branch"], "codex/lineage-22.2-bringup")
+        self.assertEqual(self.lock["device_branch"], "lineage-22.2-kernel-302")
+
+    def test_lock_pins_source_built_red_kernel(self) -> None:
+        self.assertEqual(self.lock["kernel_repository"], "derveror/android_kernel_red_msm8998")
+        self.assertEqual(self.lock["kernel_path"], "kernel/red/msm8998")
+        self.assertEqual(self.lock["kernel_branch"], "lineage-22.2")
+        self.assertEqual(
+            self.lock["kernel_commit"],
+            "440e8eb4eea36404d340a2a4ad001cf013304447",
+        )
 
     def test_permanent_ci_rechecks_pinned_vendor_tree(self) -> None:
         commit = re.escape(self.lock["vendor_commit"])

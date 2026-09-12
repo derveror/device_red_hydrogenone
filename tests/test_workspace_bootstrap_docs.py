@@ -18,7 +18,7 @@ class WorkspaceBootstrapDocsTest(unittest.TestCase):
         text = DOC.read_text(encoding="utf-8")
         self.assertIn(
             "https://raw.githubusercontent.com/derveror/device_red_hydrogenone/"
-            "lineage-22.2-stock118-rework/docs/manifests/hydrogenone-lineage-22.2.xml",
+            "lineage-22.2-kernel-302/docs/manifests/hydrogenone-lineage-22.2.xml",
             text,
         )
         self.assertIn(".repo/local_manifests/hydrogenone.xml", text)

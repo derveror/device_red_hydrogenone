@@ -1,8 +1,12 @@
 {
   "schema_version": 1,
-  "device_branch": "codex/lineage-22.2-bringup",
+  "device_branch": "lineage-22.2-kernel-302",
+  "kernel_branch": "lineage-22.2",
+  "kernel_commit": "440e8eb4eea36404d340a2a4ad001cf013304447",
+  "kernel_path": "kernel/red/msm8998",
+  "kernel_repository": "derveror/android_kernel_red_msm8998",
   "vendor_repository": "derveror/proprietary_vendor_red_hydrogenone",
-  "vendor_commit": "6d80047932b9ecade6ba34c4cff22a9206972cb6",
+  "vendor_commit": "70276f1d7ea9d70b04dd91c04b9a48c13f6795b8",
   "stock_build": "H1A1000.082ho.01.00.10r.118",
   "stock_archive_sha256": "7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e"
 }

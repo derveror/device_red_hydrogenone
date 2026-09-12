@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from pathlib import Path
-import hashlib, json, re, sys, xml.etree.ElementTree as ET
+import json, re, sys, xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
 if len(sys.argv) == 2 and not sys.argv[1].startswith('-'):
@@ -10,7 +10,7 @@ elif len(sys.argv) > 1:
 required_dirs = [
     'audio','configs','gps','keylayout','media','overlay','overlay-lineage',
     'power','configs/camera','configs/nfc','rootdir/etc/init/hw','seccomp','sepolicy/vendor','sepolicy/private',
-    'sepolicy/public','wifi','prebuilt'
+    'sepolicy/public','wifi'
 ]
 required_files = [
     'Android.bp','AndroidProducts.mk','BoardConfig.mk','device.mk','lineage_hydrogenone.mk',
@@ -21,7 +21,7 @@ required_files = [
     'configs/msm_irqbalance.conf','configs/public.libraries.txt',
     'configs/camera/camera_config.xml','configs/nfc/libnfc-nxp.conf',
     'gps/etc/gps.conf','gps/etc/flp.conf','gps/izat.conf','wifi/WCNSS_qcom_cfg.ini','wifi/wpa_supplicant_overlay.conf',
-    'seccomp/mediacodec.policy','prebuilt/Image.gz-dtb','vendor.prop'
+    'seccomp/mediacodec.policy','vendor.prop'
 ]
 errors=[]
 
@@ -141,77 +141,29 @@ if want not in deps:
 if 'include device/qcom/sepolicy-legacy-um/SEPolicy.mk' not in board:
     errors.append('missing qcom legacy-um sepolicy include')
 
-# LineageOS 22.2 vendor/lineage/build/tasks/kernel.mk compares TARGET_KERNEL_VERSION
-# for every Qualcomm device before it branches to the prebuilt-kernel path.  An
-# empty version therefore aborts ckati with `kernel.mk:110: error: Argument missing.`
+# The active kernel is the source-built RED Linux 4.4.302 tree. Reject the
+# obsolete Essential/Mata header source and every prebuilt-kernel override.
 qcom_enabled = re.search(r'(?m)^\s*BOARD_USES_QCOM_HARDWARE\s*:?=\s*true\s*$', board)
-prebuilt_enabled = re.search(r'(?m)^\s*TARGET_PREBUILT_KERNEL\s*:?=', board)
-if qcom_enabled and prebuilt_enabled:
-    km = re.search(r'(?m)^\s*TARGET_KERNEL_VERSION\s*:?=\s*([0-9]+\.[0-9]+)\s*$', board)
-    if not km:
-        errors.append('Qualcomm prebuilt kernel requires TARGET_KERNEL_VERSION for Lineage kernel.mk')
-    else:
-        # Validate the declared major.minor against the first gzip member.  The
-        # stock Image.gz-dtb has appended DTBs, so zlib.unused_data is expected.
-        import zlib
-        kernel_path = ROOT/'prebuilt/Image.gz-dtb'
-        if kernel_path.exists():
-            try:
-                image = zlib.decompressobj(16 + zlib.MAX_WBITS).decompress(kernel_path.read_bytes())
-                vm = re.search(rb'Linux version ([0-9]+\.[0-9]+)\.', image)
-                if vm and km.group(1) != vm.group(1).decode():
-                    errors.append(
-                        f'TARGET_KERNEL_VERSION {km.group(1)} does not match prebuilt kernel {vm.group(1).decode()}'
-                    )
-            except zlib.error as e:
-                errors.append(f'cannot inspect prebuilt kernel version: {e}')
-
-# A prebuilt boot kernel is not enough for vendorimage. Native Qualcomm modules
-# consume generated_kernel_headers, whose LineageOS genrule runs `make -C
-# $(TARGET_KERNEL_SOURCE) headers_install` unless a prebuilt header archive is
-# configured. Keep the RED boot payload, but provide a maintained MSM8998 source
-# tree solely for userspace UAPI header generation.
 kernel_source_match = re.search(r'(?m)^\s*TARGET_KERNEL_SOURCE\s*:?=\s*(\S+)\s*$', board)
 kernel_config_match = re.search(r'(?m)^\s*TARGET_KERNEL_CONFIG\s*:?=\s*(\S+)\s*$', board)
-prebuilt_headers_match = re.search(r'(?m)^\s*TARGET_PREBUILT_KERNEL_HEADERS\s*:?=\s*(\S+)\s*$', board)
-if prebuilt_enabled and not (kernel_source_match or prebuilt_headers_match):
-    errors.append('prebuilt kernel lacks TARGET_KERNEL_SOURCE or TARGET_PREBUILT_KERNEL_HEADERS for generated kernel headers')
-if kernel_source_match:
-    if kernel_source_match.group(1) != 'kernel/essential/msm8998':
-        errors.append('unexpected kernel header source: '+kernel_source_match.group(1))
-    if not kernel_config_match or kernel_config_match.group(1) != 'lineageos_mata_defconfig':
-        errors.append('kernel header source requires lineageos_mata_defconfig')
-    if not re.search(r'(?m)^\s*TARGET_FORCE_PREBUILT_KERNEL\s*:?=\s*true\s*$', board):
-        errors.append('kernel source must not replace the exact RED prebuilt boot kernel')
-    kernel_dep={'repository':'android_kernel_essential_msm8998','target_path':'kernel/essential/msm8998'}
-    if kernel_dep not in deps:
-        errors.append('missing MSM8998 kernel-source dependency used for header generation')
-
-# Exact bring-up kernel identity comes from the canonical RED .118 boot contract.
-# Cross-check the boot contract against the independently generated stock inventory
-# so changing the prebuilt and its expected hash together cannot silently weaken this audit.
-boot_contract_path=ROOT/'docs/stock/h1a1000-r118/boot-image-contract.json'
-stock_inventory_path=ROOT/'docs/stock/h1a1000-r118/inventory-summary.json'
-try:
-    boot_contract=json.loads(boot_contract_path.read_text(encoding='utf-8'))
-    stock_inventory=json.loads(stock_inventory_path.read_text(encoding='utf-8'))
-    contract_stock_sha=boot_contract.get('authority',{}).get('stock_archive_sha256')
-    inventory_stock_sha=stock_inventory.get('canonical_archive',{}).get('sha256')
-    if not contract_stock_sha or contract_stock_sha != inventory_stock_sha:
-        errors.append('boot contract stock authority does not match canonical inventory')
-    expected_kernel=boot_contract.get('kernel',{})
-    expected_kernel_sha=expected_kernel.get('sha256')
-    expected_kernel_size=expected_kernel.get('size')
-    k=ROOT/'prebuilt/Image.gz-dtb'
-    if k.exists():
-        data=k.read_bytes()
-        h=hashlib.sha256(data).hexdigest()
-        if h != expected_kernel_sha:
-            errors.append('stock kernel hash mismatch: '+h)
-        if len(data) != expected_kernel_size:
-            errors.append(f'stock kernel size mismatch: {len(data)} != {expected_kernel_size}')
-except Exception as e:
-    errors.append(f'cannot validate canonical RED .118 kernel contract: {e}')
+kernel_version_match = re.search(r'(?m)^\s*TARGET_KERNEL_VERSION\s*:?=\s*(\S+)\s*$', board)
+if qcom_enabled:
+    if not kernel_source_match or kernel_source_match.group(1) != 'kernel/red/msm8998':
+        errors.append('source-built RED kernel path is not active')
+    if not kernel_config_match or kernel_config_match.group(1) != 'lineageos_hydrogenone_defconfig':
+        errors.append('source-built RED kernel config is not active')
+    if not kernel_version_match or kernel_version_match.group(1) != '4.4':
+        errors.append('source-built RED kernel must declare Linux 4.4')
+for obsolete in ('TARGET_FORCE_PREBUILT_KERNEL', 'TARGET_PREBUILT_KERNEL', 'TARGET_PREBUILT_KERNEL_HEADERS'):
+    if re.search(rf'(?m)^\s*{obsolete}\s*:?=', board):
+        errors.append('obsolete kernel override remains: '+obsolete)
+kernel_dep={
+    'repository':'android_kernel_red_msm8998',
+    'target_path':'kernel/red/msm8998',
+    'branch':'lineage-22.2',
+}
+if kernel_dep not in deps:
+    errors.append('missing source-built RED kernel dependency')
 
 # A file owned by device.mk must not also be extracted at the same vendor destination.
 copy_dest_list=[

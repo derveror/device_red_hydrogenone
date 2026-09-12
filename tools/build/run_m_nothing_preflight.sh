@@ -70,7 +70,7 @@ cd "$TOP"
 
 DEVICE_PATH="device/red/hydrogenone"
 VENDOR_PATH="vendor/red/hydrogenone"
-KERNEL_PATH="kernel/essential/msm8998"
+KERNEL_PATH="kernel/red/msm8998"
 SEPOLICY_PATH="device/qcom/sepolicy-legacy-um"
 LOCK_PATH="$DEVICE_PATH/docs/reference/cross-tree-lock.json"
 
@@ -100,9 +100,25 @@ print(value)
 PY
 )"
 
+EXPECTED_KERNEL_HEAD="$(python3 - "$LOCK_PATH" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+lock = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+value = lock.get("kernel_commit", "")
+if not value:
+    raise SystemExit("cross-tree lock has no kernel_commit")
+print(value)
+PY
+)"
+
 VENDOR_HEAD="$(git -C "$VENDOR_PATH" rev-parse HEAD)"
 [[ "$VENDOR_HEAD" == "$EXPECTED_VENDOR_HEAD" ]] \
     || fail "vendor revision mismatch: expected $EXPECTED_VENDOR_HEAD, got $VENDOR_HEAD"
+KERNEL_HEAD="$(git -C "$KERNEL_PATH" rev-parse HEAD)"
+[[ "$KERNEL_HEAD" == "$EXPECTED_KERNEL_HEAD" ]] \
+    || fail "kernel revision mismatch: expected $EXPECTED_KERNEL_HEAD, got $KERNEL_HEAD"
 
 TIMESTAMP="$(date -u +%Y%m%dT%H%M%SZ)"
 if [[ -z "$LOG_DIR" ]]; then
@@ -124,6 +140,7 @@ record_revision() {
     printf 'top=%s\n' "$TOP"
     printf 'lunch_target=%s\n' "$LUNCH_TARGET"
     printf 'expected_vendor_commit=%s\n' "$EXPECTED_VENDOR_HEAD"
+    printf 'expected_kernel_commit=%s\n' "$EXPECTED_KERNEL_HEAD"
     record_revision device_head "$DEVICE_PATH"
     record_revision vendor_head "$VENDOR_PATH"
     record_revision kernel_head "$KERNEL_PATH"

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import hashlib
 import json
 import re
 import unittest
@@ -9,7 +8,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 BOARD = ROOT / "BoardConfig.mk"
 PRODUCT = ROOT / "lineage_hydrogenone.mk"
-PREBUILT = ROOT / "prebuilt" / "Image.gz-dtb"
 BOOT_CONTRACT = ROOT / "docs" / "stock" / "h1a1000-r118" / "boot-image-contract.json"
 STOCK_META = ROOT / "docs" / "stock" / "h1a1000-r118" / "inventory-summary.json"
 
@@ -57,17 +55,17 @@ class Stock118BuildContractTest(unittest.TestCase):
         self.assertNotIn("H1A1000.010ho.01.01.01r.109", self.product)
         self.assertNotIn(":8.1.0/", self.product)
 
-    def test_forced_prebuilt_kernel_is_exact_canonical_118_kernel(self) -> None:
-        self.assertEqual(make_value(self.board, "TARGET_FORCE_PREBUILT_KERNEL"), "true")
-        self.assertEqual(make_value(self.board, "TARGET_PREBUILT_KERNEL"), "$(DEVICE_PATH)/prebuilt/Image.gz-dtb")
-        data = PREBUILT.read_bytes()
-        self.assertEqual(len(data), self.boot["kernel"]["size"])
-        self.assertEqual(hashlib.sha256(data).hexdigest(), self.boot["kernel"]["sha256"])
+    def test_source_built_red_kernel_is_the_only_build_input(self) -> None:
+        self.assertEqual(make_value(self.board, "TARGET_KERNEL_SOURCE"), "kernel/red/msm8998")
+        self.assertEqual(make_value(self.board, "TARGET_KERNEL_CONFIG"), "lineageos_hydrogenone_defconfig")
+        self.assertEqual(make_value(self.board, "TARGET_KERNEL_VERSION"), "4.4")
+        self.assertIsNone(make_value(self.board, "TARGET_FORCE_PREBUILT_KERNEL"))
+        self.assertIsNone(make_value(self.board, "TARGET_PREBUILT_KERNEL"))
 
     def test_boardconfig_does_not_claim_109_for_118_authoritative_fields(self) -> None:
         active_lines = "\n".join(
             line for line in self.board.splitlines()
-            if any(token in line for token in ("Kernel", "Partitions", "VENDOR_SECURITY_PATCH", "TARGET_PREBUILT_KERNEL"))
+            if any(token in line for token in ("Kernel", "Partitions", "VENDOR_SECURITY_PATCH", "TARGET_KERNEL_SOURCE"))
         )
         self.assertNotIn(".109", active_lines)
 

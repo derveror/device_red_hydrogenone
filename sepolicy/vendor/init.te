@@ -4,5 +4,8 @@ allow init adsprpcd_file:filesystem { mount relabelfrom relabelto };
 allow init hbtp_cmd:process { transition siginh rlimitinh };
 allow init hbtp_cmd_exec:file execute;
 allow init persist_block_device:lnk_file relabelto;
+# RED stock 118 mounts the cmlog securefs partition here.  It contains the
+# persistent keymaster64 state consumed through qseecomd during FBE setup.
+allow init persist_drm_file:dir mounton;
 allow init sysfs_graphics:lnk_file { r_file_perms setattr };
 allow init sysfs_scsi_devices_0000:{ dir file } relabelfrom;

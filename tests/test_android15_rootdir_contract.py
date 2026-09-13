@@ -7,6 +7,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 TARGET = ROOT / "rootdir/etc/init/hw/init.target.rc"
 QCOM = ROOT / "rootdir/etc/init/hw/init.qcom.rc"
+INIT_SEPOLICY = ROOT / "sepolicy/vendor/init.te"
 
 SERVICE_RE = re.compile(r"(?m)^\s*service\s+(\S+)\s+(\S+)")
 IMPORT_RE = re.compile(r"(?m)^\s*import\s+/vendor/etc/init/hw/(\S+)")
@@ -141,6 +142,7 @@ class Android15RootdirContractTest(unittest.TestCase):
     def setUp(self) -> None:
         self.target = TARGET.read_text(encoding="utf-8")
         self.qcom = QCOM.read_text(encoding="utf-8")
+        self.init_sepolicy = INIT_SEPOLICY.read_text(encoding="utf-8")
 
     def test_target_declares_only_verified_red_daemons(self) -> None:
         self.assertEqual(services(self.target), EXPECTED_SERVICES)
@@ -168,6 +170,12 @@ class Android15RootdirContractTest(unittest.TestCase):
             "mount ext4 /dev/block/bootdevice/by-name/cmlog "
             "/mnt/vendor/persist/data noatime nosuid nodev barrier=1",
             fs_commands,
+        )
+
+    def test_init_can_mount_red118_securefs_on_persist_data(self) -> None:
+        self.assertIn(
+            "allow init persist_drm_file:dir mounton;",
+            self.init_sepolicy,
         )
 
     def test_target_contains_no_android8_9_control_plane_paths(self) -> None:

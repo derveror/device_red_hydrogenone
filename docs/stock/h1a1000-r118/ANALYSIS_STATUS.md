@@ -83,8 +83,16 @@ normal-boot trace exposed a boot-critical stock dependency absent from the
 initial selection: `qseecomd` loads `libssd.so` with `dlopen` and exits before
 publishing `vendor.sys.listeners.registered` when that SSD listener is missing.
 
-The rebuilt vendor image contains the exact `.118` `libssd.so`, and the device
-rootdir mounts the `.118` `cmlog` securefs partition at
-`/mnt/vendor/persist/data` before `qseecomd` starts. This correction still
+Physical trace v7 verifies that the rebuilt vendor image's `.118` `libssd.so`
+correction works: `qseecomd` remains running and publishes its listener-ready
+property in 39 ms. The trace then exposed an omitted RED policy rule: enforcing
+SELinux denied `init` the `mounton` permission when mounting the `.118` `cmlog`
+securefs partition at `/mnt/vendor/persist/data`. The physical filesystem holds
+the expected `keymaster64` state, while Keymaster exited and vold waited in
+`cryptfs enablefilecrypto` when the mount was absent.
+
+The device policy now restores the exact stock `.118`
+`allow init persist_drm_file:dir mounton;` permission. The resulting complete
+OTA passes Android SELinux/neverallow, VINTF and integrity checks but still
 requires a controlled physical sideload and normal-boot test. No hardware
 subsystem is declared working solely from repository or recovery-level proof.

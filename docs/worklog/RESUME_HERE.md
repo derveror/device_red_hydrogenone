@@ -30,14 +30,19 @@ Read this file first after interruption.
 ## Current runtime checkpoint
 
 - The source-built Linux `4.4.302+` kernel boots Lineage Recovery on H1A1000.
-- A full LineageOS 22.2 build completed successfully on 2026-09-13.
 - The first normal-boot trace showed `qseecomd` repeatedly exiting with status
-  255 and init blocked on `vendor.sys.listeners.registered`.
-- RED `.118` `qseecomd` requires `libssd.so` through `dlopen`; the rebuilt vendor
-  image now contains the exact blob.
-- The device rootdir now mounts `/dev/block/bootdevice/by-name/cmlog` at
-  `/mnt/vendor/persist/data` before `post-fs` starts `qseecomd`, matching stock
-  `.118` ordering.
-- This rebuilt OTA is statically verified but has not yet been installed on the
-  phone. The next gate is a controlled sideload from the already working
-  Lineage Recovery followed by one normal-boot attempt.
+  255 because RED `.118` `libssd.so` was missing. After adding the exact blob,
+  physical trace v7 proved that qseecomd stays running and publishes
+  `vendor.sys.listeners.registered=true` in 39 ms.
+- Trace v7 then proved that enforcing SELinux denied `init` the `mounton`
+  permission for `/mnt/vendor/persist/data`. The physical `cmlog` partition
+  contains RED securefs state, including `keymaster64`, and its failed mount
+  caused Keymaster to exit while vold waited in `cryptfs enablefilecrypto`.
+- Device policy now restores the exact stock `.118` permission:
+  `allow init persist_drm_file:dir mounton;`.
+- The rebuilt OTA passed the complete Android build, SELinux/neverallow, VINTF,
+  137 unit tests, full-tree audit and ZIP integrity. Its SHA-256 is
+  `6f0d377c91cf8d825f82a16560519750b0123b47ebe6dea684944dce8ebc463f`.
+- The phone is in Lineage Recovery on slot `B`, with the production boot image
+  restored. The next gate is one sideload of the rebuilt OTA and one controlled
+  normal boot; do not claim Android boot before that physical result.

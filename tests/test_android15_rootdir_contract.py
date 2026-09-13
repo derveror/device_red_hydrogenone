@@ -71,6 +71,72 @@ def reachable_services(entrypoint: Path) -> dict[str, str]:
     return discovered
 
 
+def reachable_rc_files(entrypoint: Path) -> list[Path]:
+    pending = [entrypoint]
+    visited: set[Path] = set()
+    discovered: list[Path] = []
+
+    while pending:
+        current = pending.pop(0)
+        if current in visited or not current.is_file():
+            continue
+        visited.add(current)
+        discovered.append(current)
+        text = current.read_text(encoding="utf-8")
+        pending.extend(current.parent / filename for filename in IMPORT_RE.findall(text))
+
+    return discovered
+
+
+def action_blocks(text: str) -> list[tuple[str, list[str]]]:
+    blocks: list[tuple[str, list[str]]] = []
+    trigger: str | None = None
+    commands: list[str] = []
+
+    for line in text.splitlines():
+        if line.startswith("on "):
+            if trigger is not None:
+                blocks.append((trigger, commands))
+            trigger = line.removeprefix("on ").strip()
+            commands = []
+        elif trigger is not None and line and not line[0].isspace() and not line.startswith("#"):
+            blocks.append((trigger, commands))
+            trigger = None
+            commands = []
+        elif trigger is not None and line.strip() and not line.lstrip().startswith("#"):
+            commands.append(line.strip())
+
+    if trigger is not None:
+        blocks.append((trigger, commands))
+
+    return blocks
+
+
+def qseecomd_ready_before_fbe(entrypoint: Path) -> bool:
+    files = reachable_rc_files(entrypoint)
+    blocks = {
+        event: [
+            commands
+            for path in files
+            for trigger, commands in action_blocks(path.read_text(encoding="utf-8"))
+            if trigger == event
+        ]
+        for event in ("early-init", "init", "fs", "post-fs")
+    }
+
+    started = False
+    listeners_ready = False
+    for event in ("early-init", "init", "fs", "post-fs"):
+        for commands in blocks[event]:
+            for command in commands:
+                if command == "start vendor.qseecomd":
+                    started = True
+                elif command == "wait_for_prop vendor.sys.listeners.registered true" and started:
+                    listeners_ready = True
+
+    return started and listeners_ready
+
+
 class Android15RootdirContractTest(unittest.TestCase):
     def setUp(self) -> None:
         self.target = TARGET.read_text(encoding="utf-8")
@@ -83,6 +149,9 @@ class Android15RootdirContractTest(unittest.TestCase):
         discovered = reachable_services(QCOM)
         self.assertEqual(discovered.get("vendor.qseecomd"), "/vendor/bin/qseecomd")
         self.assertEqual(discovered.get("spdaemon"), "/vendor/bin/spdaemon")
+
+    def test_qseecomd_is_ready_before_android15_starts_keymaster(self) -> None:
+        self.assertTrue(qseecomd_ready_before_fbe(QCOM))
 
     def test_target_contains_no_android8_9_control_plane_paths(self) -> None:
         conflicts = [f"{token}: {reason}" for token, reason in LEGACY_TOKENS.items() if token in self.target]

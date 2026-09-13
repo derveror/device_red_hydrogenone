@@ -9,6 +9,7 @@ TARGET = ROOT / "rootdir/etc/init/hw/init.target.rc"
 QCOM = ROOT / "rootdir/etc/init/hw/init.qcom.rc"
 
 SERVICE_RE = re.compile(r"(?m)^\s*service\s+(\S+)\s+(\S+)")
+IMPORT_RE = re.compile(r"(?m)^\s*import\s+/vendor/etc/init/hw/(\S+)")
 
 EXPECTED_SERVICES = {
     "vendor.per_mgr": "/vendor/bin/pm-service",
@@ -53,6 +54,23 @@ def services(text: str) -> dict[str, str]:
     return {name: executable for name, executable in SERVICE_RE.findall(text)}
 
 
+def reachable_services(entrypoint: Path) -> dict[str, str]:
+    pending = [entrypoint]
+    visited: set[Path] = set()
+    discovered: dict[str, str] = {}
+
+    while pending:
+        current = pending.pop()
+        if current in visited or not current.is_file():
+            continue
+        visited.add(current)
+        text = current.read_text(encoding="utf-8")
+        discovered.update(services(text))
+        pending.extend(current.parent / filename for filename in IMPORT_RE.findall(text))
+
+    return discovered
+
+
 class Android15RootdirContractTest(unittest.TestCase):
     def setUp(self) -> None:
         self.target = TARGET.read_text(encoding="utf-8")
@@ -60,6 +78,11 @@ class Android15RootdirContractTest(unittest.TestCase):
 
     def test_target_declares_only_verified_red_daemons(self) -> None:
         self.assertEqual(services(self.target), EXPECTED_SERVICES)
+
+    def test_secure_daemons_are_reachable_from_android_hardware_init(self) -> None:
+        discovered = reachable_services(QCOM)
+        self.assertEqual(discovered.get("vendor.qseecomd"), "/vendor/bin/qseecomd")
+        self.assertEqual(discovered.get("spdaemon"), "/vendor/bin/spdaemon")
 
     def test_target_contains_no_android8_9_control_plane_paths(self) -> None:
         conflicts = [f"{token}: {reason}" for token, reason in LEGACY_TOKENS.items() if token in self.target]

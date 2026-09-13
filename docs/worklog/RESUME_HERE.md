@@ -43,6 +43,15 @@ Read this file first after interruption.
 - The rebuilt OTA passed the complete Android build, SELinux/neverallow, VINTF,
   137 unit tests, full-tree audit and ZIP integrity. Its SHA-256 is
   `6f0d377c91cf8d825f82a16560519750b0123b47ebe6dea684944dce8ebc463f`.
-- The phone is in Lineage Recovery on slot `B`, with the production boot image
-  restored. The next gate is one sideload of the rebuilt OTA and one controlled
-  normal boot; do not claim Android boot before that physical result.
+- The corrected OTA was installed successfully from Recovery: Update Engine
+  wrote and verified `boot_a`, `system_a` and `vendor_a` and finished with
+  status 0. The saved sideload log SHA-256 is
+  `56f30165150452c31eb0fd6491b9eea30919e36532607cd6168d00e9a609a0bc`.
+- The following slot-`A` normal boot did not complete. The phone remained on
+  the RED logo for at least 150 seconds with neither ADB nor fastboot visible
+  and did not automatically return to the bootloader during observation.
+- The phone was last observed at the RED logo. Only the user can enter Lineage
+  Recovery physically; never issue `adb reboot recovery` or
+  `fastboot reboot recovery` on this device.
+- The next gate is a new durable normal-boot trace from slot `A`. Do not change
+  another runtime component or claim Android boot until that evidence is read.

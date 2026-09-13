@@ -50,5 +50,18 @@ A regression test binds the init command and this policy permission together.
 - Output boot SHA-256:
   `de425880b858568353a2c93cc2b9c91903402d55ed0975c49ab334169b354d03`.
 
-Physical validation of this policy correction is the next gate; successful
-compilation is not recorded as proof of a successful Android boot.
+## Physical validation result
+
+The verified OTA was sideloaded from Lineage Recovery while slot `B` was
+running. Update Engine wrote and verified `boot_a`, `system_a` and `vendor_a`,
+reported `Update successfully applied`, and recovery finished with status 0.
+The saved recovery log has SHA-256
+`56f30165150452c31eb0fd6491b9eea30919e36532607cd6168d00e9a609a0bc`.
+
+The subsequent normal-boot attempt did not complete. The physical device
+remained on the RED logo for at least 150 seconds, exposed neither ADB nor
+fastboot over USB, and did not automatically return to the bootloader during
+that observation window. This is a different symptom from the earlier rapid
+return to the bootloader, but it is not proof that the securefs/Keymaster gate
+was passed. A new durable normal-boot trace is required before the next code
+change. LineageOS boot is not claimed.

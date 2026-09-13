@@ -5,7 +5,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 FSTAB = ROOT / "rootdir" / "etc" / "fstab.qcom"
+SYSTEM_FSTAB = ROOT / "rootdir" / "etc" / "fstab.system.qcom"
 RECOVERY = ROOT / "rootdir" / "etc" / "recovery.fstab"
+DEVICE_MK = ROOT / "device.mk"
 UFS = "/dev/block/platform/soc/1da4000.ufshc/by-name/"
 
 
@@ -25,10 +27,42 @@ class Android15FstabContractTest(unittest.TestCase):
     def setUp(self) -> None:
         self.text = FSTAB.read_text(encoding="utf-8")
         self.recovery_text = RECOVERY.read_text(encoding="utf-8")
+        self.device_mk = DEVICE_MK.read_text(encoding="utf-8")
         self.rows = entries(self.text)
 
     def test_recovery_and_vendor_fstab_share_one_mount_contract(self) -> None:
         self.assertEqual(self.recovery_text, self.text)
+
+    def test_normal_boot_uses_a_system_as_root_specific_fstab(self) -> None:
+        self.assertTrue(
+            SYSTEM_FSTAB.is_file(),
+            "normal boot needs a separate fstab that does not remount /system",
+        )
+        self.assertIn(
+            "$(LOCAL_PATH)/rootdir/etc/fstab.system.qcom:"
+            "$(TARGET_COPY_OUT_SYSTEM)/etc/fstab.qcom",
+            self.device_mk,
+        )
+        self.assertNotIn(
+            "$(LOCAL_PATH)/rootdir/etc/fstab.qcom:"
+            "$(TARGET_COPY_OUT_SYSTEM)/etc/fstab.qcom",
+            self.device_mk,
+        )
+
+    def test_system_as_root_fstab_does_not_remount_system(self) -> None:
+        self.assertTrue(
+            SYSTEM_FSTAB.is_file(),
+            "normal boot needs a separate fstab that does not remount /system",
+        )
+        rows = entries(SYSTEM_FSTAB.read_text(encoding="utf-8"))
+        self.assertNotIn("/system", rows)
+        vendor = rows["/vendor"]
+        self.assertTrue(vendor[0].startswith(UFS), vendor)
+        self.assertTrue(
+            {"wait", "slotselect", "first_stage_mount"}
+            <= set(vendor[4].split(",")),
+            vendor,
+        )
 
     def test_system_and_vendor_are_ab_first_stage_mounts(self) -> None:
         for mount in ("/system", "/vendor"):

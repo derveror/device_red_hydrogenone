@@ -3,7 +3,7 @@
     "device_branch": "118-lineage-22.2-kernel-302",
     "stock_archive_sha256": "7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e",
     "stock_build": "H1A1000.082ho.01.00.10r.118",
-    "vendor_commit": "70276f1d7ea9d70b04dd91c04b9a48c13f6795b8"
+    "vendor_commit": "a6560ec388398760f3d45e7634ba23c89f4a2eb6"
   },
   "copy_destination_collisions": [],
   "device_copy_destinations": {
@@ -14,6 +14,9 @@
       "device.mk"
     ],
     "recovery/root/system/lib64/libvndksupport.so": [
+      "device.mk"
+    ],
+    "system/etc/fstab.qcom": [
       "device.mk"
     ],
     "vendor/etc/a2dp_audio_policy_configuration.xml": [

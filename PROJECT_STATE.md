@@ -1,6 +1,6 @@
 # RED Hydrogen One LineageOS 22.2 project state
 
-Last updated: 2026-09-11.
+Last updated: 2026-09-13.
 
 This is the current status for `device/red/hydrogenone`. Detailed stock evidence,
 generated audits and historical worklogs remain under `docs/`.
@@ -21,7 +21,7 @@ generated audits and historical worklogs remain under `docs/`.
 
 - Device branch: `118-lineage-22.2-kernel-302`.
 - Vendor repository: `derveror/proprietary_vendor_red_hydrogenone`, commit
-  `70276f1d7ea9d70b04dd91c04b9a48c13f6795b8`.
+  `a6560ec388398760f3d45e7634ba23c89f4a2eb6`.
 - Kernel repository: `derveror/android_kernel_red_msm8998`, commit
   `440e8eb4eea36404d340a2a4ad001cf013304447`.
 - Kernel path: `kernel/red/msm8998`.
@@ -43,9 +43,11 @@ remain in scope.
 
 ## Vendor payload and HIDL compatibility
 
-The pinned Android 15 vendor selection contains 459 files. Its
+The pinned Android 15 vendor selection contains 460 files. Its
 `proprietary-files.txt`, `proprietary-manifest.json` and on-disk payload agree
-on all 459 entries.
+on all 460 entries. This includes the exact `.118` 64-bit `libssd.so` loaded by
+`qseecomd` through `dlopen`; ordinary `DT_NEEDED` analysis does not expose that
+runtime dependency.
 
 The platform HIDL base libraries are source-owned and are not selected as RED
 prebuilts. Sixty-three exact `.118` HIDL consumers receive the narrow
@@ -63,7 +65,7 @@ and pinned in `docs/reference/vendor-hidl-runtime-contract.json`.
 - Device and vendor copy destinations are checked for collisions.
 - Source-owned GNSS, NFC, Wi-Fi, camera and media wrappers must not coexist with
   conflicting proprietary implementations.
-- The device extraction list mirrors the current 459-file vendor selection.
+- The device extraction list mirrors the current 460-file vendor selection.
 
 ## Confirmed static contracts
 
@@ -80,18 +82,27 @@ and pinned in `docs/reference/vendor-hidl-runtime-contract.json`.
 - vendor ELF dependency and fixup registry;
 - absence of SmartPort runtime control and kernel prebuilts from this tree.
 
-## Not yet proven
+## Proven build and recovery gates
 
-Static tests do not prove that the complete ROM builds or boots. Physical-device
+- A complete LineageOS 22.2 OTA build completed successfully on 2026-09-13.
+- The packaged kernel reports Linux `4.4.302+` and the boot image is below the
+  stock 64 MiB partition limit.
+- Lineage Recovery boots on the physical H1A1000 with the source-built kernel.
+- A durable normal-boot trace reached Android init and identified `qseecomd`
+  exiting with status 255 before publishing
+  `vendor.sys.listeners.registered`.
+- The rebuilt vendor image now contains the exact `.118` `libssd.so` and mounts
+  the dedicated `cmlog` securefs partition before starting `qseecomd`.
+
+The QSEE correction has built and passed static/image verification but has not
+yet been installed on the phone. Full Android userspace boot and physical-device
 operation of radio, camera, audio, sensors, Leia/display, DRM, GNSS, Wi-Fi,
-Bluetooth, NFC, fingerprint, power, thermal management and OTA remains subject
-to build logs and staged device testing.
+Bluetooth, NFC, fingerprint, power, thermal management and OTA remain unproven.
 
 ## Next gates
 
-1. Run workspace validation and `m nothing` from a complete clean LineageOS
-   22.2 checkout.
-2. Fix only failures produced by that build.
-3. Build `bootimage`, `vendorimage`, `systemimage`, target-files and OTA.
+1. Install the verified 2026-09-13 OTA from Lineage Recovery.
+2. Attempt normal boot without overwriting the recoverable alternate slot.
+3. Capture another durable boot trace if Android userspace still does not start.
 4. Validate installed VINTF, SELinux, linker namespaces and image sizes.
-5. Proceed to recoverable physical-device boot testing and subsystem bring-up.
+5. Continue physical subsystem bring-up only after a stable userspace boot.

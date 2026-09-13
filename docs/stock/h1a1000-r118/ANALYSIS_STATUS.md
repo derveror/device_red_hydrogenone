@@ -50,9 +50,9 @@ from `kernel/red/msm8998`; no stock kernel prebuilt is a build input.
 ## Vendor payload audit
 
 Pinned vendor commit:
-`70276f1d7ea9d70b04dd91c04b9a48c13f6795b8`.
+`a6560ec388398760f3d45e7634ba23c89f4a2eb6`.
 
-The selected list, manifest and on-disk payload each contain 459 entries. Stock
+The selected list, manifest and on-disk payload each contain 460 entries. Stock
 copies of `libhidlbase`, `libhidltransport` and `libhwbinder` are pruned because
 the Android 15 source tree owns those providers. Sixty-three exact `.118` HIDL
 consumers receive `libhidlbase_shim`; `imsdatadaemon` is retargeted from
@@ -66,7 +66,7 @@ registries.
 - source kernel and four-DTB contract;
 - radio, fstab, camera, init and VINTF static contracts;
 - device/vendor copy ownership;
-- reproducible 459-file extraction list and compatibility fixups;
+- reproducible 460-file extraction list and compatibility fixups;
 - rejection of superseded stock identity and raw reference trees;
 - rejection of SmartPort runtime control and kernel prebuilts.
 
@@ -75,9 +75,16 @@ copy mappings: 74 are byte-identical at the same destination, seven are
 documented Android 15 adaptations and five are source-only or use a different
 Lineage destination. No mapped device source is missing.
 
-## Remaining proof
+## Current runtime proof and remaining gates
 
-A full clean LineageOS build and physical-device boot have not yet been proven.
-The next gates are `m nothing`, individual images, target-files, OTA, installed
-VINTF/SELinux/linker inspection and staged H1A1000 testing. No hardware subsystem
-is declared working solely from repository-level checks.
+A complete LineageOS 22.2 OTA build has succeeded, and the source-built Linux
+`4.4.302+` kernel boots Lineage Recovery on the physical H1A1000. A durable
+normal-boot trace exposed a boot-critical stock dependency absent from the
+initial selection: `qseecomd` loads `libssd.so` with `dlopen` and exits before
+publishing `vendor.sys.listeners.registered` when that SSD listener is missing.
+
+The rebuilt vendor image contains the exact `.118` `libssd.so`, and the device
+rootdir mounts the `.118` `cmlog` securefs partition at
+`/mnt/vendor/persist/data` before `qseecomd` starts. This correction still
+requires a controlled physical sideload and normal-boot test. No hardware
+subsystem is declared working solely from repository or recovery-level proof.

@@ -61,7 +61,7 @@ class Stock118PurgeContractTest(unittest.TestCase):
             for line in (ROOT / "proprietary-files.txt").read_text(encoding="utf-8").splitlines()
             if line.strip() and not line.lstrip().startswith("#")
         ]
-        self.assertEqual(len(entries), 459)
+        self.assertEqual(len(entries), 460)
         self.assertEqual(len(entries), len(set(entries)))
 
     def test_vendor_hidl_runtime_contract_is_pinned_to_red118(self) -> None:
@@ -69,9 +69,9 @@ class Stock118PurgeContractTest(unittest.TestCase):
         self.assertEqual(contract["schema_version"], 1)
         self.assertEqual(
             contract["vendor_commit"],
-            "70276f1d7ea9d70b04dd91c04b9a48c13f6795b8",
+            "a6560ec388398760f3d45e7634ba23c89f4a2eb6",
         )
-        self.assertEqual(contract["selected_file_count"], 459)
+        self.assertEqual(contract["selected_file_count"], 460)
         self.assertTrue(contract["source_owned_hidl_base_pruned"])
         self.assertEqual(contract["selected_stock_hidl_base_blobs"], [])
         self.assertEqual(contract["hidlbase_shim_consumer_count"], 63)

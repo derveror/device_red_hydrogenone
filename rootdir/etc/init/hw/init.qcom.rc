@@ -9,6 +9,16 @@ on fs
     wait /dev/block/platform/soc/1da4000.ufshc
     symlink /dev/block/platform/soc/1da4000.ufshc /dev/block/bootdevice
     mount_all /vendor/etc/fstab.qcom --early
+
+    # RED .118 keeps the QSEE file-system listener state on the dedicated
+    # cmlog partition. It must be mounted before post-fs starts qseecomd.
+    chown root system /mnt/vendor/persist
+    chmod 0771 /mnt/vendor/persist
+    restorecon_recursive /mnt/vendor/persist
+    mkdir /mnt/vendor/persist/data 0700 system system
+    mount ext4 /dev/block/bootdevice/by-name/cmlog /mnt/vendor/persist/data noatime nosuid nodev barrier=1
+    restorecon_recursive /mnt/vendor/persist/data
+
     swapon_all /vendor/etc/fstab.qcom
 
 on late-fs

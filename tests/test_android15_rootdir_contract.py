@@ -153,6 +153,23 @@ class Android15RootdirContractTest(unittest.TestCase):
     def test_qseecomd_is_ready_before_android15_starts_keymaster(self) -> None:
         self.assertTrue(qseecomd_ready_before_fbe(QCOM))
 
+    def test_red118_securefs_is_mounted_before_qseecomd(self) -> None:
+        fs_commands = [
+            command
+            for trigger, commands in action_blocks(self.qcom)
+            if trigger == "fs"
+            for command in commands
+        ]
+        self.assertIn(
+            "mkdir /mnt/vendor/persist/data 0700 system system",
+            fs_commands,
+        )
+        self.assertIn(
+            "mount ext4 /dev/block/bootdevice/by-name/cmlog "
+            "/mnt/vendor/persist/data noatime nosuid nodev barrier=1",
+            fs_commands,
+        )
+
     def test_target_contains_no_android8_9_control_plane_paths(self) -> None:
         conflicts = [f"{token}: {reason}" for token, reason in LEGACY_TOKENS.items() if token in self.target]
         self.assertEqual(conflicts, [], "legacy rootdir constructs remain:\n" + "\n".join(conflicts))

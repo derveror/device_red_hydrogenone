@@ -39,7 +39,7 @@ class CrossTreeLockContractTest(unittest.TestCase):
         self.assertEqual(self.lock["kernel_branch"], "lineage-22.2")
         self.assertEqual(
             self.lock["kernel_commit"],
-            "440e8eb4eea36404d340a2a4ad001cf013304447",
+            "39e74780ffb29d0b6ac30e9d68ae5b1195fe529e",
         )
 
     def test_permanent_ci_rechecks_pinned_vendor_tree(self) -> None:

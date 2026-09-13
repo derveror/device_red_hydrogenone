@@ -2,7 +2,7 @@
   "schema_version": 1,
   "device_branch": "118-lineage-22.2-kernel-302",
   "kernel_branch": "lineage-22.2",
-  "kernel_commit": "440e8eb4eea36404d340a2a4ad001cf013304447",
+  "kernel_commit": "39e74780ffb29d0b6ac30e9d68ae5b1195fe529e",
   "kernel_path": "kernel/red/msm8998",
   "kernel_repository": "derveror/android_kernel_red_msm8998",
   "vendor_repository": "derveror/proprietary_vendor_red_hydrogenone",

@@ -23,7 +23,7 @@ generated audits and historical worklogs remain under `docs/`.
 - Vendor repository: `derveror/proprietary_vendor_red_hydrogenone`, commit
   `a6560ec388398760f3d45e7634ba23c89f4a2eb6`.
 - Kernel repository: `derveror/android_kernel_red_msm8998`, commit
-  `440e8eb4eea36404d340a2a4ad001cf013304447`.
+  `39e74780ffb29d0b6ac30e9d68ae5b1195fe529e`.
 - Kernel path: `kernel/red/msm8998`.
 - Kernel config: `lineageos_hydrogenone_defconfig`.
 

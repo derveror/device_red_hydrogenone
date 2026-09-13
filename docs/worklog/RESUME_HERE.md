@@ -9,7 +9,7 @@ Read this file first after interruption.
 - Vendor: `derveror/proprietary_vendor_red_hydrogenone`, commit
   `a6560ec388398760f3d45e7634ba23c89f4a2eb6`.
 - Kernel: `derveror/android_kernel_red_msm8998`, commit
-  `440e8eb4eea36404d340a2a4ad001cf013304447`.
+  `39e74780ffb29d0b6ac30e9d68ae5b1195fe529e`.
 - Stock authority: `H1A1000.082ho.01.00.10r.118`.
 - Stock archive SHA-256:
   `7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e`.

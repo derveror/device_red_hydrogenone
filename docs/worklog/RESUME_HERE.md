@@ -6,8 +6,9 @@ Read this file first after interruption.
 
 - Device: `derveror/device_red_hydrogenone`, branch
   `118-lineage-22.2-kernel-302`.
-- Vendor: `derveror/proprietary_vendor_red_hydrogenone`, commit
-  `a6560ec388398760f3d45e7634ba23c89f4a2eb6`.
+- Vendor: `derveror/proprietary_vendor_red_hydrogenone`, branch
+  `lineage-22.2-kernel-302`, commit
+  `aa87d1e184ab100547a5cb3262393dd96c5348bc`.
 - Kernel: `derveror/android_kernel_red_msm8998`, commit
   `39e74780ffb29d0b6ac30e9d68ae5b1195fe529e`.
 - Stock authority: `H1A1000.082ho.01.00.10r.118`.
@@ -22,8 +23,9 @@ Read this file first after interruption.
 - No RED `msm8998-common` repositories.
 - SmartPort excluded; standard USB/Bluetooth/charging and Leia/display retained.
 - Device tree owns open configuration and source wrappers.
-- Vendor tree owns 460 selected proprietary files, including the exact `.118`
-  `libssd.so` required by the SSD QSEE listener.
+- Vendor tree owns 464 selected proprietary files, including the exact `.118`
+  `libssd.so` required by the SSD QSEE listener and the physically verified
+  RED `.118` QTI Keymaster stack.
 - Stock HIDL base libraries are source-owned, with narrow compatibility fixups
   for verified `.118` consumers.
 
@@ -47,11 +49,22 @@ Read this file first after interruption.
   wrote and verified `boot_a`, `system_a` and `vendor_a` and finished with
   status 0. The saved sideload log SHA-256 is
   `56f30165150452c31eb0fd6491b9eea30919e36532607cd6168d00e9a609a0bc`.
-- The following slot-`A` normal boot did not complete. The phone remained on
-  the RED logo for at least 150 seconds with neither ADB nor fastboot visible
-  and did not automatically return to the bootloader during observation.
-- The phone was last observed at the RED logo. Only the user can enter Lineage
-  Recovery physically; never issue `adb reboot recovery` or
-  `fastboot reboot recovery` on this device.
-- The next gate is a new durable normal-boot trace from slot `A`. Do not change
-  another runtime component or claim Android boot until that evidence is read.
+- Durable trace v8 proved that the corrected securefs mount succeeds, qseecomd
+  remains ready and `/data` mounts, but the generic MSM8998 Keymaster exits
+  because it expects absent file-based
+  `/vendor/firmware_mnt/image/keymaster.mdt` firmware. This is not a kernel
+  panic and is not a Linux 4.4.302 failure.
+- A read-only Recovery chroot test proved that the exact RED `.118` QTI
+  Keymaster stack instead uses the device's dedicated Keymaster partitions,
+  registers `IKeymasterDevice/default`, and remains running with the current
+  LineageOS source-built `libion`.
+- Device/vendor now select only that QTI stack. Full `mka bacon` passed; the new
+  OTA SHA-256 is
+  `fb4890863015e01bcf210d12c4ad4b5e1b5b0ff256be0937e8ff698bda2b2f65`.
+- Production `boot_a` was restored byte-exactly after diagnostic boot v8. The
+  phone is in Lineage Recovery on slot `A`; no phone partition contains the
+  temporary chroot overlay.
+- Only the user can enter Lineage Recovery physically; never issue
+  `adb reboot recovery` or `fastboot reboot recovery` on this device.
+- The next gate is one sideload of the new QTI-Keymaster OTA followed by one
+  normal-boot test. Do not claim a complete Android boot before that result.

@@ -175,13 +175,18 @@ PRODUCT_PACKAGES += \
 # DRM
 PRODUCT_PACKAGES += android.hardware.drm-service.clearkey
 
-# Gatekeeper / keymaster source service wrappers
+# Gatekeeper source service wrapper
 PRODUCT_PACKAGES += \
     android.hardware.gatekeeper@1.0-impl \
     android.hardware.gatekeeper@1.0-service \
-    android.hardware.gatekeeper@1.0.vendor \
-    android.hardware.keymaster@3.0-impl \
-    android.hardware.keymaster@3.0-service
+    android.hardware.gatekeeper@1.0.vendor
+
+# RED .118 QTI Keymaster is owned by
+# vendor/red/hydrogenone/hydrogenone-vendor.mk.  The generic MSM8998 wrapper
+# expects file-based /vendor/firmware_mnt/image/keymaster.mdt firmware, while
+# Hydrogen One boots Keymaster from its dedicated keymaster/keymaster64
+# partitions.  Selecting both stacks would make the generic service win the
+# keymaster-3-0 service name and block file-based encryption during first boot.
 
 # GNSS - Qualcomm MSM8998 legacy ABI source stack.
 # Razer cheryl is the primary source-ABI donor here because its maintained

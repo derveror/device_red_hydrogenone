@@ -66,7 +66,7 @@ registries.
 - source kernel and four-DTB contract;
 - radio, fstab, camera, init and VINTF static contracts;
 - device/vendor copy ownership;
-- reproducible 460-file extraction list and compatibility fixups;
+- reproducible 464-file extraction list and compatibility fixups;
 - rejection of superseded stock identity and raw reference trees;
 - rejection of SmartPort runtime control and kernel prebuilts.
 
@@ -96,6 +96,17 @@ The device policy now restores the exact stock `.118`
 OTA passes Android SELinux/neverallow, VINTF and integrity checks. Update Engine
 successfully wrote and verified that OTA on slot `A`, but its normal-boot test
 remained at the RED logo for at least 150 seconds without ADB or fastboot.
-This changed physical symptom is not proof that Keymaster succeeded; a new
-durable normal-boot trace is the next evidence gate. No hardware subsystem is
-declared working solely from repository or recovery-level proof.
+This physical symptom was investigated with durable trace v8. The corrected
+securefs mount, qseecomd and `/data` mount all succeeded, but the generic
+MSM8998 Keymaster repeatedly exited. A read-only system chroot captured its
+failed attempt to open absent
+`/vendor/firmware_mnt/image/keymaster.mdt` firmware.
+
+Hydrogen One instead carries Keymaster firmware in dedicated A/B raw
+partitions. The exact RED `.118` QTI service/implementation was tested in the
+same chroot with the generic implementation absent. It opened QSEECom/ION,
+completed TrustZone requests, registered `IKeymasterDevice/default`, and
+remained running with LineageOS 22.2's source-built `libion`. Device/vendor now
+select that verified QTI stack, and the resulting full OTA build passes. One
+new sideload and normal-boot test remains the next evidence gate. No hardware
+subsystem is declared working solely from repository or recovery-level proof.

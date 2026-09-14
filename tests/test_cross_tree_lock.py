@@ -58,7 +58,9 @@ class CrossTreeLockContractTest(unittest.TestCase):
         self.assertIn("path: device/red/hydrogenone", self.workflow)
         self.assertIn("path: vendor/red/hydrogenone", self.workflow)
         self.assertIn("path: kernel/red/msm8998", self.workflow)
+        self.assertIn("path: device/qcom/sepolicy-legacy-um", self.workflow)
         self.assertIn("repository: derveror/android_kernel_red_msm8998", self.workflow)
+        self.assertIn("repository: LineageOS/android_device_qcom_sepolicy_vndr", self.workflow)
 
 
 if __name__ == "__main__":

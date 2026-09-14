@@ -39,6 +39,13 @@ jobs:
           ref: aba534bba4e9d779245ee077e83bb99a9522d24d
           path: kernel/red/msm8998
 
+      - name: Checkout legacy Qualcomm sepolicy for BoardConfig evaluation
+        uses: actions/checkout@v4
+        with:
+          repository: LineageOS/android_device_qcom_sepolicy_vndr
+          ref: lineage-22.2-legacy-um
+          path: device/qcom/sepolicy-legacy-um
+
       - name: Validate JSON and source lock
         shell: bash
         run: |

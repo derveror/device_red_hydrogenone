@@ -9,7 +9,7 @@ from source:
 repository: https://github.com/derveror/android_kernel_red_msm8998.git
 branch: lineage-22.2
 path: kernel/red/msm8998
-commit: 39e74780ffb29d0b6ac30e9d68ae5b1195fe529e
+commit: a2af472c6545873a1f8884468ea84381d69be21a
 version: Linux 4.4.302+
 defconfig: lineageos_hydrogenone_defconfig
 output: arch/arm64/boot/Image.gz-dtb

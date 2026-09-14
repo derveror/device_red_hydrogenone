@@ -7,7 +7,7 @@ The LineageOS 22.2 device build uses the RED-specific source kernel below.
 | Workspace path | `kernel/red/msm8998` |
 | Repository | `https://github.com/derveror/android_kernel_red_msm8998` |
 | Branch | `lineage-22.2` |
-| Verified commit | `39e74780ffb29d0b6ac30e9d68ae5b1195fe529e` |
+| Verified commit | `a2af472c6545873a1f8884468ea84381d69be21a` |
 | Kernel version | Linux `4.4.302+` |
 | Defconfig | `lineageos_hydrogenone_defconfig` |
 | Image target | `Image.gz-dtb` |

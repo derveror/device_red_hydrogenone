@@ -33,11 +33,29 @@ on post-fs-data
     mkdir /mnt/vendor/persist/data/tz 0700 system system
     mkdir /mnt/vendor/persist/data/app_g 0700 system system
     mkdir /mnt/vendor/persist/hvdcp_opti 0770 root system
+    mkdir /mnt/vendor/persist/sensors 0770 system system
+    mkdir /mnt/vendor/persist/sensors/registry 0770 system system
     mkdir /mnt/vendor/persist/time 0770 system system
+    chown system system /mnt/vendor/persist/sensors
+    chown system system /mnt/vendor/persist/sensors/sns.reg
+    chmod 0664 /mnt/vendor/persist/sensors/sns.reg
+    chown system system /mnt/vendor/persist/sensors/sensors_list.txt
+    chown system system /mnt/vendor/persist/sensors/registry
+    chown system system /mnt/vendor/persist/sensors/registry/registry
+    chown system system /mnt/vendor/persist/sensors/registry/registry/sensors_registry
+    chown system system /mnt/vendor/persist/sensors/sensors_settings
+    chown system system /mnt/vendor/persist/sensors/registry/sns_reg_config
+    chown system system /mnt/vendor/persist/sensors/registry/sns_reg_version
+    chown system system /mnt/vendor/persist/sensors/registry/config
+    chmod 0664 /mnt/vendor/persist/sensors/sensors_settings
 
     mkdir /data/vendor 0771 root root
     mkdir /data/vendor/tombstones 0771 root root
     mkdir /data/vendor/qvr 0770 system system
+
+on early-boot
+    # The RED .118 sensor HAL is backed by the SLPI sensor DSP.
+    write /sys/kernel/boot_slpi/boot 1
 
 on boot
     # RED .118 canonical modem is MPSS.AT and stock is DSDS. Stock
@@ -53,3 +71,16 @@ on boot
     chmod 0600 /sys/bus/platform/devices/soc:fpc1020/irq
     chmod 0200 /sys/bus/platform/devices/soc:fpc1020/wakeup_enable
     chmod 0200 /sys/bus/platform/devices/soc:fpc1020/wakeup_feature
+
+# RED .118 SSC registry daemon. The source-owned Android 15 HIDL wrapper loads
+# sensors.ssc.so through /vendor/etc/sensors/hals.conf.
+service vendor.sensors.qti /vendor/bin/sensors.qti
+    class core
+    user system
+    group system
+    disabled
+
+service vendor-sensor-sh /vendor/bin/init.qcom.sensors.sh
+    class core
+    user root
+    oneshot

@@ -1,6 +1,6 @@
 # RED Hydrogen One LineageOS 22.2 project state
 
-Last updated: 2026-09-13.
+Last updated: 2026-09-14.
 
 This is the current status for `device/red/hydrogenone`. Detailed stock evidence,
 generated audits and historical worklogs remain under `docs/`.
@@ -21,9 +21,9 @@ generated audits and historical worklogs remain under `docs/`.
 
 - Device branch: `118-lineage-22.2-kernel-302`.
 - Vendor repository: `derveror/proprietary_vendor_red_hydrogenone`, commit
-  `a6560ec388398760f3d45e7634ba23c89f4a2eb6`.
+  `b9e652a35e9dd5b5bec3dfa349ca445f62b2b0ef`.
 - Kernel repository: `derveror/android_kernel_red_msm8998`, commit
-  `39e74780ffb29d0b6ac30e9d68ae5b1195fe529e`.
+  `a2af472c6545873a1f8884468ea84381d69be21a`.
 - Kernel path: `kernel/red/msm8998`.
 - Kernel config: `lineageos_hydrogenone_defconfig`.
 
@@ -43,11 +43,12 @@ remain in scope.
 
 ## Vendor payload and HIDL compatibility
 
-The pinned Android 15 vendor selection contains 460 files. Its
+The pinned Android 15 vendor selection contains 474 files. Its
 `proprietary-files.txt`, `proprietary-manifest.json` and on-disk payload agree
-on all 460 entries. This includes the exact `.118` 64-bit `libssd.so` loaded by
+on all 474 entries. This includes the exact `.118` 64-bit `libssd.so` loaded by
 `qseecomd` through `dlopen`; ordinary `DT_NEEDED` analysis does not expose that
-runtime dependency.
+runtime dependency. It also contains the exact `.118` SSC sensor payload for
+both architectures while retaining the Android 15 source-owned HIDL wrapper.
 
 The platform HIDL base libraries are source-owned and are not selected as RED
 prebuilts. Sixty-three exact `.118` HIDL consumers receive the narrow
@@ -65,7 +66,7 @@ and pinned in `docs/reference/vendor-hidl-runtime-contract.json`.
 - Device and vendor copy destinations are checked for collisions.
 - Source-owned GNSS, NFC, Wi-Fi, camera and media wrappers must not coexist with
   conflicting proprietary implementations.
-- The device extraction list mirrors the current 460-file vendor selection.
+- The device extraction list mirrors the current 474-file vendor selection.
 
 ## Confirmed static contracts
 
@@ -84,25 +85,34 @@ and pinned in `docs/reference/vendor-hidl-runtime-contract.json`.
 
 ## Proven build and recovery gates
 
-- A complete LineageOS 22.2 OTA build completed successfully on 2026-09-13.
+- Complete LineageOS 22.2 OTA builds passed on 2026-09-13 and, with the SSC
+  correction, on 2026-09-14.
 - The packaged kernel reports Linux `4.4.302+` and the boot image is below the
   stock 64 MiB partition limit.
 - Lineage Recovery boots on the physical H1A1000 with the source-built kernel.
-- A durable normal-boot trace reached Android init and identified `qseecomd`
-  exiting with status 255 before publishing
-  `vendor.sys.listeners.registered`.
-- The rebuilt vendor image now contains the exact `.118` `libssd.so` and mounts
-  the dedicated `cmlog` securefs partition before starting `qseecomd`.
+- The QSEE securefs, QTI Keymaster and `/dev/ion` corrections moved normal boot
+  past the RED logo to the Lineage boot animation.
+- Durable trace v16 contains no kernel panic, GPU fault or hardware watchdog.
+  It proves that `system_server` was killed by its software watchdog after two
+  66-second waits in `SystemSensorManager.nativeCreate`, while
+  `vendor.sensors-hal-1-0` repeatedly reported `Couldn't load sensors module`.
+- The exact `.118` SSC module, registry dependencies and configs are now
+  restored for arm/arm64. The Android 15 module build, `check_elf_file`, SELinux
+  neverallow checks and complete `vendor.img` build pass. The resulting
+  `vendor.img` is 319,480,028 bytes against the 1 GiB partition limit. A full
+  `mka bacon` and a final incremental rebuild both pass; the final OTA SHA-256
+  is `f0b63723a732d16b2e2d6f4b7cb88a84080b7470e45d75f04d1fee83e6c1ecf2`.
 
-The QSEE correction has built and passed static/image verification but has not
-yet been installed on the phone. Full Android userspace boot and physical-device
-operation of radio, camera, audio, sensors, Leia/display, DRM, GNSS, Wi-Fi,
-Bluetooth, NFC, fingerprint, power, thermal management and OTA remain unproven.
+Full Android userspace boot and physical-device operation of radio, camera,
+audio, sensors, Leia/display, DRM, GNSS, Wi-Fi, Bluetooth, NFC, fingerprint,
+power and thermal management remain unproven until the rebuilt OTA is installed
+and observed on the phone.
 
 ## Next gates
 
-1. Install the verified 2026-09-13 OTA from Lineage Recovery.
-2. Attempt normal boot without overwriting the recoverable alternate slot.
-3. Capture another durable boot trace if Android userspace still does not start.
-4. Validate installed VINTF, SELinux, linker namespaces and image sizes.
-5. Continue physical subsystem bring-up only after a stable userspace boot.
+1. Commit and push the verified device-tree SSC correction.
+2. Replace the temporary diagnostic boot image only with the verified production
+   artifact and install the OTA from physically entered Lineage Recovery.
+3. Capture a durable normal-boot trace and verify that the sensor HAL registers
+   without another `system_server` watchdog reset.
+4. Continue physical subsystem bring-up only after stable Android userspace.

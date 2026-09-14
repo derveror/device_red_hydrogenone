@@ -3,7 +3,7 @@
     "device_branch": "118-lineage-22.2-kernel-302",
     "stock_archive_sha256": "7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e",
     "stock_build": "H1A1000.082ho.01.00.10r.118",
-    "vendor_commit": "a6560ec388398760f3d45e7634ba23c89f4a2eb6"
+    "vendor_commit": "b9e652a35e9dd5b5bec3dfa349ca445f62b2b0ef"
   },
   "copy_destination_collisions": [],
   "device_copy_destinations": {
@@ -487,6 +487,12 @@
       "hydrogenone-vendor.mk"
     ],
     "vendor/etc/permissions/com.android.nfc_extras.xml": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/etc/sensors/hals.conf": [
+      "hydrogenone-vendor.mk"
+    ],
+    "vendor/etc/sensors/sensor_def_qcomdev.conf": [
       "hydrogenone-vendor.mk"
     ],
     "vendor/etc/thermal-engine-3d.conf": [

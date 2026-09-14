@@ -50,9 +50,9 @@ from `kernel/red/msm8998`; no stock kernel prebuilt is a build input.
 ## Vendor payload audit
 
 Pinned vendor commit:
-`aa87d1e184ab100547a5cb3262393dd96c5348bc`.
+`b9e652a35e9dd5b5bec3dfa349ca445f62b2b0ef`.
 
-The selected list, manifest and on-disk payload each contain 464 entries. Stock
+The selected list, manifest and on-disk payload each contain 474 entries. Stock
 copies of `libhidlbase`, `libhidltransport` and `libhwbinder` are pruned because
 the Android 15 source tree owns those providers. Sixty-three exact `.118` HIDL
 consumers receive `libhidlbase_shim`; `imsdatadaemon` is retargeted from
@@ -66,7 +66,7 @@ registries.
 - source kernel and four-DTB contract;
 - radio, fstab, camera, init and VINTF static contracts;
 - device/vendor copy ownership;
-- reproducible 464-file extraction list and compatibility fixups;
+- reproducible 474-file extraction list and compatibility fixups;
 - rejection of superseded stock identity and raw reference trees;
 - rejection of SmartPort runtime control and kernel prebuilts.
 
@@ -117,5 +117,18 @@ curated `ueventd.rc` had omitted the stock `.118`
 is now restored with a regression contract. The rebuilt OTA passes all tree
 tests, full Android build, filesystem, VINTF and ZIP-integrity checks, and the
 final sparse vendor image contains the exact rule. A physical normal-boot test
-remains the next evidence gate. No hardware subsystem is declared working
-solely from repository or recovery-level proof.
+reached the Lineage boot animation. Durable trace v16 then proved that the
+kernel remained alive while `vendor.sensors-hal-1-0` repeatedly failed with
+`Couldn't load sensors module`. `system_server` blocked twice for 66 seconds in
+`SystemSensorManager.nativeCreate` and was killed by its software watchdog.
+
+The vendor selection now contains the exact stock `.118` arm/arm64 SSC module,
+its registry and low-latency dependencies, `libsdsprpc`, and the two stock sensor
+configs. Device init boots SLPI and runs the stock registry control plane while
+the Android 15 source-owned HIDL wrapper remains selected. All four proprietary
+modules pass Android 15 ELF checks in both architectures, and the complete
+vendor image passes SELinux and partition-size checks. The sensor-corrected full
+OTA and final incremental rebuild pass, including ZIP integrity, VINTF, the
+source-built `4.4.302+` kernel and the exact four-DTB order. A physical
+normal-boot trace remains the next evidence gate. No hardware subsystem is
+declared working solely from repository or recovery-level proof.

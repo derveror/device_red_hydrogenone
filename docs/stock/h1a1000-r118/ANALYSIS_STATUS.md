@@ -50,9 +50,9 @@ from `kernel/red/msm8998`; no stock kernel prebuilt is a build input.
 ## Vendor payload audit
 
 Pinned vendor commit:
-`b9e652a35e9dd5b5bec3dfa349ca445f62b2b0ef`.
+`4dce3edee53619e1d1cd15182c6189f3208f283c`.
 
-The selected list, manifest and on-disk payload each contain 474 entries. Stock
+The selected list, manifest and on-disk payload each contain 659 entries. Stock
 copies of `libhidlbase`, `libhidltransport` and `libhwbinder` are pruned because
 the Android 15 source tree owns those providers. Sixty-three exact `.118` HIDL
 consumers receive `libhidlbase_shim`; `imsdatadaemon` is retargeted from
@@ -66,7 +66,7 @@ registries.
 - source kernel and four-DTB contract;
 - radio, fstab, camera, init and VINTF static contracts;
 - device/vendor copy ownership;
-- reproducible 474-file extraction list and compatibility fixups;
+- reproducible 659-file extraction list and compatibility fixups;
 - rejection of superseded stock identity and raw reference trees;
 - rejection of SmartPort runtime control and kernel prebuilts.
 
@@ -129,6 +129,15 @@ the Android 15 source-owned HIDL wrapper remains selected. All four proprietary
 modules pass Android 15 ELF checks in both architectures, and the complete
 vendor image passes SELinux and partition-size checks. The sensor-corrected full
 OTA and final incremental rebuild pass, including ZIP integrity, VINTF, the
-source-built `4.4.302+` kernel and the exact four-DTB order. A physical
-normal-boot trace remains the next evidence gate. No hardware subsystem is
-declared working solely from repository or recovery-level proof.
+source-built `4.4.302+` kernel and the exact four-DTB order. A subsequent
+physical test reached the LineageOS setup/system UI and confirmed touchscreen
+input. Wi-Fi, Bluetooth, camera/flashlight and USB data/ADB remained unavailable
+in that installed build.
+
+The current uninstalled candidate adds the exact Cherokee Bluetooth source
+contract, the stock persist-backed WLAN MAC link, the RED `.118` camera power
+ABI and the byte-verified 185-file production camera runtime closure. Its full
+OTA build and static checks pass without changing DTS, defconfig, display,
+touchscreen, recovery or init ordering. Runtime validation on the phone remains
+required; no repaired hardware subsystem is declared working from build proof
+alone.

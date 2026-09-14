@@ -19,13 +19,13 @@
         name="proprietary_vendor_red_hydrogenone"
         path="vendor/red/hydrogenone"
         remote="derveror"
-        revision="b9e652a35e9dd5b5bec3dfa349ca445f62b2b0ef" />
+        revision="4dce3edee53619e1d1cd15182c6189f3208f283c" />
 
     <project
         name="android_kernel_red_msm8998"
         path="kernel/red/msm8998"
         remote="derveror"
-        revision="a2af472c6545873a1f8884468ea84381d69be21a" />
+        revision="aba534bba4e9d779245ee077e83bb99a9522d24d" />
 
     <project
         name="android_device_qcom_sepolicy_vndr"

@@ -2,6 +2,10 @@
 # SPDX-License-Identifier: Apache-2.0
 # H1A1000 / HydrogenONE LineageOS 22.2 bring-up extraction scaffold.
 
+import subprocess
+import sys
+from pathlib import Path
+
 from extract_utils.fixups_blob import blob_fixup, blob_fixups_user_type
 from extract_utils.fixups_lib import lib_fixups
 from extract_utils.main import ExtractUtils, ExtractUtilsModule
@@ -40,5 +44,16 @@ module = ExtractUtilsModule(
     namespace_imports=namespace_imports,
 )
 
+
+def apply_android15_vendor_contract() -> None:
+    android_root = Path(__file__).resolve().parents[3]
+    vendor_root = android_root / 'vendor' / 'red' / 'hydrogenone'
+    pipeline = vendor_root / 'tools' / 'apply_android15_vendor_contract.py'
+    if not pipeline.is_file():
+        raise SystemExit(f'missing required Android 15 vendor pipeline: {pipeline}')
+    subprocess.run([sys.executable, str(pipeline)], cwd=vendor_root, check=True)
+
+
 if __name__ == '__main__':
     ExtractUtils.device(module).run()
+    apply_android15_vendor_contract()

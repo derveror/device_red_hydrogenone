@@ -5,3 +5,12 @@ soong_namespace {
         "hardware/qcom-caf/wlan",
     ],
 }
+
+// RED .118 exposes the WLAN MAC stored in persist at the firmware path used
+// by qcacld.  Keep persist as the single source of truth.
+install_symlink {
+    name: "wlan_mac_bin_symlink",
+    vendor: true,
+    installed_location: "firmware/wlan/qca_cld/wlan_mac.bin",
+    symlink_target: "/mnt/vendor/persist/wlan_mac.bin",
+}

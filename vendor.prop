@@ -4,7 +4,9 @@ ro.hardware.egl=adreno
 ro.hardware.vulkan=adreno
 ro.opengles.version=196610
 
-# Bluetooth - stock Cherokee controller; Oreo Qualcomm libbt-vendor reads the legacy key
+# Bluetooth - stock Cherokee controller.  Keep the aliases used by older
+# components, but expose the exact property read by the source vendor library.
+vendor.qcom.bluetooth.soc=cherokee
 qcom.bluetooth.soc=cherokee
 vendor.bluetooth.soc=cherokee
 

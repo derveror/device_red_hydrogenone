@@ -90,7 +90,11 @@ PRODUCT_COPY_FILES += \
     frameworks/av/services/audiopolicy/config/r_submix_audio_policy_configuration.xml:$(TARGET_COPY_OUT_VENDOR)/etc/r_submix_audio_policy_configuration.xml \
     frameworks/av/services/audiopolicy/config/usb_audio_policy_configuration.xml:$(TARGET_COPY_OUT_VENDOR)/etc/usb_audio_policy_configuration.xml
 
-# Camera provider wrapper; camera HAL payload remains in future vendor tree
+# Bluetooth - source Qualcomm Cherokee vendor transport selected by RED .118.
+PRODUCT_PACKAGES += \
+    libbt-vendor
+
+# Camera provider wrapper; camera HAL payload remains vendor-tree owned.
 PRODUCT_PACKAGES += \
     android.hardware.camera.provider@2.4-impl:32 \
     android.hardware.camera.provider@2.4-service
@@ -358,6 +362,7 @@ PRODUCT_PACKAGES += \
     hostapd_cli \
     libwifi-hal-qcom \
     libwpa_client \
+    wlan_mac_bin_symlink \
     WifiOverlay \
     wpa_supplicant \
     wpa_supplicant.conf

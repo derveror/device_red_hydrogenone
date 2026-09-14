@@ -9,6 +9,8 @@ ROOT = Path(__file__).resolve().parents[1]
 LOCK = ROOT / "docs" / "reference" / "cross-tree-lock.json"
 EVIDENCE = ROOT / "docs" / "stock" / "h1a1000-r118" / "cross-tree-copy-contract.json"
 WORKFLOW = ROOT / ".github" / "workflows" / "verify-analysis.yml"
+KERNEL_COMMIT = "aba534bba4e9d779245ee077e83bb99a9522d24d"
+VENDOR_COMMIT = "4dce3edee53619e1d1cd15182c6189f3208f283c"
 
 
 class CrossTreeLockContractTest(unittest.TestCase):
@@ -31,6 +33,7 @@ class CrossTreeLockContractTest(unittest.TestCase):
         self.assertEqual(self.lock["schema_version"], 1)
         self.assertEqual(self.lock["vendor_repository"], "derveror/proprietary_vendor_red_hydrogenone")
         self.assertRegex(self.lock["vendor_commit"], r"^[0-9a-f]{40}$")
+        self.assertEqual(self.lock["vendor_commit"], VENDOR_COMMIT)
         self.assertEqual(self.lock["device_branch"], "118-lineage-22.2-kernel-302")
 
     def test_lock_pins_source_built_red_kernel(self) -> None:
@@ -39,12 +42,13 @@ class CrossTreeLockContractTest(unittest.TestCase):
         self.assertEqual(self.lock["kernel_branch"], "lineage-22.2")
         self.assertEqual(
             self.lock["kernel_commit"],
-            "a2af472c6545873a1f8884468ea84381d69be21a",
+            KERNEL_COMMIT,
         )
 
     def test_permanent_ci_rechecks_pinned_vendor_tree(self) -> None:
         commit = re.escape(self.lock["vendor_commit"])
         self.assertRegex(self.workflow, rf"(?m)^\s*ref:\s*{commit}\s*$")
+        self.assertIn(KERNEL_COMMIT, self.workflow)
         self.assertIn("tools/analysis/cross_tree_contract.py", self.workflow)
         self.assertIn("copy_destination_collisions", self.workflow)
         self.assertIn("cross-tree-lock.json", self.workflow)

@@ -43,9 +43,9 @@ remain in scope.
 
 ## Vendor payload and HIDL compatibility
 
-The pinned Android 15 vendor selection contains 474 files. Its
+The pinned Android 15 vendor selection contains 659 files. Its
 `proprietary-files.txt`, `proprietary-manifest.json` and on-disk payload agree
-on all 474 entries. This includes the exact `.118` 64-bit `libssd.so` loaded by
+on all 659 entries. This includes the exact `.118` 64-bit `libssd.so` loaded by
 `qseecomd` through `dlopen`; ordinary `DT_NEEDED` analysis does not expose that
 runtime dependency. It also contains the exact `.118` SSC sensor payload for
 both architectures while retaining the Android 15 source-owned HIDL wrapper.
@@ -66,7 +66,7 @@ and pinned in `docs/reference/vendor-hidl-runtime-contract.json`.
 - Device and vendor copy destinations are checked for collisions.
 - Source-owned GNSS, NFC, Wi-Fi, camera and media wrappers must not coexist with
   conflicting proprietary implementations.
-- The device extraction list mirrors the current 474-file vendor selection.
+- The device extraction list mirrors the current 659-file vendor selection.
 
 ## Confirmed static contracts
 

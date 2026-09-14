@@ -53,6 +53,13 @@ class CrossTreeLockContractTest(unittest.TestCase):
         self.assertIn("copy_destination_collisions", self.workflow)
         self.assertIn("cross-tree-lock.json", self.workflow)
 
+    def test_ci_unit_tests_use_android_workspace_layout(self) -> None:
+        self.assertIn("working-directory: device/red/hydrogenone", self.workflow)
+        self.assertIn("path: device/red/hydrogenone", self.workflow)
+        self.assertIn("path: vendor/red/hydrogenone", self.workflow)
+        self.assertIn("path: kernel/red/msm8998", self.workflow)
+        self.assertIn("repository: derveror/android_kernel_red_msm8998", self.workflow)
+
 
 if __name__ == "__main__":
     unittest.main()

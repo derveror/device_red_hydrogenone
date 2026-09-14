@@ -16,8 +16,28 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: device/red/hydrogenone
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout device tree in Android workspace layout
+        uses: actions/checkout@v4
+        with:
+          path: device/red/hydrogenone
+
+      - name: Checkout pinned vendor tree for cross-tree unit tests
+        uses: actions/checkout@v4
+        with:
+          repository: derveror/proprietary_vendor_red_hydrogenone
+          ref: 4dce3edee53619e1d1cd15182c6189f3208f283c
+          path: vendor/red/hydrogenone
+
+      - name: Checkout pinned kernel tree for cross-tree unit tests
+        uses: actions/checkout@v4
+        with:
+          repository: derveror/android_kernel_red_msm8998
+          ref: aba534bba4e9d779245ee077e83bb99a9522d24d
+          path: kernel/red/msm8998
 
       - name: Validate JSON and source lock
         shell: bash

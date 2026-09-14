@@ -51,6 +51,10 @@ REMOVED_STALE_SERVICES = {
     "keyserver",
 }
 
+# Installed by vendor/red/hydrogenone/hydrogenone-vendor.mk.  The device init
+# sequence deliberately starts it only after qseecomd reports listener readiness.
+EXTERNAL_VENDOR_SERVICES = {"keymaster-3-0"}
+
 
 def services(text: str) -> dict[str, str]:
     return {name: executable for name, executable in SERVICE_RE.findall(text)}
@@ -157,6 +161,22 @@ class Android15RootdirContractTest(unittest.TestCase):
     def test_qseecomd_is_ready_before_android15_starts_keymaster(self) -> None:
         self.assertTrue(qseecomd_ready_before_fbe(QCOM))
 
+    def test_red118_keymaster_starts_after_qsee_listeners_before_fbe(self) -> None:
+        post_fs_commands = [
+            command
+            for trigger, commands in action_blocks(self.target)
+            if trigger == "post-fs"
+            for command in commands
+        ]
+        self.assertEqual(
+            post_fs_commands[:3],
+            [
+                "start vendor.qseecomd",
+                "wait_for_prop vendor.sys.listeners.registered true",
+                "start keymaster-3-0",
+            ],
+        )
+
     def test_red118_keymaster_can_open_legacy_ion_device(self) -> None:
         self.assertRegex(
             self.ueventd,
@@ -211,7 +231,7 @@ class Android15RootdirContractTest(unittest.TestCase):
         referenced: set[str] = set()
         for command in re.finditer(r"(?m)^\s*(?:start|stop|restart)\s+(\S+)", self.target):
             referenced.add(command.group(1))
-        unknown = sorted(referenced - defined)
+        unknown = sorted(referenced - defined - EXTERNAL_VENDOR_SERVICES)
         self.assertEqual(unknown, [], f"rootdir triggers reference undefined services: {unknown}")
 
     def test_required_modern_service_semantics_are_present(self) -> None:

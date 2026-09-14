@@ -6,11 +6,13 @@
 # actions are owned by init.qcom.rc / init.qcom.usb.rc.
 
 # RED .118 starts qseecomd after the early filesystems are mounted and waits
-# until its secure-world listeners are registered. Android 15 starts Keymaster
-# during late-fs, so this ordering must complete before the FBE unlock path.
+# until its secure-world listeners are registered. Start the RED QTI Keymaster
+# explicitly here so its dedicated-partition trustlet is live before Android 15
+# can request Gatekeeper during the FBE path.
 on post-fs
     start vendor.qseecomd
     wait_for_prop vendor.sys.listeners.registered true
+    start keymaster-3-0
 
 # Peripheral manager
 service vendor.per_mgr /vendor/bin/pm-service

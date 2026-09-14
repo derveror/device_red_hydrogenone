@@ -8,6 +8,13 @@ ro.opengles.version=196610
 qcom.bluetooth.soc=cherokee
 vendor.bluetooth.soc=cherokee
 
+# USB - RED .118 MSM8998 DWC3 gadget controller. Android 15 requires a
+# Gadget HAL; FunctionFS is used for MTP/PTP as expected by the QTI service.
+vendor.usb.controller=a800000.dwc3
+vendor.usb.use_gadget_hal=1
+vendor.usb.use_ffs_mtp=1
+vendor.usb.rndis.func.name=rndis
+
 # Radio - RED .118 canonical MPSS.AT modem + DSDS selects qcrild/qcrild2.
 # Legacy vendor.rild.libpath is intentionally not advertised by this qcrild path.
 

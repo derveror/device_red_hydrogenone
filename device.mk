@@ -330,8 +330,13 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/keylayout/gpio-keys.kl:$(TARGET_COPY_OUT_VENDOR)/usr/keylayout/gpio-keys.kl
 
-# USB source service
-PRODUCT_PACKAGES += android.hardware.usb@1.3-service.dual_role_usb
+# USB. The dual-role service reports the Type-C port role; the separate QTI
+# gadget service owns Android 15 ADB/MTP/PTP compositions on RED's configfs
+# controller.
+PRODUCT_PACKAGES += \
+    android.hardware.usb.gadget-service.qti \
+    android.hardware.usb@1.3-service.dual_role_usb \
+    usb_compositions.conf
 
 # Vibrator source service
 PRODUCT_PACKAGES += vendor.qti.hardware.vibrator.service

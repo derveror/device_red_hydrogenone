@@ -8,6 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 TARGET = ROOT / "rootdir/etc/init/hw/init.target.rc"
 QCOM = ROOT / "rootdir/etc/init/hw/init.qcom.rc"
 INIT_SEPOLICY = ROOT / "sepolicy/vendor/init.te"
+UEVENTD = ROOT / "rootdir/etc/ueventd.rc"
 
 SERVICE_RE = re.compile(r"(?m)^\s*service\s+(\S+)\s+(\S+)")
 IMPORT_RE = re.compile(r"(?m)^\s*import\s+/vendor/etc/init/hw/(\S+)")
@@ -143,6 +144,7 @@ class Android15RootdirContractTest(unittest.TestCase):
         self.target = TARGET.read_text(encoding="utf-8")
         self.qcom = QCOM.read_text(encoding="utf-8")
         self.init_sepolicy = INIT_SEPOLICY.read_text(encoding="utf-8")
+        self.ueventd = UEVENTD.read_text(encoding="utf-8")
 
     def test_target_declares_only_verified_red_daemons(self) -> None:
         self.assertEqual(services(self.target), EXPECTED_SERVICES)
@@ -154,6 +156,12 @@ class Android15RootdirContractTest(unittest.TestCase):
 
     def test_qseecomd_is_ready_before_android15_starts_keymaster(self) -> None:
         self.assertTrue(qseecomd_ready_before_fbe(QCOM))
+
+    def test_red118_keymaster_can_open_legacy_ion_device(self) -> None:
+        self.assertRegex(
+            self.ueventd,
+            r"(?m)^/dev/ion\s+0664\s+system\s+system$",
+        )
 
     def test_red118_securefs_is_mounted_before_qseecomd(self) -> None:
         fs_commands = [

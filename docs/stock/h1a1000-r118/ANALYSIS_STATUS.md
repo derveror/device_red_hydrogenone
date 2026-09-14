@@ -50,9 +50,9 @@ from `kernel/red/msm8998`; no stock kernel prebuilt is a build input.
 ## Vendor payload audit
 
 Pinned vendor commit:
-`a6560ec388398760f3d45e7634ba23c89f4a2eb6`.
+`aa87d1e184ab100547a5cb3262393dd96c5348bc`.
 
-The selected list, manifest and on-disk payload each contain 460 entries. Stock
+The selected list, manifest and on-disk payload each contain 464 entries. Stock
 copies of `libhidlbase`, `libhidltransport` and `libhwbinder` are pruned because
 the Android 15 source tree owns those providers. Sixty-three exact `.118` HIDL
 consumers receive `libhidlbase_shim`; `imsdatadaemon` is retargeted from
@@ -106,7 +106,16 @@ Hydrogen One instead carries Keymaster firmware in dedicated A/B raw
 partitions. The exact RED `.118` QTI service/implementation was tested in the
 same chroot with the generic implementation absent. It opened QSEECom/ION,
 completed TrustZone requests, registered `IKeymasterDevice/default`, and
-remained running with LineageOS 22.2's source-built `libion`. Device/vendor now
-select that verified QTI stack, and the resulting full OTA build passes. One
-new sideload and normal-boot test remains the next evidence gate. No hardware
-subsystem is declared working solely from repository or recovery-level proof.
+remained running with LineageOS 22.2's source-built `libion`. That controlled
+test applied the stock device-node modes manually.
+
+After installing the QTI-Keymaster OTA, durable physical trace v11 proved that
+the bootloader-preloaded `keymaster64` application is found as QSEE app ID
+`65537`, but production Keymaster fails before its first ION/QSEE command. The
+curated `ueventd.rc` had omitted the stock `.118`
+`/dev/ion 0664 system system` rule, leaving the node `0600 root:root`. The rule
+is now restored with a regression contract. The rebuilt OTA passes all tree
+tests, full Android build, filesystem, VINTF and ZIP-integrity checks, and the
+final sparse vendor image contains the exact rule. A physical normal-boot test
+remains the next evidence gate. No hardware subsystem is declared working
+solely from repository or recovery-level proof.

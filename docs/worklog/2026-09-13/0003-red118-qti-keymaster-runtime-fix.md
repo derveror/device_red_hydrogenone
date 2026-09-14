@@ -28,6 +28,9 @@ modifying any phone partition. With a current LineageOS 22.2 source-built
 running. A second test used the exact stock filename
 `android.hardware.keymaster@3.0-impl-qti.so` with the generic `impl.so`
 absent; HIDL discovered the QTI implementation and registered it successfully.
+The Recovery harness temporarily applied the stock device-node modes to
+`/dev/qseecom` and `/dev/ion`; this proved the HAL/library/kernel ABI path, but
+did not prove that the production `ueventd.rc` reproduced both modes.
 
 ## Permanent tree change
 

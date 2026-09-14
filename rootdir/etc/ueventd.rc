@@ -1,5 +1,6 @@
 # Curated from RED .118 ueventd.rc plus source-kernel device-node evidence.
 /dev/diag                 0660   system     system
+/dev/ion                  0664   system     system
 /dev/wlan                 0660   wifi       wifi
 /dev/kgsl                 0666   system     system
 /dev/kgsl-3d0             0666   system     system

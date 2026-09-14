@@ -6,7 +6,7 @@ Read this file first after interruption.
 
 - Device: `derveror/device_red_hydrogenone`, branch
   `118-lineage-22.2-kernel-302`; the radio/camera runtime restoration has passed
-  its complete build and artifact gates and is ready for commit/push.
+  its complete build and artifact gates and is published on the named branch.
 - Vendor: `derveror/proprietary_vendor_red_hydrogenone`, branch
   `lineage-22.2-kernel-302`, commit
   `4dce3edee53619e1d1cd15182c6189f3208f283c`.

@@ -228,7 +228,7 @@ unzip -l "$ZIP" | grep -E 'payload.bin|META-INF/com/android/metadata'
 sha256sum "$ZIP" out/target/product/hydrogenone/boot.img
 ```
 
-- [ ] **Step 4: Commit and push each repository to its existing named branch**
+- [x] **Step 4: Commit and push each repository to its existing named branch**
 
 ```bash
 git push origin lineage-22.2
@@ -236,6 +236,6 @@ git push origin 118-lineage-22.2-kernel-302
 git push origin lineage-22.2-kernel-302
 ```
 
-- [ ] **Step 5: Stop before installation and provide artifact paths and manual recovery instructions**
+- [x] **Step 5: Stop before installation and provide artifact paths and manual recovery instructions**
 
 No command in this task may reboot or flash the connected phone.

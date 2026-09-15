@@ -19,6 +19,10 @@
 /dev/msm_camera/*         0660   system     camera
 /dev/qseecom              0660   system     drmrpc
 /dev/wcnss_wlan           0660   system     system
+
+# SSR devices
+/dev/subsys_*             0640   system     system
+
 /dev/hbtp_input           0660   system     system
 /dev/jpeg*                0660   system     camera
 /dev/gemini*              0660   system     camera

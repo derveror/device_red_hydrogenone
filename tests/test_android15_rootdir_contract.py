@@ -183,6 +183,12 @@ class Android15RootdirContractTest(unittest.TestCase):
             r"(?m)^/dev/ion\s+0664\s+system\s+system$",
         )
 
+    def test_peripheral_manager_can_vote_red118_subsystems_online(self) -> None:
+        self.assertRegex(
+            self.ueventd,
+            r"(?m)^/dev/subsys_\*\s+0640\s+system\s+system$",
+        )
+
     def test_red118_securefs_is_mounted_before_qseecomd(self) -> None:
         fs_commands = [
             command

@@ -25,7 +25,7 @@
         name="android_kernel_red_msm8998"
         path="kernel/red/msm8998"
         remote="derveror"
-        revision="0932f2750f540aa029ada8d2b574d54251533243" />
+        revision="f3819ee742506ded5da6b0cb65a0b47b5fc63ef6" />
 
     <project
         name="android_device_qcom_sepolicy_vndr"

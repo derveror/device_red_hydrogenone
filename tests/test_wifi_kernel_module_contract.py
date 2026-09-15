@@ -47,12 +47,15 @@ class WifiKernelModuleContractTest(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.variables = evaluated_wifi_variables()
 
-    def test_wifi_driver_is_built_into_the_kernel(self) -> None:
-        self.assertIn("CONFIG_QCA_CLD_WLAN=y", KERNEL_DEFCONFIG.read_text())
+    def test_wifi_driver_is_a_loadable_kernel_module(self) -> None:
+        self.assertIn("CONFIG_QCA_CLD_WLAN=m", KERNEL_DEFCONFIG.read_text())
 
-    def test_wifi_hal_does_not_load_a_separate_kernel_module(self) -> None:
-        self.assertEqual(self.variables["path"], "")
-        self.assertEqual(self.variables["name"], "")
+    def test_wifi_hal_loads_the_source_built_module_from_vendor(self) -> None:
+        self.assertEqual(
+            self.variables["path"],
+            '"/vendor/lib/modules/wlan.ko"',
+        )
+        self.assertEqual(self.variables["name"], '"wlan"')
         self.assertEqual(self.variables["arg"], "")
 
 

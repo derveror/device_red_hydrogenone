@@ -99,7 +99,7 @@ The script runs only:
 
 ```bash
 source build/envsetup.sh
-lunch lineage_hydrogenone-userdebug
+lunch lineage_hydrogenone-bp1a-userdebug
 m nothing
 ```
 

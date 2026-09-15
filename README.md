@@ -155,11 +155,13 @@ Then from a LineageOS 22.2 checkout:
 
 ```bash
 source build/envsetup.sh
-lunch lineage_hydrogenone-userdebug
+lunch lineage_hydrogenone-bp1a-userdebug
 m nothing
 ```
 
-The two-component lunch form is valid on LineageOS 22.2; when no release component is supplied the build environment resolves the default release configuration. The device product itself declares `lineage_hydrogenone-user`, `lineage_hydrogenone-userdebug` and `lineage_hydrogenone-eng`.
+The explicit `bp1a` release component is required by the current LineageOS 22.2
+build environment. The device product declares `user`, `userdebug` and `eng`
+variants with that release token.
 
 After `m nothing` is clean, run the image gates explicitly:
 

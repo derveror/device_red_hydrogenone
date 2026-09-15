@@ -9,7 +9,7 @@ Read this file first after interruption.
   its complete build and artifact gates and is published on the named branch.
 - Vendor: `derveror/proprietary_vendor_red_hydrogenone`, branch
   `lineage-22.2-kernel-302`, commit
-  `d366bcb55dee043b801b86b9adca0f209051e825`.
+  `f99b7f3f6c284ac418eda689a4f89e556fb33069`.
 - Kernel: `derveror/android_kernel_red_msm8998`, commit
   `f3819ee742506ded5da6b0cb65a0b47b5fc63ef6`.
 - Stock authority: `H1A1000.082ho.01.00.10r.118`.
@@ -24,7 +24,7 @@ Read this file first after interruption.
 - No RED `msm8998-common` repositories.
 - SmartPort excluded; standard USB/Bluetooth/charging and Leia/display retained.
 - Device tree owns open configuration and source wrappers.
-- Vendor tree owns 662 selected proprietary files, including the exact `.118`
+- Vendor tree owns 663 selected proprietary files, including the exact `.118`
   `libssd.so` required by the SSD QSEE listener and the physically verified
   RED `.118` QTI Keymaster and SSC sensor stacks.
 - Stock HIDL base libraries are source-owned, with narrow compatibility fixups
@@ -43,23 +43,24 @@ Read this file first after interruption.
   camera power ABI, and a byte-verified 185-file stock `.118` production camera
   closure. SmartPort remains excluded.
 - The new uninstalled Wi-Fi candidate adds the exact RED `.118` QRTR/TFTP
-  transport (`tftp_server`, `libqsocket.so`, `libqrtr.so`) and starts it in the
-  core init class so the modem can fetch `wlanmdsp.mbn` before ICNSS reports
+  transport (`qrtr-ns`, `tftp_server`, `libqsocket.so`, `libqrtr.so`). The
+  stock `vendor.qrtr-ns` core service starts before TFTP so the modem can
+  publish WLAN QMI and fetch `wlanmdsp.mbn` before ICNSS reports
   firmware-ready. Physical Wi-Fi validation is still required.
-- The current vendor selection contains 662 files and 507 proprietary ELF
-  modules; all 507 have checkelf enabled and zero exceptions. Extraction now
+- The current vendor selection contains 663 files and 508 proprietary ELF
+  modules; all 508 have checkelf enabled and zero exceptions. Extraction now
   replays the complete Android 15 compatibility pipeline automatically.
 - The latest full `mka bacon` build passes SELinux/neverallow, VINTF, partition
   size and ZIP integrity checks. Its artifacts are:
-  - OTA `lineage-22.2-20260915-UNOFFICIAL-hydrogenone.zip`, 851,086,541 bytes,
-    SHA-256 `6c62df4d0879b8958660c2c2dfb870f1bafd379dcab4e0913fc5923e9c9d6d67`;
+  - OTA `lineage-22.2-20260915-UNOFFICIAL-hydrogenone.zip`, 851,038,702 bytes,
+    SHA-256 `bcb028f8137fbd370354ac2e65fe172c9f017299a6efa343de247b25dc21f51f`;
   - production `boot.img`, 32,403,456 bytes, SHA-256
-    `b076a961e93a8b6e0bb6ecd6f1853bd80c483a69fe8a4dfc338edc4653f6f584`;
-  - `vendor.img`, 333,439,208 bytes, SHA-256
-    `aa1ca0228d019916527d912cd672a5cb7dd6bb7d1df475473c890bbbe0c3b198`.
+    `7f62ec5933809d2031b30b9530e3dadd43d7160641c51d624b299e7efde56e30`;
+  - `vendor.img`, 333,463,784 bytes, SHA-256
+    `6745d19884af9eaf5ebd2274304eabbaaaab8ac6521c625bdd632f8a320f3d3a`.
 - The latest changes do not touch DTS, defconfig, DTB order, display,
   touchscreen, recovery or boot-image layout. They add only the stock
-  core-class WLAN TFTP service to the existing device init file.
+  core-class QRTR name service before the existing WLAN TFTP service.
 - Only the user can enter Lineage Recovery physically; never issue
   `adb reboot recovery` or `fastboot reboot recovery` on this device.
 - No command may flash or reboot the phone without a new explicit user request.

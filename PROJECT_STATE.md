@@ -21,7 +21,7 @@ generated audits and historical worklogs remain under `docs/`.
 
 - Device branch: `118-lineage-22.2-kernel-302`.
 - Vendor repository: `derveror/proprietary_vendor_red_hydrogenone`, commit
-  `d366bcb55dee043b801b86b9adca0f209051e825`.
+  `f99b7f3f6c284ac418eda689a4f89e556fb33069`.
 - Kernel repository: `derveror/android_kernel_red_msm8998`, commit
   `f3819ee742506ded5da6b0cb65a0b47b5fc63ef6`.
 - Kernel path: `kernel/red/msm8998`.
@@ -43,9 +43,9 @@ remain in scope.
 
 ## Vendor payload and HIDL compatibility
 
-The pinned Android 15 vendor selection contains 662 files. Its
+The pinned Android 15 vendor selection contains 663 files. Its
 `proprietary-files.txt`, `proprietary-manifest.json` and on-disk payload agree
-on all 662 entries. This includes the exact `.118` 64-bit `libssd.so` loaded by
+on all 663 entries. This includes the exact `.118` 64-bit `libssd.so` loaded by
 `qseecomd` through `dlopen`; ordinary `DT_NEEDED` analysis does not expose that
 runtime dependency. It also contains the exact `.118` SSC sensor payload for
 both architectures while retaining the Android 15 source-owned HIDL wrapper.
@@ -66,7 +66,7 @@ and pinned in `docs/reference/vendor-hidl-runtime-contract.json`.
 - Device and vendor copy destinations are checked for collisions.
 - Source-owned GNSS, NFC, Wi-Fi, camera and media wrappers must not coexist with
   conflicting proprietary implementations.
-- The device extraction list mirrors the current 662-file vendor selection.
+- The device extraction list mirrors the current 663-file vendor selection.
 
 ## Confirmed static contracts
 
@@ -94,22 +94,24 @@ and pinned in `docs/reference/vendor-hidl-runtime-contract.json`.
   Android userspace to reach setup/system UI. Touchscreen, camera, flashlight
   and USB debugging have been confirmed on the physical phone.
 - The installed build still lacks Wi-Fi and Bluetooth. Runtime comparison with
-  stock `.118` identified the missing QRTR/TFTP WLAN firmware transport.
-- The new candidate contains exact `.118` `tftp_server`, `libqsocket.so` and
-  `libqrtr.so` payloads, with all 507 proprietary ELF checks enabled and zero
-  exceptions. The complete build passes SELinux/neverallow, VINTF and ZIP
-  integrity checks. Its 333,439,208-byte `vendor.img` is below the 1 GiB limit;
-  the OTA SHA-256 is
-  `6c62df4d0879b8958660c2c2dfb870f1bafd379dcab4e0913fc5923e9c9d6d67`.
+  stock `.118` identified the missing boot-time QRTR name service: without it
+  the modem never publishes WLAN QMI and ICNSS remains before firmware-ready.
+- The new candidate contains exact `.118` `qrtr-ns`, `tftp_server`,
+  `libqsocket.so` and `libqrtr.so` payloads. It starts `vendor.qrtr-ns` before
+  `vendor.tftp_server` with the stock credentials and capability. All 508
+  proprietary ELF checks are enabled with zero exceptions. The complete build
+  passes SELinux/neverallow, VINTF and ZIP integrity checks. Its
+  333,463,784-byte `vendor.img` is below the 1 GiB limit; the OTA SHA-256 is
+  `bcb028f8137fbd370354ac2e65fe172c9f017299a6efa343de247b25dc21f51f`.
 
 Physical Wi-Fi recovery from this candidate is not yet proven. Bluetooth and
 the remaining hardware subsystems retain their own runtime validation gates.
 
 ## Next gates
 
-1. Push the coordinated vendor and device commits with the exact cross-tree pin.
-2. Install the WLAN transport OTA only after a separate explicit user request,
+1. Install the WLAN transport OTA only after a separate explicit user request,
    preserving the known-working slot as fallback.
-3. Capture early boot and Wi-Fi logs and verify `vendor.tftp_server`, modem WLAN
-   QMI service publication, ICNSS firmware-ready and interface creation.
-4. Diagnose Bluetooth separately after the Wi-Fi result is known.
+2. Capture early boot and Wi-Fi logs and verify `vendor.qrtr-ns`,
+   `vendor.tftp_server`, modem WLAN QMI service publication, ICNSS
+   firmware-ready and interface creation.
+3. Diagnose Bluetooth separately after the Wi-Fi result is known.

@@ -61,7 +61,7 @@ class Stock118PurgeContractTest(unittest.TestCase):
             for line in (ROOT / "proprietary-files.txt").read_text(encoding="utf-8").splitlines()
             if line.strip() and not line.lstrip().startswith("#")
         ]
-        self.assertEqual(len(entries), 662)
+        self.assertEqual(len(entries), 663)
         self.assertEqual(len(entries), len(set(entries)))
 
     def test_vendor_hidl_runtime_contract_is_pinned_to_red118(self) -> None:

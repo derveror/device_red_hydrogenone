@@ -50,9 +50,9 @@ from `kernel/red/msm8998`; no stock kernel prebuilt is a build input.
 ## Vendor payload audit
 
 Pinned vendor commit:
-`d366bcb55dee043b801b86b9adca0f209051e825`.
+`f99b7f3f6c284ac418eda689a4f89e556fb33069`.
 
-The selected list, manifest and on-disk payload each contain 662 entries. Stock
+The selected list, manifest and on-disk payload each contain 663 entries. Stock
 copies of `libhidlbase`, `libhidltransport` and `libhwbinder` are pruned because
 the Android 15 source tree owns those providers. Sixty-three exact `.118` HIDL
 consumers receive `libhidlbase_shim`; `imsdatadaemon` is retargeted from
@@ -66,7 +66,7 @@ registries.
 - source kernel and four-DTB contract;
 - radio, fstab, camera, init and VINTF static contracts;
 - device/vendor copy ownership;
-- reproducible 662-file extraction list and compatibility fixups;
+- reproducible 663-file extraction list and compatibility fixups;
 - rejection of superseded stock identity and raw reference trees;
 - rejection of SmartPort runtime control and kernel prebuilts.
 
@@ -137,8 +137,10 @@ in that installed build.
 The radio/camera candidate was installed and reaches Android system UI. Physical
 testing confirms touchscreen, camera, flashlight and USB debugging; Wi-Fi and
 Bluetooth remain unavailable. The next uninstalled candidate adds the exact
-stock `.118` `tftp_server`, `libqsocket.so` and `libqrtr.so` transport used by
-the modem to fetch `wlanmdsp.mbn` before ICNSS firmware-ready. Its full OTA and
-static checks pass without changing DTS, defconfig, display, touchscreen,
-recovery or boot-image layout. Runtime Wi-Fi validation remains required; no
-Wi-Fi success is declared from build proof alone.
+stock `.118` `qrtr-ns`, `tftp_server`, `libqsocket.so` and `libqrtr.so`
+transport. Stock init ordering starts the QRTR name service before TFTP so the
+modem can publish WLAN QMI and fetch `wlanmdsp.mbn` before ICNSS
+firmware-ready. Its full OTA and static checks pass without changing DTS,
+defconfig, display, touchscreen, recovery or boot-image layout. Runtime Wi-Fi
+validation remains required; no Wi-Fi success is declared from build proof
+alone.

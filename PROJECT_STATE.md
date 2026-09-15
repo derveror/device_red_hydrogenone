@@ -23,7 +23,7 @@ generated audits and historical worklogs remain under `docs/`.
 - Vendor repository: `derveror/proprietary_vendor_red_hydrogenone`, commit
   `f5192d041cb9bc914b5e438c1fc54c1aae7f8891`.
 - Kernel repository: `derveror/android_kernel_red_msm8998`, commit
-  `f3819ee742506ded5da6b0cb65a0b47b5fc63ef6`.
+  `a70742ff9578d6aa0201f66a389659386c716f10`.
 - Kernel path: `kernel/red/msm8998`.
 - Kernel config: `lineageos_hydrogenone_defconfig`.
 
@@ -86,32 +86,38 @@ and pinned in `docs/reference/vendor-hidl-runtime-contract.json`.
 ## Proven build and recovery gates
 
 - Complete LineageOS 22.2 OTA builds passed on 2026-09-13 and 2026-09-14; the
-  WLAN transport candidate completed a fresh full build on 2026-09-15.
+  WLAN transport candidate completed a fresh full build on 2026-09-15. Those
+  full builds used kernel commit `f3819ee742506ded5da6b0cb65a0b47b5fc63ef6`,
+  not the current pinned kernel.
 - The packaged kernel reports Linux `4.4.302+` and the boot image is below the
   stock 64 MiB partition limit.
 - Lineage Recovery boots on the physical H1A1000 with the source-built kernel.
 - The QSEE securefs, QTI Keymaster, `/dev/ion` and SSC corrections allow normal
   Android userspace to reach setup/system UI. Touchscreen, camera, flashlight
   and USB debugging have been confirmed on the physical phone.
-- The installed build still lacks Wi-Fi and Bluetooth. Runtime comparison with
-  stock `.118` identified the missing boot-time QRTR name service: without it
-  the modem never publishes WLAN QMI and ICNSS remains before firmware-ready.
-- The new candidate contains exact `.118` `qrtr-ns`, `tftp_server`,
-  `libqsocket.so` and `libqrtr.so` payloads. It starts `vendor.qrtr-ns` before
-  `vendor.tftp_server` with the stock credentials and capability. All 508
-  proprietary ELF checks are enabled with zero exceptions. The complete build
-  passes SELinux/neverallow, VINTF and ZIP integrity checks. Its
-  333,463,784-byte `vendor.img` is below the 1 GiB limit; the OTA SHA-256 is
-  `bcb028f8137fbd370354ac2e65fe172c9f017299a6efa343de247b25dc21f51f`.
+- The installed build still lacks Wi-Fi and Bluetooth. The `.118` QRTR/TFTP
+  transport reaches modem WLAN service publication, but the kernel rejects the
+  packaged `wlan.ko` at `module_layout` while KASLR and MODVERSIONS are active.
+- Kernel commit `a70742ff9578d6aa0201f66a389659386c716f10` restores the upstream
+  ARM64 kcrctab relocation contract removed by `f3819ee`. Its kernel/module
+  symbol-version contract matches all 435 versioned symbols, and the same fix
+  is present in every supplied maintained MSM8998 reference kernel.
+- The standalone `a70742ff` diagnostic build used GNU binutils while the
+  LineageOS build path uses Clang 19 with LLVM/LLD. It is static evidence only
+  and must not be flashed as the production candidate.
 
-Physical Wi-Fi recovery from this candidate is not yet proven. Bluetooth and
-the remaining hardware subsystems retain their own runtime validation gates.
+Physical Wi-Fi recovery with `a70742ff` is not yet proven. Bluetooth and the
+remaining hardware subsystems retain their own runtime validation gates.
 
 ## Next gates
 
-1. Install the WLAN transport OTA only after a separate explicit user request,
+1. Perform a clean full LineageOS build with the pinned `a70742ff` kernel using
+   the normal Clang 19/LLVM/LLD build path.
+2. Verify the packaged kernel and `wlan.ko` came from that one output tree,
+   including commit identity, version CRCs, four-DTB order and boot size.
+3. Install the resulting candidate only after a separate explicit user request,
    preserving the known-working slot as fallback.
-2. Capture early boot and Wi-Fi logs and verify `vendor.qrtr-ns`,
+4. Capture early boot and Wi-Fi logs and verify `vendor.qrtr-ns`,
    `vendor.tftp_server`, modem WLAN QMI service publication, ICNSS
    firmware-ready and interface creation.
-3. Diagnose Bluetooth separately after the Wi-Fi result is known.
+5. Diagnose Bluetooth separately after the Wi-Fi result is known.

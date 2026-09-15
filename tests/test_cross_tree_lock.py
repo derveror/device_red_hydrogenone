@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 LOCK = ROOT / "docs" / "reference" / "cross-tree-lock.json"
 EVIDENCE = ROOT / "docs" / "stock" / "h1a1000-r118" / "cross-tree-copy-contract.json"
 WORKFLOW = ROOT / ".github" / "workflows" / "verify-analysis.yml"
-KERNEL_COMMIT = "f3819ee742506ded5da6b0cb65a0b47b5fc63ef6"
+KERNEL_COMMIT = "a70742ff9578d6aa0201f66a389659386c716f10"
 VENDOR_COMMIT = "f5192d041cb9bc914b5e438c1fc54c1aae7f8891"
 
 

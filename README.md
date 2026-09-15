@@ -75,8 +75,10 @@ Verified boot contract:
 - vendor partition 1 GiB
 
 The complete source build, DTB decompilation/order checks, appended-image layout,
-module build and boot-partition budget have passed. This is static/build evidence,
-not a claim that the resulting image has booted on physical hardware.
+module build and boot-partition budget have passed. Earlier source-built 4.4.302
+commit `f3819ee` booted Recovery and Android on physical hardware. Current commit
+`a70742ff` restores the ARM64 KASLR/MODVERSIONS kcrctab relocation contract and
+still requires a clean full LineageOS build and physical validation.
 
 ### Kernel command line
 
@@ -173,7 +175,10 @@ m target-files-package
 m otapackage
 ```
 
-Do not treat static CI or successful image compilation as proof of a bootable ROM. A new full LineageOS workspace build from the current `.118` branches and physical H1A1000 bring-up are still required.
+Do not treat static CI or successful image compilation as proof of a bootable
+ROM. The next candidate must be built from the pinned `.118` branches through
+the normal Clang 19/LLVM/LLD path; the standalone GNU-binutils `a70742ff` build
+is diagnostic evidence only.
 
 ## Current verification gates
 
@@ -194,14 +199,16 @@ Permanent vendor CI validates its Android 15 proprietary contract independently.
 
 The current work is not declared release-complete or device-bootable. Major remaining gates are:
 
-1. finish exhaustive `.118` per-file ownership/dependency classification;
-2. close remaining evidence gaps such as raw stock boot-ramdisk fstab data;
-3. run a clean full LineageOS 22.2 workspace build from the pinned device/vendor revisions;
-4. fix build-system failures only from their actual logs;
-5. perform staged physical bring-up with logs for kernel/init/mounts/SELinux/graphics/touch/radio;
-6. validate P1 hardware (telephony/IMS, Wi-Fi, Bluetooth, GNSS, sensors, fingerprint, camera, NFC, audio, thermal/suspend, A/B OTA/recovery);
-7. validate RED-specific display/Leia behavior; SmartPort remains explicitly out of scope;
-8. boot-test the pinned RED 4.4.302 source kernel and iterate only from captured evidence.
+1. run a clean full LineageOS 22.2 build with pinned kernel `a70742ff`;
+2. verify exact kernel/module CRC identity, four-DTB order, boot metadata and
+   partition budget before any physical test;
+3. install only with explicit user approval while preserving the working slot;
+4. capture staged physical logs for kernel/init/mounts/SELinux/graphics/touch/radio;
+5. validate P1 hardware (telephony/IMS, Wi-Fi, Bluetooth, GNSS, sensors,
+   fingerprint, camera, NFC, audio, thermal/suspend, A/B OTA/recovery);
+6. validate RED-specific display/Leia behavior; SmartPort remains explicitly
+   out of scope;
+7. iterate only from captured evidence, one proven blocker at a time.
 
 ## Dependencies
 

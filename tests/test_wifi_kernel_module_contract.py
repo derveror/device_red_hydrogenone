@@ -7,6 +7,10 @@ from pathlib import Path
 
 DEVICE_ROOT = Path(__file__).resolve().parents[1]
 ANDROID_ROOT = DEVICE_ROOT.parents[2]
+KERNEL_DEFCONFIG = (
+    ANDROID_ROOT
+    / "kernel/red/msm8998/arch/arm64/configs/lineageos_hydrogenone_defconfig"
+)
 
 
 def evaluated_wifi_variables() -> dict[str, str]:
@@ -43,15 +47,13 @@ class WifiKernelModuleContractTest(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.variables = evaluated_wifi_variables()
 
-    def test_wifi_hal_loads_the_source_built_module_from_vendor(self) -> None:
-        self.assertEqual(
-            self.variables["path"],
-            '"/vendor/lib/modules/wlan.ko"',
-        )
-        self.assertEqual(self.variables["name"], '"wlan"')
+    def test_wifi_driver_is_built_into_the_kernel(self) -> None:
+        self.assertIn("CONFIG_QCA_CLD_WLAN=y", KERNEL_DEFCONFIG.read_text())
 
-    def test_wifi_module_uses_no_stock_only_arguments(self) -> None:
-        self.assertIn(self.variables["arg"], {"", '""'})
+    def test_wifi_hal_does_not_load_a_separate_kernel_module(self) -> None:
+        self.assertEqual(self.variables["path"], "")
+        self.assertEqual(self.variables["name"], "")
+        self.assertEqual(self.variables["arg"], "")
 
 
 if __name__ == "__main__":

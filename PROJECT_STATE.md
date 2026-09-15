@@ -21,7 +21,7 @@ generated audits and historical worklogs remain under `docs/`.
 
 - Device branch: `118-lineage-22.2-kernel-302`.
 - Vendor repository: `derveror/proprietary_vendor_red_hydrogenone`, commit
-  `f99b7f3f6c284ac418eda689a4f89e556fb33069`.
+  `f5192d041cb9bc914b5e438c1fc54c1aae7f8891`.
 - Kernel repository: `derveror/android_kernel_red_msm8998`, commit
   `f3819ee742506ded5da6b0cb65a0b47b5fc63ef6`.
 - Kernel path: `kernel/red/msm8998`.

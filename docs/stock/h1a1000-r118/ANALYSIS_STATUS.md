@@ -50,7 +50,7 @@ from `kernel/red/msm8998`; no stock kernel prebuilt is a build input.
 ## Vendor payload audit
 
 Pinned vendor commit:
-`f99b7f3f6c284ac418eda689a4f89e556fb33069`.
+`f5192d041cb9bc914b5e438c1fc54c1aae7f8891`.
 
 The selected list, manifest and on-disk payload each contain 663 entries. Stock
 copies of `libhidlbase`, `libhidltransport` and `libhwbinder` are pruned because

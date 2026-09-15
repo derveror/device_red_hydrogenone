@@ -29,7 +29,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: derveror/proprietary_vendor_red_hydrogenone
-          ref: f99b7f3f6c284ac418eda689a4f89e556fb33069
+          ref: f5192d041cb9bc914b5e438c1fc54c1aae7f8891
           path: vendor/red/hydrogenone
 
       - name: Checkout pinned kernel tree for cross-tree unit tests
@@ -133,7 +133,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: derveror/proprietary_vendor_red_hydrogenone
-          ref: f99b7f3f6c284ac418eda689a4f89e556fb33069
+          ref: f5192d041cb9bc914b5e438c1fc54c1aae7f8891
           path: vendor-tree
 
       - name: Verify pinned cross-tree ownership contract

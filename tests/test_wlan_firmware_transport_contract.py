@@ -31,6 +31,10 @@ REQUIRED_PAYLOAD = {
     },
 }
 
+RED118_SEC_CONFIG_SHA256 = (
+    "bbdfba0ec570136e627fe806b35fa3c7b292a3c1da60f12e14f38036b78942e9"
+)
+
 
 def selected_paths() -> set[str]:
     result: set[str] = set()
@@ -148,6 +152,41 @@ class WlanFirmwareTransportContractTest(unittest.TestCase):
         qrtr_offset = init.index("service vendor.qrtr-ns")
         tftp_offset = init.index("service vendor.tftp_server")
         self.assertLess(qrtr_offset, tftp_offset, "QRTR name service must precede TFTP")
+
+    def test_irsc_applies_ipc_permissions_before_tftp_starts(self) -> None:
+        init = (DEVICE_ROOT / "rootdir/etc/init/hw/init.qcom.rc").read_text(
+            encoding="utf-8"
+        )
+        match = re.search(
+            r'(?m)^service vendor\.irsc_util /vendor/bin/irsc_util '
+            r'"/vendor/etc/sec_config"\s*$'
+            r"(?P<body>(?:\n(?:[ \t]+[^\n]*|[ \t]*))*)",
+            init,
+        )
+        self.assertIsNotNone(match, "vendor.irsc_util service is not declared")
+        if match is None:
+            return
+
+        directives = {
+            line.strip()
+            for line in match.group("body").splitlines()
+            if line.strip() and not line.lstrip().startswith("#")
+        }
+        self.assertIn("class core", directives)
+        self.assertIn("user root", directives)
+        self.assertIn("oneshot", directives)
+        self.assertNotIn("disabled", directives)
+
+        qrtr_offset = init.index("service vendor.qrtr-ns")
+        irsc_offset = init.index("service vendor.irsc_util")
+        tftp_offset = init.index("service vendor.tftp_server")
+        self.assertLess(qrtr_offset, irsc_offset)
+        self.assertLess(irsc_offset, tftp_offset)
+
+    def test_ipc_permissions_are_exact_red118_configuration(self) -> None:
+        sec_config = DEVICE_ROOT / "configs/sec_config"
+        data = sec_config.read_bytes()
+        self.assertEqual(hashlib.sha256(data).hexdigest(), RED118_SEC_CONFIG_SHA256)
 
     def test_unproven_qrtr_utilities_are_not_selected(self) -> None:
         self.assertTrue(

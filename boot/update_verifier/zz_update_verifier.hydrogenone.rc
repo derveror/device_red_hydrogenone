@@ -1,0 +1,6 @@
+service update_verifier /system/bin/update_verifier.hydrogenone
+    override
+    user root
+    group cache system
+    priority -20
+    ioprio rt 0

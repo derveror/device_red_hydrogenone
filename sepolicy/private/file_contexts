@@ -1,1 +1,2 @@
 /system/bin/fastboot_target                                   u:object_r:shell_exec:s0
+/system/bin/update_verifier\.hydrogenone                     u:object_r:update_verifier_exec:s0

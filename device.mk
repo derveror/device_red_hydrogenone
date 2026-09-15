@@ -32,7 +32,7 @@ PRODUCT_PACKAGES += \
     fastbootd \
     update_engine \
     update_engine_sideload \
-    update_verifier
+    update_verifier.hydrogenone
 PRODUCT_PACKAGES_DEBUG += \
     bootctl \
     update_engine_client

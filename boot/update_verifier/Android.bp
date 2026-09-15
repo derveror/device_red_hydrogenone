@@ -1,0 +1,34 @@
+cc_binary {
+    name: "update_verifier.hydrogenone",
+    overrides: ["update_verifier"],
+
+    defaults: [
+        "recovery_defaults",
+    ],
+
+    srcs: [
+        "legacy_avb1_verifier_policy.cpp",
+        "update_verifier_hydrogenone.cpp",
+    ],
+
+    static_libs: [
+        "libupdate_verifier",
+        "libotautil",
+        "libvold_binder",
+    ],
+
+    shared_libs: [
+        "android.hardware.boot@1.0",
+        "libbase",
+        "libbinder",
+        "libboot_control_client",
+        "libcutils",
+        "libhardware",
+        "libhidlbase",
+        "liblog",
+        "libprotobuf-cpp-lite",
+        "libutils",
+    ],
+
+    init_rc: ["zz_update_verifier.hydrogenone.rc"],
+}

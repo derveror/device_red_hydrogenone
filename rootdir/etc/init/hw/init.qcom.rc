@@ -72,6 +72,12 @@ on boot
     chmod 0200 /sys/bus/platform/devices/soc:fpc1020/wakeup_enable
     chmod 0200 /sys/bus/platform/devices/soc:fpc1020/wakeup_feature
 
+# RED .118 modem fetches wlanmdsp.mbn over the QRTR/TFTP transport during
+# core startup. ICNSS cannot signal firmware-ready without this service.
+service vendor.tftp_server /vendor/bin/tftp_server
+    class core
+    user root
+
 # RED .118 SSC registry daemon. The source-owned Android 15 HIDL wrapper loads
 # sensors.ssc.so through /vendor/etc/sensors/hals.conf.
 service vendor.sensors.qti /vendor/bin/sensors.qti

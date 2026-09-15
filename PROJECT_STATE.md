@@ -1,6 +1,6 @@
 # RED Hydrogen One LineageOS 22.2 project state
 
-Last updated: 2026-09-14.
+Last updated: 2026-09-15.
 
 This is the current status for `device/red/hydrogenone`. Detailed stock evidence,
 generated audits and historical worklogs remain under `docs/`.
@@ -21,9 +21,9 @@ generated audits and historical worklogs remain under `docs/`.
 
 - Device branch: `118-lineage-22.2-kernel-302`.
 - Vendor repository: `derveror/proprietary_vendor_red_hydrogenone`, commit
-  `b9e652a35e9dd5b5bec3dfa349ca445f62b2b0ef`.
+  `d366bcb55dee043b801b86b9adca0f209051e825`.
 - Kernel repository: `derveror/android_kernel_red_msm8998`, commit
-  `a2af472c6545873a1f8884468ea84381d69be21a`.
+  `f3819ee742506ded5da6b0cb65a0b47b5fc63ef6`.
 - Kernel path: `kernel/red/msm8998`.
 - Kernel config: `lineageos_hydrogenone_defconfig`.
 
@@ -43,9 +43,9 @@ remain in scope.
 
 ## Vendor payload and HIDL compatibility
 
-The pinned Android 15 vendor selection contains 659 files. Its
+The pinned Android 15 vendor selection contains 662 files. Its
 `proprietary-files.txt`, `proprietary-manifest.json` and on-disk payload agree
-on all 659 entries. This includes the exact `.118` 64-bit `libssd.so` loaded by
+on all 662 entries. This includes the exact `.118` 64-bit `libssd.so` loaded by
 `qseecomd` through `dlopen`; ordinary `DT_NEEDED` analysis does not expose that
 runtime dependency. It also contains the exact `.118` SSC sensor payload for
 both architectures while retaining the Android 15 source-owned HIDL wrapper.
@@ -66,7 +66,7 @@ and pinned in `docs/reference/vendor-hidl-runtime-contract.json`.
 - Device and vendor copy destinations are checked for collisions.
 - Source-owned GNSS, NFC, Wi-Fi, camera and media wrappers must not coexist with
   conflicting proprietary implementations.
-- The device extraction list mirrors the current 659-file vendor selection.
+- The device extraction list mirrors the current 662-file vendor selection.
 
 ## Confirmed static contracts
 
@@ -85,34 +85,31 @@ and pinned in `docs/reference/vendor-hidl-runtime-contract.json`.
 
 ## Proven build and recovery gates
 
-- Complete LineageOS 22.2 OTA builds passed on 2026-09-13 and, with the SSC
-  correction, on 2026-09-14.
+- Complete LineageOS 22.2 OTA builds passed on 2026-09-13 and 2026-09-14; the
+  WLAN transport candidate completed a fresh full build on 2026-09-15.
 - The packaged kernel reports Linux `4.4.302+` and the boot image is below the
   stock 64 MiB partition limit.
 - Lineage Recovery boots on the physical H1A1000 with the source-built kernel.
-- The QSEE securefs, QTI Keymaster and `/dev/ion` corrections moved normal boot
-  past the RED logo to the Lineage boot animation.
-- Durable trace v16 contains no kernel panic, GPU fault or hardware watchdog.
-  It proves that `system_server` was killed by its software watchdog after two
-  66-second waits in `SystemSensorManager.nativeCreate`, while
-  `vendor.sensors-hal-1-0` repeatedly reported `Couldn't load sensors module`.
-- The exact `.118` SSC module, registry dependencies and configs are now
-  restored for arm/arm64. The Android 15 module build, `check_elf_file`, SELinux
-  neverallow checks and complete `vendor.img` build pass. The resulting
-  `vendor.img` is 319,480,028 bytes against the 1 GiB partition limit. A full
-  `mka bacon` and a final incremental rebuild both pass; the final OTA SHA-256
-  is `f0b63723a732d16b2e2d6f4b7cb88a84080b7470e45d75f04d1fee83e6c1ecf2`.
+- The QSEE securefs, QTI Keymaster, `/dev/ion` and SSC corrections allow normal
+  Android userspace to reach setup/system UI. Touchscreen, camera, flashlight
+  and USB debugging have been confirmed on the physical phone.
+- The installed build still lacks Wi-Fi and Bluetooth. Runtime comparison with
+  stock `.118` identified the missing QRTR/TFTP WLAN firmware transport.
+- The new candidate contains exact `.118` `tftp_server`, `libqsocket.so` and
+  `libqrtr.so` payloads, with all 507 proprietary ELF checks enabled and zero
+  exceptions. The complete build passes SELinux/neverallow, VINTF and ZIP
+  integrity checks. Its 333,439,208-byte `vendor.img` is below the 1 GiB limit;
+  the OTA SHA-256 is
+  `6c62df4d0879b8958660c2c2dfb870f1bafd379dcab4e0913fc5923e9c9d6d67`.
 
-Full Android userspace boot and physical-device operation of radio, camera,
-audio, sensors, Leia/display, DRM, GNSS, Wi-Fi, Bluetooth, NFC, fingerprint,
-power and thermal management remain unproven until the rebuilt OTA is installed
-and observed on the phone.
+Physical Wi-Fi recovery from this candidate is not yet proven. Bluetooth and
+the remaining hardware subsystems retain their own runtime validation gates.
 
 ## Next gates
 
-1. Commit and push the verified device-tree SSC correction.
-2. Replace the temporary diagnostic boot image only with the verified production
-   artifact and install the OTA from physically entered Lineage Recovery.
-3. Capture a durable normal-boot trace and verify that the sensor HAL registers
-   without another `system_server` watchdog reset.
-4. Continue physical subsystem bring-up only after stable Android userspace.
+1. Push the coordinated vendor and device commits with the exact cross-tree pin.
+2. Install the WLAN transport OTA only after a separate explicit user request,
+   preserving the known-working slot as fallback.
+3. Capture early boot and Wi-Fi logs and verify `vendor.tftp_server`, modem WLAN
+   QMI service publication, ICNSS firmware-ready and interface creation.
+4. Diagnose Bluetooth separately after the Wi-Fi result is known.

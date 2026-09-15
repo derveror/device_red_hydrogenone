@@ -50,9 +50,9 @@ from `kernel/red/msm8998`; no stock kernel prebuilt is a build input.
 ## Vendor payload audit
 
 Pinned vendor commit:
-`4dce3edee53619e1d1cd15182c6189f3208f283c`.
+`d366bcb55dee043b801b86b9adca0f209051e825`.
 
-The selected list, manifest and on-disk payload each contain 659 entries. Stock
+The selected list, manifest and on-disk payload each contain 662 entries. Stock
 copies of `libhidlbase`, `libhidltransport` and `libhwbinder` are pruned because
 the Android 15 source tree owns those providers. Sixty-three exact `.118` HIDL
 consumers receive `libhidlbase_shim`; `imsdatadaemon` is retargeted from
@@ -66,7 +66,7 @@ registries.
 - source kernel and four-DTB contract;
 - radio, fstab, camera, init and VINTF static contracts;
 - device/vendor copy ownership;
-- reproducible 659-file extraction list and compatibility fixups;
+- reproducible 662-file extraction list and compatibility fixups;
 - rejection of superseded stock identity and raw reference trees;
 - rejection of SmartPort runtime control and kernel prebuilts.
 
@@ -134,10 +134,11 @@ physical test reached the LineageOS setup/system UI and confirmed touchscreen
 input. Wi-Fi, Bluetooth, camera/flashlight and USB data/ADB remained unavailable
 in that installed build.
 
-The current uninstalled candidate adds the exact Cherokee Bluetooth source
-contract, the stock persist-backed WLAN MAC link, the RED `.118` camera power
-ABI and the byte-verified 185-file production camera runtime closure. Its full
-OTA build and static checks pass without changing DTS, defconfig, display,
-touchscreen, recovery or init ordering. Runtime validation on the phone remains
-required; no repaired hardware subsystem is declared working from build proof
-alone.
+The radio/camera candidate was installed and reaches Android system UI. Physical
+testing confirms touchscreen, camera, flashlight and USB debugging; Wi-Fi and
+Bluetooth remain unavailable. The next uninstalled candidate adds the exact
+stock `.118` `tftp_server`, `libqsocket.so` and `libqrtr.so` transport used by
+the modem to fetch `wlanmdsp.mbn` before ICNSS firmware-ready. Its full OTA and
+static checks pass without changing DTS, defconfig, display, touchscreen,
+recovery or boot-image layout. Runtime Wi-Fi validation remains required; no
+Wi-Fi success is declared from build proof alone.

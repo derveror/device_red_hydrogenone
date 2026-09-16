@@ -61,6 +61,50 @@ def readelf(*args: str, path: Path) -> str:
 
 
 class WlanFirmwareTransportContractTest(unittest.TestCase):
+    def test_post_fs_data_creates_supplicant_runtime_tree(self) -> None:
+        init = (DEVICE_ROOT / "rootdir/etc/init/hw/init.qcom.rc").read_text(
+            encoding="utf-8"
+        )
+        match = re.search(
+            r"(?ms)^on post-fs-data\s*$\n(?P<body>.*?)(?=^on |^service |\Z)",
+            init,
+        )
+        self.assertIsNotNone(match, "init.qcom.rc has no post-fs-data action")
+        if match is None:
+            return
+
+        created_directories: dict[str, tuple[str, str, str]] = {}
+        creation_order: list[str] = []
+        for line in match.group("body").splitlines():
+            fields = line.strip().split()
+            if len(fields) == 5 and fields[0] == "mkdir":
+                created_directories[fields[1]] = tuple(fields[2:])
+                creation_order.append(fields[1])
+
+        expected_paths = [
+            "/data/vendor/wifi",
+            "/data/vendor/wifi/wpa",
+            "/data/vendor/wifi/wpa/sockets",
+        ]
+
+        self.assertEqual(
+            {
+                path: created_directories.get(path)
+                for path in expected_paths
+            },
+            {
+                "/data/vendor/wifi": ("0770", "wifi", "wifi"),
+                "/data/vendor/wifi/wpa": ("0770", "wifi", "wifi"),
+                "/data/vendor/wifi/wpa/sockets": ("0770", "wifi", "wifi"),
+            },
+            "wpa_supplicant cannot create its config or control socket tree",
+        )
+        self.assertEqual(
+            [path for path in creation_order if path in expected_paths],
+            expected_paths,
+            "supplicant runtime directories must be created parent-first",
+        )
+
     def test_stock118_transport_payload_is_selected(self) -> None:
         self.assertEqual(
             sorted(set(REQUIRED_PAYLOAD) - selected_paths()),

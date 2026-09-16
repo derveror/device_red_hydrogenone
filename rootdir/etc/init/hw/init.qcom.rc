@@ -53,6 +53,12 @@ on post-fs-data
     mkdir /data/vendor/tombstones 0771 root root
     mkdir /data/vendor/qvr 0770 system system
 
+    # The AIDL supplicant copies its base configuration here before adding
+    # wlan0 and places its control sockets below the same runtime tree.
+    mkdir /data/vendor/wifi 0770 wifi wifi
+    mkdir /data/vendor/wifi/wpa 0770 wifi wifi
+    mkdir /data/vendor/wifi/wpa/sockets 0770 wifi wifi
+
 on early-boot
     # The RED .118 sensor HAL is backed by the SLPI sensor DSP.
     write /sys/kernel/boot_slpi/boot 1

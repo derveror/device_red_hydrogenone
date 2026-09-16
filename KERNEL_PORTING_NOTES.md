@@ -9,7 +9,7 @@ from source:
 repository: https://github.com/derveror/android_kernel_red_msm8998.git
 branch: lineage-22.2
 path: kernel/red/msm8998
-commit: a70742ff9578d6aa0201f66a389659386c716f10
+commit: bc1283e4bf00425cf60f43d549f49ff26bf7474e
 version: Linux 4.4.302+
 defconfig: lineageos_hydrogenone_defconfig
 output: arch/arm64/boot/Image.gz-dtb
@@ -40,20 +40,23 @@ USB, charging or Bluetooth paths.
 - DTB compilation and reverse decompilation;
 - appended `Image.gz-dtb` order validation;
 - selected external-module build (10 modules);
-- boot partition budget: 26,354,984 bytes used of 67,108,864 bytes.
+- current boot partition budget: 32,403,456 bytes used of 67,108,864 bytes;
+- current kernel payload: 15,655,357 bytes, below the 16 MiB loader window.
 
 Detailed evidence is stored in the kernel repository at
 `docs/hydrogenone/runtime-driver-build-evidence.md`.
 
 ## Runtime status and remaining gates
 
-Earlier 4.4.302 commit `f3819ee` booted Lineage Recovery and LineageOS on a
-physical H1A1000. Runtime Wi-Fi diagnostics then proved that its removal of the
-ARM64 KASLR/MODVERSIONS kcrctab relocation contract makes the kernel reject the
-matching `wlan.ko` at `module_layout`.
+Commit `a70742ff` boots Lineage Recovery and LineageOS on a physical H1A1000,
+but live dynamic-debug evidence records kernel CRC
+`0xffffffe183b71df1` versus module CRC `0x13d71df1`. The LLD-linked vmlinux
+contains raw kcrctab value `0x13d71df1` and no dynamic relocation for that
+entry; unconditional subtraction of the KASLR slide therefore corrupts it.
 
-Current commit `a70742ff` restores that upstream ARM64 contract. Its standalone
-diagnostic build used GNU binutils and is not a production candidate. The next
-gate is a clean complete LineageOS 22.2 build through the normal Clang
-19/LLVM/LLD path, followed by exact kernel/module/DTB/boot-image verification
-and staged physical testing with ADB, `dmesg`, `logcat` and service evidence.
+Current commit `bc1283e4` retains the upstream ARM64 relocation path for GNU
+linker output and first accepts an exact raw CRC for LLD output. A normal
+Clang 19/LLVM/LLD boot-image build passes exact kernel/module/DTB/size checks.
+The complete A/B OTA passes VINTF, ZIP/signature, partition and payload checks.
+The remaining gate is staged physical Wi-Fi testing with ADB, `dmesg`,
+`logcat` and service evidence.

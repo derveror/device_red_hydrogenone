@@ -23,7 +23,7 @@ generated audits and historical worklogs remain under `docs/`.
 - Vendor repository: `derveror/proprietary_vendor_red_hydrogenone`, commit
   `f5192d041cb9bc914b5e438c1fc54c1aae7f8891`.
 - Kernel repository: `derveror/android_kernel_red_msm8998`, commit
-  `a70742ff9578d6aa0201f66a389659386c716f10`.
+  `bc1283e4bf00425cf60f43d549f49ff26bf7474e`.
 - Kernel path: `kernel/red/msm8998`.
 - Kernel config: `lineageos_hydrogenone_defconfig`.
 
@@ -85,10 +85,8 @@ and pinned in `docs/reference/vendor-hidl-runtime-contract.json`.
 
 ## Proven build and recovery gates
 
-- Complete LineageOS 22.2 OTA builds passed on 2026-09-13 and 2026-09-14; the
-  WLAN transport candidate completed a fresh full build on 2026-09-15. Those
-  full builds used kernel commit `f3819ee742506ded5da6b0cb65a0b47b5fc63ef6`,
-  not the current pinned kernel.
+- Complete LineageOS 22.2 OTA builds passed on 2026-09-13 through 2026-09-15.
+  The currently installed 2026-09-15 build uses kernel commit `a70742ff`.
 - The packaged kernel reports Linux `4.4.302+` and the boot image is below the
   stock 64 MiB partition limit.
 - Lineage Recovery boots on the physical H1A1000 with the source-built kernel.
@@ -96,28 +94,33 @@ and pinned in `docs/reference/vendor-hidl-runtime-contract.json`.
   Android userspace to reach setup/system UI. Touchscreen, camera, flashlight
   and USB debugging have been confirmed on the physical phone.
 - The installed build still lacks Wi-Fi and Bluetooth. The `.118` QRTR/TFTP
-  transport reaches modem WLAN service publication, but the kernel rejects the
-  packaged `wlan.ko` at `module_layout` while KASLR and MODVERSIONS are active.
-- Kernel commit `a70742ff9578d6aa0201f66a389659386c716f10` restores the upstream
-  ARM64 kcrctab relocation contract removed by `f3819ee`. Its kernel/module
-  symbol-version contract matches all 435 versioned symbols, and the same fix
-  is present in every supplied maintained MSM8998 reference kernel.
-- The standalone `a70742ff` diagnostic build used GNU binutils while the
-  LineageOS build path uses Clang 19 with LLVM/LLD. It is static evidence only
-  and must not be flashed as the production candidate.
+  transport and ICNSS control plane are ready, but the kernel rejects the
+  packaged `wlan.ko` at `module_layout`.
+- Dynamic debug proves the installed kernel computes
+  `0xffffffe183b71df1` while the module requires `0x13d71df1`. The exact
+  Clang/LLD vmlinux stores raw `0x13d71df1` and has no relocation for that
+  kcrctab entry, so the `a70742ff` KASLR subtraction corrupts a correct CRC.
+- Current kernel commit `bc1283e4bf00425cf60f43d549f49ff26bf7474e`
+  accepts either the exact raw CRC emitted by LLD or the standard relocated
+  ARM64 form used by other link paths. It keeps `wlan.ko` external like stock
+  `.118`; maintained MSM8998 references instead avoid this loader path by
+  building qcacld into the kernel.
 
-Physical Wi-Fi recovery with `a70742ff` is not yet proven. Bluetooth and the
+Physical Wi-Fi recovery with `bc1283e4` is not yet proven. Bluetooth and the
 remaining hardware subsystems retain their own runtime validation gates.
+
+The `bc1283e4` production candidate completed the normal Clang 19/LLVM/LLD
+`mka bacon -j8` path on 2026-09-15. Its A/B OTA is
+`lineage-22.2-20260916-UNOFFICIAL-hydrogenone.zip`, size 851,029,208 bytes,
+SHA-256 `d3a582d50980d8d9e9eb1350f8f9ffb535a8d2f4b821209c3962e768de9581dc`.
+VINTF is compatible, ZIP integrity passes, and the packaged boot/kernel/module
+identities match the verified build output.
 
 ## Next gates
 
-1. Perform a clean full LineageOS build with the pinned `a70742ff` kernel using
-   the normal Clang 19/LLVM/LLD build path.
-2. Verify the packaged kernel and `wlan.ko` came from that one output tree,
-   including commit identity, version CRCs, four-DTB order and boot size.
-3. Install the resulting candidate only after a separate explicit user request,
+1. Install the resulting candidate only after a separate explicit user request,
    preserving the known-working slot as fallback.
-4. Capture early boot and Wi-Fi logs and verify `vendor.qrtr-ns`,
+2. Capture early boot and Wi-Fi logs and verify `vendor.qrtr-ns`,
    `vendor.tftp_server`, modem WLAN QMI service publication, ICNSS
    firmware-ready and interface creation.
-5. Diagnose Bluetooth separately after the Wi-Fi result is known.
+3. Diagnose Bluetooth separately after the Wi-Fi result is known.

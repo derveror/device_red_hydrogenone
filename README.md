@@ -75,10 +75,12 @@ Verified boot contract:
 - vendor partition 1 GiB
 
 The complete source build, DTB decompilation/order checks, appended-image layout,
-module build and boot-partition budget have passed. Earlier source-built 4.4.302
-commit `f3819ee` booted Recovery and Android on physical hardware. Current commit
-`a70742ff` restores the ARM64 KASLR/MODVERSIONS kcrctab relocation contract and
-still requires a clean full LineageOS build and physical validation.
+module build and boot-partition budget have passed. Source-built 4.4.302 commit
+`a70742ff` boots Recovery and Android on physical hardware, but live evidence
+shows its module loader subtracting the KASLR delta from an already-absolute LLD
+CRC. Current commit `bc1283e4` accepts both raw LLD kcrctab entries and the
+standard relocated ARM64 form. Its full A/B OTA gates pass; physical Wi-Fi
+validation remains.
 
 ### Kernel command line
 
@@ -177,8 +179,7 @@ m otapackage
 
 Do not treat static CI or successful image compilation as proof of a bootable
 ROM. The next candidate must be built from the pinned `.118` branches through
-the normal Clang 19/LLVM/LLD path; the standalone GNU-binutils `a70742ff` build
-is diagnostic evidence only.
+the normal Clang 19/LLVM/LLD path and physically validated.
 
 ## Current verification gates
 
@@ -197,18 +198,18 @@ Permanent vendor CI validates its Android 15 proprietary contract independently.
 
 ## Remaining milestones
 
-The current work is not declared release-complete or device-bootable. Major remaining gates are:
+The current work is not declared release-complete. Major remaining gates are:
 
-1. run a clean full LineageOS 22.2 build with pinned kernel `a70742ff`;
-2. verify exact kernel/module CRC identity, four-DTB order, boot metadata and
-   partition budget before any physical test;
-3. install only with explicit user approval while preserving the working slot;
-4. capture staged physical logs for kernel/init/mounts/SELinux/graphics/touch/radio;
-5. validate P1 hardware (telephony/IMS, Wi-Fi, Bluetooth, GNSS, sensors,
+1. install the verified `bc1283e4` OTA only with explicit user approval while
+   preserving the working slot;
+2. capture the first Wi-Fi enable attempt with kernel and Android logs;
+3. verify `wlan.ko` loads, ICNSS reaches firmware-ready and a WLAN interface is
+   created before changing any other subsystem;
+4. validate P1 hardware (telephony/IMS, Wi-Fi, Bluetooth, GNSS, sensors,
    fingerprint, camera, NFC, audio, thermal/suspend, A/B OTA/recovery);
-6. validate RED-specific display/Leia behavior; SmartPort remains explicitly
+5. validate RED-specific display/Leia behavior; SmartPort remains explicitly
    out of scope;
-7. iterate only from captured evidence, one proven blocker at a time.
+6. iterate only from captured evidence, one proven blocker at a time.
 
 ## Dependencies
 

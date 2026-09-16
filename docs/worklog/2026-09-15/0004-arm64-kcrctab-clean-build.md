@@ -1,5 +1,10 @@
 # ARM64 kcrctab fix — clean LineageOS build evidence
 
+> Runtime supersession: installing this artifact proved that its unconditional
+> ARM64 KASLR subtraction corrupts the raw CRC emitted by the production LLD
+> link. The artifact hashes below remain historical evidence; the corrected
+> diagnosis and replacement kernel are recorded in `0005-lld-raw-kcrctab-wifi-fix.md`.
+
 ## Purpose
 
 This record verifies the first complete LineageOS 22.2 artifact built with the

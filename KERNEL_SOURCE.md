@@ -7,7 +7,7 @@ The LineageOS 22.2 device build uses the RED-specific source kernel below.
 | Workspace path | `kernel/red/msm8998` |
 | Repository | `https://github.com/derveror/android_kernel_red_msm8998` |
 | Branch | `lineage-22.2` |
-| Pinned commit | `a70742ff9578d6aa0201f66a389659386c716f10` |
+| Pinned commit | `bc1283e4bf00425cf60f43d549f49ff26bf7474e` |
 | Kernel version | Linux `4.4.302+` |
 | Defconfig | `lineageos_hydrogenone_defconfig` |
 | Image target | `Image.gz-dtb` |
@@ -22,11 +22,14 @@ and JDI CYTTSP5 support is built in. The proprietary rear SmartPort is excluded;
 ordinary USB-C, charging, Bluetooth and UFS remain in scope. Leia/display is
 retained.
 
-Earlier source-built 4.4.302 commit `f3819ee` booted Lineage Recovery and
-LineageOS on a physical H1A1000. The current `a70742ff` commit restores the
-ARM64 KASLR/MODVERSIONS kcrctab relocation contract after runtime rejection of
-`wlan.ko`; it still requires a clean full LineageOS build and physical test.
-The standalone GNU-binutils diagnostic build is not a production artifact.
+Source-built 4.4.302 commit `a70742ff` boots Lineage Recovery and LineageOS on
+a physical H1A1000, but its module loader subtracts the KASLR delta from an
+already-absolute LLD kcrctab CRC and rejects the matching `wlan.ko`. Current
+commit `bc1283e4` accepts both raw LLD CRC entries and the standard relocated
+ARM64 form. Its source tests, boot-image build, exact four-DTB order, module CRC
+identity and boot-size gate pass; physical Wi-Fi validation remains required.
+The complete A/B OTA also passes VINTF, ZIP/signature, partition and payload
+checks.
 
 TFA speaker runtime also requires packaging and testing `tfa98xx.cnt` and
 `tfa98xx_a3d.cnt` from stock-authoritative vendor material.

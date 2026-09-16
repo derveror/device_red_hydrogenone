@@ -94,6 +94,15 @@ PRODUCT_COPY_FILES += \
 PRODUCT_PACKAGES += \
     libbt-vendor
 
+# Radio - bridge the maintained MSM8998 QCRIL stack to Android 15's minimum
+# IRadio/RadioConfig contract. The backend shims stay Make-owned, while the
+# Lineage wrapper publishes android.hardware.radio.config@1.1 to the framework.
+PRODUCT_PACKAGES += \
+    android.hardware.radio.c_shim@1.0 \
+    android.hardware.radio.c_shim@1.1 \
+    android.hardware.radio.c_shim@1.2 \
+    android.hardware.radio.config@1.1-service.wrapper
+
 # Camera provider wrapper; camera HAL payload remains vendor-tree owned.
 PRODUCT_PACKAGES += \
     android.hardware.camera.provider@2.4-impl:32 \

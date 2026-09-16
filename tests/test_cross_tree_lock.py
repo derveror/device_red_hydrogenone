@@ -9,8 +9,8 @@ ROOT = Path(__file__).resolve().parents[1]
 LOCK = ROOT / "docs" / "reference" / "cross-tree-lock.json"
 EVIDENCE = ROOT / "docs" / "stock" / "h1a1000-r118" / "cross-tree-copy-contract.json"
 WORKFLOW = ROOT / ".github" / "workflows" / "verify-analysis.yml"
-KERNEL_COMMIT = "bc1283e4bf00425cf60f43d549f49ff26bf7474e"
-VENDOR_COMMIT = "ec16aa36d6a5173655c45636183193260da12c06"
+KERNEL_COMMIT = "2fb7457475a6fb2de07ea603717dac6a83eecb1a"
+VENDOR_COMMIT = "8f69f96712bc8a2f683e59fbfb2379847970546b"
 
 
 class CrossTreeLockContractTest(unittest.TestCase):

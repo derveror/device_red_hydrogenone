@@ -7,7 +7,11 @@ import sys
 from pathlib import Path
 
 from extract_utils.fixups_blob import blob_fixup, blob_fixups_user_type
-from extract_utils.fixups_lib import lib_fixups
+from extract_utils.fixups_lib import (
+    lib_fixup_remove,
+    lib_fixups,
+    lib_fixups_user_type,
+)
 from extract_utils.main import ExtractUtils, ExtractUtilsModule
 
 from tools.hidlbase_shim_fixup_paths import HIDLBASE_SHIM_FIXUP_PATHS
@@ -19,6 +23,15 @@ namespace_imports = [
     'vendor/qcom/opensource/data-ipa-cfg-mgr-legacy-um',
     'vendor/qcom/opensource/dataservices',
 ]
+
+lib_fixups: lib_fixups_user_type = {
+    **lib_fixups,
+    (
+        'android.hardware.radio.c_shim@1.0',
+        'android.hardware.radio.c_shim@1.1',
+        'android.hardware.radio.c_shim@1.2',
+    ): lib_fixup_remove,
+}
 
 # Canonical RED .118 Android 9 HIDL interfaces still reference the removed
 # android::hardware::details::gBnConstructorMap ABI. LineageOS 22.2 provides
@@ -34,6 +47,20 @@ blob_fixups: blob_fixups_user_type = {
         .clear_symbol_version('__aeabi_memcpy')
         .clear_symbol_version('__aeabi_memset')
         .clear_symbol_version('__gnu_Unwind_Find_exidx'),
+    'vendor/lib64/libril-qc-hal-qmi.so':
+        blob_fixup()
+        .replace_needed(
+            'android.hardware.radio.config@1.0.so',
+            'android.hardware.radio.c_shim@1.0.so',
+        )
+        .replace_needed(
+            'android.hardware.radio.config@1.1.so',
+            'android.hardware.radio.c_shim@1.1.so',
+        )
+        .replace_needed(
+            'android.hardware.radio.config@1.2.so',
+            'android.hardware.radio.c_shim@1.2.so',
+        ),
 }
 
 module = ExtractUtilsModule(

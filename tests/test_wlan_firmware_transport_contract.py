@@ -13,6 +13,10 @@ ANDROID_ROOT = DEVICE_ROOT.parents[2]
 VENDOR_ROOT = ANDROID_ROOT / "vendor/red/hydrogenone"
 
 REQUIRED_PAYLOAD = {
+    "vendor/bin/cnss-daemon": {
+        "size": 69880,
+        "sha256": "ccb5244705d434f749f5836aa7db7cfebcc117ca5714a8f1168fc7608ece46a2",
+    },
     "vendor/bin/qrtr-ns": {
         "size": 68632,
         "sha256": "294d3d810af39d66db49469917e46fc0537e5122cf54c883344135bfd83bf7dd",
@@ -126,6 +130,54 @@ class WlanFirmwareTransportContractTest(unittest.TestCase):
         dynamic = readelf("-d", path=path)
         needed = set(re.findall(r"Shared library: \[([^]]+)]", dynamic))
         self.assertIn("libqrtr.so", needed)
+
+    def test_cnss_daemon_is_stock118_wlfw_qmi_client(self) -> None:
+        path = VENDOR_ROOT / "proprietary/vendor/bin/cnss-daemon"
+        self.assertTrue(path.is_file(), f"missing RED .118 payload: {path}")
+        if not path.is_file():
+            return
+
+        header = readelf("-h", path=path)
+        self.assertRegex(header, r"(?m)^\s*Class:\s+ELF64$")
+        self.assertRegex(header, r"(?m)^\s*Machine:\s+AArch64$")
+
+        dynamic = readelf("-d", path=path)
+        needed = set(re.findall(r"Shared library: \[([^]]+)]", dynamic))
+        self.assertTrue(
+            {
+                "libcld80211.so",
+                "libmdmdetect.so",
+                "libperipheral_client.so",
+                "libqmi_cci.so",
+                "libqmi_common_so.so",
+                "libqmiservices.so",
+            }.issubset(needed),
+            needed,
+        )
+
+    def test_cnss_daemon_starts_in_late_start_with_stock118_credentials(self) -> None:
+        init = (DEVICE_ROOT / "rootdir/etc/init/hw/init.qcom.rc").read_text(
+            encoding="utf-8"
+        )
+        match = re.search(
+            r"(?m)^service vendor\.cnss-daemon /vendor/bin/cnss-daemon -n -l\s*$"
+            r"(?P<body>(?:\n(?:[ \t]+[^\n]*|[ \t]*))*)",
+            init,
+        )
+        self.assertIsNotNone(match, "vendor.cnss-daemon service is not declared")
+        if match is None:
+            return
+
+        directives = {
+            line.strip()
+            for line in match.group("body").splitlines()
+            if line.strip() and not line.lstrip().startswith("#")
+        }
+        self.assertIn("class late_start", directives)
+        self.assertIn("user system", directives)
+        self.assertIn("group system inet net_admin wifi", directives)
+        self.assertIn("capabilities NET_ADMIN", directives)
+        self.assertNotIn("disabled", directives)
 
     def test_qrtr_name_service_precedes_tftp_with_stock118_credentials(self) -> None:
         init = (DEVICE_ROOT / "rootdir/etc/init/hw/init.qcom.rc").read_text(encoding="utf-8")

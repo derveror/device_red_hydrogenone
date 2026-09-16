@@ -94,6 +94,14 @@ service vendor.tftp_server /vendor/bin/tftp_server
     class core
     user root
 
+# RED .118 WLAN firmware waits for this userspace WLFW client to deliver the
+# board data and calibration report before advertising FW_READY to ICNSS.
+service vendor.cnss-daemon /vendor/bin/cnss-daemon -n -l
+    class late_start
+    user system
+    group system inet net_admin wifi
+    capabilities NET_ADMIN
+
 # RED .118 SSC registry daemon. The source-owned Android 15 HIDL wrapper loads
 # sensors.ssc.so through /vendor/etc/sensors/hals.conf.
 service vendor.sensors.qti /vendor/bin/sensors.qti

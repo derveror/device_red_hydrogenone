@@ -9,7 +9,7 @@ Read this file first after interruption.
   its complete build and artifact gates and is published on the named branch.
 - Vendor: `derveror/proprietary_vendor_red_hydrogenone`, branch
   `lineage-22.2-kernel-302`, commit
-  `f5192d041cb9bc914b5e438c1fc54c1aae7f8891`.
+  `ec16aa36d6a5173655c45636183193260da12c06`.
 - Kernel: `derveror/android_kernel_red_msm8998`, commit
   `bc1283e4bf00425cf60f43d549f49ff26bf7474e`.
 - Stock authority: `H1A1000.082ho.01.00.10r.118`.
@@ -24,7 +24,7 @@ Read this file first after interruption.
 - No RED `msm8998-common` repositories.
 - SmartPort excluded; standard USB/Bluetooth/charging and Leia/display retained.
 - Device tree owns open configuration and source wrappers.
-- Vendor tree owns 663 selected proprietary files, including the exact `.118`
+- Vendor tree owns 664 selected proprietary files, including the exact `.118`
   `libssd.so` required by the SSD QSEE listener and the physically verified
   RED `.118` QTI Keymaster and SSC sensor stacks.
 - Stock HIDL base libraries are source-owned, with narrow compatibility fixups
@@ -35,25 +35,26 @@ Read this file first after interruption.
 - The source-built Linux `4.4.302+` kernel boots Lineage Recovery and LineageOS
   22.2 reaches the setup/system UI on the physical H1A1000; touchscreen input is
   confirmed working.
-- The installed build boots to Android with touchscreen, camera, flashlight and
-  USB debugging working. Wi-Fi and Bluetooth remain unavailable; those are
-  runtime observations, not build claims.
+- The installed `bc1283e4` build boots to Android with touchscreen, camera,
+  flashlight and USB debugging working. Bluetooth remains unavailable. Wi-Fi
+  reaches the Android framework but reports `WifiNative Failure` before the
+  permanent `cnss-daemon` restoration described below.
 - The new uninstalled candidate restores the exact Bluetooth Cherokee property
   and source `libbt-vendor`, the stock persist-backed WLAN MAC link, the RED
   camera power ABI, and a byte-verified 185-file stock `.118` production camera
   closure. SmartPort remains excluded.
 - The installed candidate includes the exact RED `.118` QRTR/TFTP transport
-  (`qrtr-ns`, `tftp_server`, `libqsocket.so`, `libqrtr.so`). Runtime evidence
-  reaches modem WLAN service publication, then the `a70742ff` kernel rejects
-  `wlan.ko` at `module_layout` under KASLR/MODVERSIONS.
+  (`qrtr-ns`, `tftp_server`, `libqsocket.so`, `libqrtr.so`). The `bc1283e4`
+  kernel accepts the matching external `wlan.ko`; the remaining failure was the
+  missing RED `.118` userspace WLFW QMI client.
 - Dynamic debug reports `0xffffffe183b71df1` versus module `0x13d71df1`.
   The exact LLD vmlinux stores raw `0x13d71df1` with no relocation for that
   kcrctab entry, proving that unconditional KASLR subtraction corrupts it.
 - Current kernel commit `bc1283e4bf00425cf60f43d549f49ff26bf7474e`
   accepts both the raw LLD CRC and the standard relocated ARM64 form. Its
-  source tests and normal LLD boot-image gates pass; it has not been installed.
-- The current vendor selection contains 663 files and 508 proprietary ELF
-  modules; all 508 have checkelf enabled and zero exceptions. Extraction now
+  source tests and normal LLD boot-image gates pass and it is installed.
+- The current vendor selection contains 664 files and 509 proprietary ELF
+  modules; all 509 have checkelf enabled and zero exceptions. Extraction now
   replays the complete Android 15 compatibility pipeline automatically.
 - The earlier superseded candidate embeds kernel `f3819ee`. Its historical
   artifacts are:
@@ -85,6 +86,27 @@ Read this file first after interruption.
     `9d066fb204fbce603692fcfb6e3512866da5a163e00dd3814ae2867d9768c150`;
   - packaged `wlan.ko`, 5,660,568 bytes, SHA-256
     `a8126f3fb6c58516a3263a63454f67068035c643682a8f26a630d933a8516c72`.
+- Live diagnosis of that installed build proved the remaining Wi-Fi boundary:
+  the exact stock `.118` `cnss-daemon` completed the WLFW QMI board-data and
+  calibration handshake, after which ICNSS reported `FW_READY` and created
+  `wlan0` plus `p2p0`. This rules out kernel size, DT selection and module ABI
+  as the cause of the observed `WifiNative Failure`.
+- Vendor commit `ec16aa36d6a5173655c45636183193260da12c06`
+  permanently restores that exact daemon and the stock-equivalent `late_start`
+  service. `cnss_diag` remains excluded.
+- The resulting uninstalled candidate was built with `make bacon -j7`, passed
+  VINTF compatibility and contains Android security patch level `2026-09`:
+  - OTA `lineage-22.2-20260916-UNOFFICIAL-hydrogenone.zip`, 851,071,144 bytes,
+    SHA-256 `12a8cf73d60a47fe709e1ddd612ac46b3edced27c4e0376561217f3983e98ef3`;
+  - `boot.img`, 32,403,456 bytes, SHA-256
+    `01084bfa71d167d6e7ec0d70fa970d4092e48857d6eaded4050ec2fd8ad7ef52`;
+  - `vendor.img`, 333,541,608 bytes, SHA-256
+    `51df08a98f60f498a4c816704046d1e6e380a754a6d164d9e44397789514a91d`;
+  - kernel payload remains 15,655,357 bytes, leaving 1,121,859 bytes below
+    the observed 16 MiB RED ABL boundary.
+- This candidate has not been installed. Full Wi-Fi UI and association remain
+  a physical runtime gate after a user-approved sideload; Bluetooth remains a
+  separate unresolved runtime issue.
 - Only the user can enter Lineage Recovery physically; never issue
   `adb reboot recovery` or `fastboot reboot recovery` on this device.
 - No command may flash or reboot the phone without a new explicit user request.

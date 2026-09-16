@@ -50,9 +50,9 @@ from `kernel/red/msm8998`; no stock kernel prebuilt is a build input.
 ## Vendor payload audit
 
 Pinned vendor commit:
-`f5192d041cb9bc914b5e438c1fc54c1aae7f8891`.
+`ec16aa36d6a5173655c45636183193260da12c06`.
 
-The selected list, manifest and on-disk payload each contain 663 entries. Stock
+The selected list, manifest and on-disk payload each contain 664 entries. Stock
 copies of `libhidlbase`, `libhidltransport` and `libhwbinder` are pruned because
 the Android 15 source tree owns those providers. Sixty-three exact `.118` HIDL
 consumers receive `libhidlbase_shim`; `imsdatadaemon` is retargeted from
@@ -66,7 +66,7 @@ registries.
 - source kernel and four-DTB contract;
 - radio, fstab, camera, init and VINTF static contracts;
 - device/vendor copy ownership;
-- reproducible 663-file extraction list and compatibility fixups;
+- reproducible 664-file extraction list and compatibility fixups;
 - rejection of superseded stock identity and raw reference trees;
 - rejection of SmartPort runtime control and kernel prebuilts.
 

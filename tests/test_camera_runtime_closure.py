@@ -27,6 +27,19 @@ PRODUCTION_SUPPORT = {
     "vendor/lib/libremosaic_daemon.so",
     "vendor/firmware/cpp_firmware_v1_12_0.fw",
 }
+STILL_CAPTURE_SUPPORT = {
+    "vendor/lib/libjpegdhw.so",
+    "vendor/lib/libjpegdmahw.so",
+    "vendor/lib/libjpegehw.so",
+    "vendor/lib/libmmcamera_tintless_algo.so",
+    "vendor/lib/libmmcamera_tintless_bg_pca_algo.so",
+    "vendor/lib/libmmjpeg.so",
+    "vendor/lib/libmmqjpeg_codec.so",
+    "vendor/lib/libmmqjpegdma.so",
+    "vendor/lib/libqomx_jpegdec.so",
+    "vendor/lib/libqomx_jpegenc.so",
+    "vendor/lib/libqomx_jpegenc_pipe.so",
+}
 RUNTIME_ISP_MODULES = {
     "libmmcamera_isp_bpc48.so",
     "libmmcamera_isp_cac47.so",
@@ -112,6 +125,24 @@ class CameraRuntimeClosureTest(unittest.TestCase):
             path for path in required if not (VENDOR_ROOT / "proprietary" / path).is_file()
         )
         self.assertEqual(missing, [], "missing vendor camera files:\n" + "\n".join(missing))
+
+    def test_still_capture_runtime_is_listed_and_present(self) -> None:
+        missing_entries = sorted(STILL_CAPTURE_SUPPORT - proprietary_entries())
+        self.assertEqual(
+            missing_entries,
+            [],
+            "missing still-capture proprietary entries:\n" + "\n".join(missing_entries),
+        )
+        missing_files = sorted(
+            path
+            for path in STILL_CAPTURE_SUPPORT
+            if not (VENDOR_ROOT / "proprietary" / path).is_file()
+        )
+        self.assertEqual(
+            missing_files,
+            [],
+            "missing still-capture vendor files:\n" + "\n".join(missing_files),
+        )
 
     def test_extraction_replays_the_android15_vendor_contract(self) -> None:
         extraction = (ROOT / "extract-files.py").read_text(encoding="utf-8")

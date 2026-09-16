@@ -424,6 +424,9 @@ vendor/lib/libchromatix_imx380_sub_zsl_preview_lc898122_3dmode.so
 vendor/lib/libchromatix_imx380_sub_zsl_preview_lc898122_bokeh.so
 vendor/lib/libchromatix_imx380_sub_zsl_video_lc898122.so
 vendor/lib/libflash_pmic.so
+vendor/lib/libjpegdhw.so
+vendor/lib/libjpegdmahw.so
+vendor/lib/libjpegehw.so
 vendor/lib/libmmcamera_isp_bpc48.so
 vendor/lib/libmmcamera_isp_cac47.so
 vendor/lib/libmmcamera_isp_chroma_enhan40.so
@@ -465,8 +468,13 @@ vendor/lib/libmmcamera_m24c64s_sub_eeprom.so
 vendor/lib/libmmcamera_paaf_lib.so
 vendor/lib/libmmcamera_ppeiscore.so
 vendor/lib/libmmcamera_quadracfa.so
+vendor/lib/libmmcamera_tintless_algo.so
+vendor/lib/libmmcamera_tintless_bg_pca_algo.so
+vendor/lib/libmmjpeg.so
 vendor/lib/libremosaic_daemon.so
 vendor/lib/libmmjpeg_interface.so
+vendor/lib/libmmqjpeg_codec.so
+vendor/lib/libmmqjpegdma.so
 vendor/lib/libmmlib2d_interface.so
 vendor/lib/libmmosal_proprietary.so
 vendor/lib/libmpbase.so
@@ -483,6 +491,9 @@ vendor/lib/libqmi_common_so.so
 vendor/lib/libqmi_encdec.so
 vendor/lib/libqmiservices.so
 vendor/lib/libqomx_core.so
+vendor/lib/libqomx_jpegdec.so
+vendor/lib/libqomx_jpegenc.so
+vendor/lib/libqomx_jpegenc_pipe.so
 vendor/lib/libril-qcril-hook-oem.so
 vendor/lib/libril.so
 vendor/lib/librilutils.so

@@ -47,14 +47,14 @@ Read this file first after interruption.
   reaches modem WLAN service publication, then the `f3819ee` kernel rejects
   `wlan.ko` at `module_layout` under KASLR/MODVERSIONS.
 - Current kernel commit `a70742ff9578d6aa0201f66a389659386c716f10`
-  restores the upstream ARM64 kcrctab relocation contract. It is not yet in a
-  complete LineageOS boot/OTA artifact and has not been tested on the phone.
+  restores the upstream ARM64 kcrctab relocation contract. It is now present
+  in a clean complete LineageOS boot/OTA artifact, but that artifact has not
+  been tested on the phone.
 - The current vendor selection contains 663 files and 508 proprietary ELF
   modules; all 508 have checkelf enabled and zero exceptions. Extraction now
   replays the complete Android 15 compatibility pipeline automatically.
-- The latest completed `mka bacon` build passes SELinux/neverallow, VINTF,
-  partition size and ZIP integrity checks, but is superseded because it embeds
-  kernel `f3819ee`, not `a70742ff`. Its historical artifacts are:
+- The superseded installed-candidate build embeds kernel `f3819ee`, not
+  `a70742ff`. Its historical artifacts are:
   - OTA `lineage-22.2-20260915-UNOFFICIAL-hydrogenone.zip`, 851,038,702 bytes,
     SHA-256 `bcb028f8137fbd370354ac2e65fe172c9f017299a6efa343de247b25dc21f51f`;
   - production `boot.img`, 32,403,456 bytes, SHA-256
@@ -64,8 +64,20 @@ Read this file first after interruption.
 - The `a70742ff` kernel change does not touch DTS, defconfig, DTB order,
   display, touchscreen, recovery or boot-image layout. It restores only the
   ARM64 KASLR/module-CRC relocation contract.
+- The current clean `a70742ff` build completed with `mka bacon -j8`. It passes
+  VINTF (`COMPATIBLE`), partition-size, SignApk/ZIP, boot-payload, exact
+  four-DTB, module-strip and 435/435 CRC gates. Current artifacts are:
+  - OTA `lineage-22.2-20260915-UNOFFICIAL-hydrogenone.zip`, 851,026,784 bytes,
+    SHA-256 `3b54b9dfa3b16291a9b84cea390155f94b3b4b8b50ed3df1b40386addc49b4f1`;
+  - `boot.img`, 32,403,456 bytes, SHA-256
+    `c67f079d1ece6a39a6d436d100a50d943e51a053f648892c3f1da265598a6132`;
+  - `vendor.img`, 333,467,880 bytes, SHA-256
+    `ed83894f4ddb10b51c65791d1e9f8609d6ca1d3ac4524603a32df6879f300f0b`.
+  Full build evidence is in
+  `docs/worklog/2026-09-15/0004-arm64-kcrctab-clean-build.md`.
 - Only the user can enter Lineage Recovery physically; never issue
   `adb reboot recovery` or `fastboot reboot recovery` on this device.
 - No command may flash or reboot the phone without a new explicit user request.
-  The next build gate is a clean full LineageOS build with `a70742ff` through
-  Clang 19/LLVM/LLD, followed by exact kernel/module/DTB/boot verification.
+  The clean build and exact kernel/module/DTB/boot verification gate is now
+  complete. The next gate is a user-controlled recovery install and physical
+  runtime collection; build success alone does not prove Wi-Fi or Bluetooth.

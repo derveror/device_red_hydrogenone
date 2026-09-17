@@ -12,9 +12,26 @@ VENDOR_PROP = ROOT / "vendor.prop"
 SYSTEM_EXT_PROP = ROOT / "system_ext.prop"
 BOARD_CONFIG = ROOT / "BoardConfig.mk"
 DEVICE_MANIFEST = ROOT / "manifest.xml"
+INIT_TARGET_RC = ROOT / "rootdir/etc/init/hw/init.target.rc"
 
 
 class RadioDataPlaneRuntimeContractTest(unittest.TestCase):
+    def test_post_fs_starts_ipa_gsi_firmware_after_qseecom(self) -> None:
+        text = INIT_TARGET_RC.read_text(encoding="utf-8")
+        match = re.search(r"(?ms)^on post-fs\n(?P<body>.*?)(?=^\S|\Z)", text)
+        self.assertIsNotNone(match, "init.target.rc must define a post-fs action")
+
+        commands = [
+            line.strip()
+            for line in match.group("body").splitlines()
+            if line.strip() and not line.lstrip().startswith("#")
+        ]
+        self.assertIn("write /dev/ipa 1", commands)
+        self.assertLess(
+            commands.index("wait_for_prop vendor.sys.listeners.registered true"),
+            commands.index("write /dev/ipa 1"),
+        )
+
     def test_red118_dsds_defaults_to_lte_capable_mode(self) -> None:
         text = VENDOR_PROP.read_text(encoding="utf-8")
         self.assertRegex(text, r"(?m)^ro\.telephony\.default_network=22,22$")

@@ -13,6 +13,8 @@ on post-fs
     start vendor.qseecomd
     wait_for_prop vendor.sys.listeners.registered true
     start keymaster-3-0
+    # Load the IPA 3.1 GSI firmware before rmnet/netmgr bring up mobile data.
+    write /dev/ipa 1
 
 # Peripheral manager
 service vendor.per_mgr /vendor/bin/pm-service

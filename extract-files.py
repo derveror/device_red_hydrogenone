@@ -47,6 +47,12 @@ blob_fixups: blob_fixups_user_type = {
         .clear_symbol_version('__aeabi_memcpy')
         .clear_symbol_version('__aeabi_memset')
         .clear_symbol_version('__gnu_Unwind_Find_exidx'),
+    # The stock .118 64-bit IMS RCS client imports its IMS-private IDL
+    # service object from libqmiservices. The Android 15-compatible FP3 QMI
+    # generation deliberately removed that old export, while the matching
+    # stock lib-imsrcsbaseimpl still owns the exact implementation.
+    'vendor/lib64/lib-imsrcs-v2.so':
+        blob_fixup().add_needed('lib-imsrcsbaseimpl.so'),
     'vendor/lib64/libril-qc-hal-qmi.so':
         blob_fixup()
         .replace_needed(

@@ -6,7 +6,7 @@
   "kernel_path": "kernel/red/msm8998",
   "kernel_repository": "derveror/android_kernel_red_msm8998",
   "vendor_repository": "derveror/proprietary_vendor_red_hydrogenone",
-  "vendor_commit": "8f69f96712bc8a2f683e59fbfb2379847970546b",
+  "vendor_commit": "0c0351fcfc0a00edece8147403675d3575185e7f",
   "stock_build": "H1A1000.082ho.01.00.10r.118",
   "stock_archive_sha256": "7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e"
 }

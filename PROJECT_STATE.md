@@ -1,6 +1,6 @@
 # RED Hydrogen One LineageOS 22.2 project state
 
-Last updated: 2026-09-16.
+Last updated: 2026-09-17.
 
 This is the current status for `device/red/hydrogenone`. Detailed stock evidence,
 generated audits and historical worklogs remain under `docs/`.
@@ -21,7 +21,7 @@ generated audits and historical worklogs remain under `docs/`.
 
 - Device branch: `118-lineage-22.2-kernel-302`.
 - Vendor repository: `derveror/proprietary_vendor_red_hydrogenone`, commit
-  `8f69f96712bc8a2f683e59fbfb2379847970546b`.
+  `0c0351fcfc0a00edece8147403675d3575185e7f`.
 - Kernel repository: `derveror/android_kernel_red_msm8998`, commit
   `2fb7457475a6fb2de07ea603717dac6a83eecb1a`.
 - Kernel path: `kernel/red/msm8998`.
@@ -43,11 +43,12 @@ remain in scope.
 
 ## Vendor payload and HIDL compatibility
 
-The device extraction list contains 691 files: the 675-path RED `.118`
-selection plus 16 new dependencies in the Android 15 QCRIL compatibility
-closure. Six existing QCRIL paths are replaced in place. The stock manifest,
-the donor override and every transformed hash are recorded separately so the
-origin of each file remains explicit. The stock selection includes the exact
+The device extraction list contains 712 files. It includes the RED `.118`
+selection, the Android 15 QCRIL interface closure, one coherent FP3 QMI
+generation and the matching QCRIL database plus every upgrade from version 0
+through version 10. The stock manifest, each reference override and every
+transformed hash are recorded separately so the origin of each file remains
+explicit. The stock selection includes the exact
 `.118` 64-bit `libssd.so` loaded by `qseecomd` through `dlopen`; ordinary
 `DT_NEEDED` analysis does not expose that runtime dependency. It also contains
 the exact `.118` SSC sensor payload for both architectures while retaining the
@@ -69,7 +70,7 @@ and pinned in `docs/reference/vendor-hidl-runtime-contract.json`.
 - Device and vendor copy destinations are checked for collisions.
 - Source-owned GNSS, NFC, Wi-Fi, camera and media wrappers must not coexist with
   conflicting proprietary implementations.
-- The device extraction list mirrors the current 691-file vendor selection.
+- The device extraction list mirrors the current 712-file vendor selection.
 
 ## Confirmed static contracts
 
@@ -114,18 +115,43 @@ and pinned in `docs/reference/vendor-hidl-runtime-contract.json`.
 Bluetooth and the remaining hardware subsystems retain their own runtime
 validation gates.
 
-The Android 15 radio-compatibility candidate completed the normal Clang
-19/LLVM/LLD `mka bacon -j7` path on 2026-09-16. Its A/B OTA is
-`lineage-22.2-20260916-UNOFFICIAL-hydrogenone.zip`, size 858,301,520 bytes,
-SHA-256 `232664bbb6306671d70fa9e5ec24588499887ce9239ae806e10a6cb08ac29ea1`.
-VINTF is compatible, ZIP integrity passes, and the packaged QCRIL publishes the
-Android 15-compatible radio interface closure. This radio change is not yet
-runtime-validated on the physical device.
+The first Android 15 QCRIL candidate was installed and published supported
+IRadio 1.4 and RadioConfig 1.1 interfaces, but physical testing still showed an
+unknown baseband, no IMEI and no SIM. Runtime traces proved two independent
+causes. The Android 15 init tree did not create the stock-required
+`/dev/socket/qmux_radio` and `/data/vendor/radio` state, so both `qcrild`
+instances repeatedly crashed in `QtiBusSocketTransport::clientLoop()`. Creating
+those paths live kept both daemons stable for more than 120 seconds. The next
+failure was `qmi_client_init_instance returned (-17) for DMS`; `-17` is the QMI
+client parameter error and exposed the mixed QCRIL/QMI generations.
+
+Vendor commit `0c0351fcfc0a00edece8147403675d3575185e7f` replaces that mixed
+closure with the byte-identical FP3 QMI set shared by the maintained Mata,
+Cheryl, Nubia and OnePlus MSM8998 references, packages its version-10 database,
+and bridges the retained RED IMS-private IDL to its matching stock provider.
+The device init now reproduces the required QtiBus socket, radio-data directory,
+database flags and MBN-copy completion trigger.
+
+The corrected candidate completed the normal Clang 19/LLVM/LLD
+`mka bacon -j7` path on 2026-09-17. VINTF is compatible, all device and vendor
+contract tests pass, and the installed image contains the expected QMI hashes,
+database upgrades and init directives. Its artifacts are:
+
+- OTA `lineage-22.2-20260917-UNOFFICIAL-hydrogenone.zip`, 858,334,655 bytes,
+  SHA-256 `6a78e95d96a3d0e1c9b8fd9cdb6fb78b49e89edb04d1c75f0dcb6b977a920224`;
+- `boot.img`, 32,403,456 bytes, SHA-256
+  `c89def7c5a2f8d7296966d9c56dcb38ce279b08928111eca2eccc36d54cecf90`;
+- `vendor.img`, 369,557,736 bytes, SHA-256
+  `137409e2129fe179c65ca847287231af0e36e028014aca47d7f3f416a4425773`.
+
+This corrected radio candidate has not yet been installed. Baseband, IMEI, SIM,
+calls and data remain physical runtime gates; build success is not reported as
+a radio fix.
 
 ## Next gates
 
-1. Install the radio candidate only after a separate explicit user request,
-   preserving the known-working slot as fallback.
+1. Install the corrected radio candidate only after a separate explicit user
+   request, preserving the known-working slot as fallback.
 2. Verify baseband, IMEI, SIM detection, calls/data and the absence of Android
    15 unsupported-radio-HAL errors while confirming Wi-Fi and camera regressions
    have not been introduced.

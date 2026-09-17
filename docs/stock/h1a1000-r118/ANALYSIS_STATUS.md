@@ -50,15 +50,16 @@ from `kernel/red/msm8998`; no stock kernel prebuilt is a build input.
 ## Vendor payload audit
 
 Pinned vendor commit:
-`ec16aa36d6a5173655c45636183193260da12c06`.
+`0c0351fcfc0a00edece8147403675d3575185e7f`.
 
-The selected list, manifest and on-disk payload each contain 664 entries. Stock
+The selected list, manifest and on-disk payload each contain 712 entries. Stock
 copies of `libhidlbase`, `libhidltransport` and `libhwbinder` are pruned because
 the Android 15 source tree owns those providers. Sixty-three exact `.118` HIDL
 consumers receive `libhidlbase_shim`; `imsdatadaemon` is retargeted from
-`libhwbinder.so` to `libhidlbase.so`. The identities and operations are pinned
-in `docs/reference/vendor-hidl-runtime-contract.json` and the vendor fixup
-registries.
+`libhwbinder.so` to `libhidlbase.so`. The Android 15 QCRIL override includes one
+coherent FP3 QMI generation and the matching version-10 database. The identities
+and operations are pinned in the source lock, ELF audit, extraction manifest and
+fixup registries.
 
 ## Current repository gates
 
@@ -66,7 +67,7 @@ registries.
 - source kernel and four-DTB contract;
 - radio, fstab, camera, init and VINTF static contracts;
 - device/vendor copy ownership;
-- reproducible 664-file extraction list and compatibility fixups;
+- reproducible 712-file extraction list and compatibility fixups;
 - rejection of superseded stock identity and raw reference trees;
 - rejection of SmartPort runtime control and kernel prebuilts.
 
@@ -134,13 +135,18 @@ physical test reached the LineageOS setup/system UI and confirmed touchscreen
 input. Wi-Fi, Bluetooth, camera/flashlight and USB data/ADB remained unavailable
 in that installed build.
 
-The radio/camera candidate was installed and reaches Android system UI. Physical
-testing confirms touchscreen, camera, flashlight and USB debugging; Wi-Fi and
-Bluetooth remain unavailable. The next uninstalled candidate adds the exact
-stock `.118` `qrtr-ns`, `tftp_server`, `libqsocket.so` and `libqrtr.so`
-transport. Stock init ordering starts the QRTR name service before TFTP so the
-modem can publish WLAN QMI and fetch `wlanmdsp.mbn` before ICNSS
-firmware-ready. Its full OTA and static checks pass without changing DTS,
-defconfig, display, touchscreen, recovery or boot-image layout. Runtime Wi-Fi
-validation remains required; no Wi-Fi success is declared from build proof
-alone.
+Physical testing now confirms touchscreen, Wi-Fi on 2.4/5 GHz, camera preview
+and still capture, flashlight, USB debugging and normal Android boot. The
+source-built kernel and device-specific recovery remain unchanged. Bluetooth
+is still a separate unresolved runtime gate.
+
+The first Android 15 QCRIL candidate published framework-supported radio HALs
+but still exposed no baseband, IMEI or SIM. Live traces proved missing
+`qmux_radio` and radio-data init state caused both QCRIL instances to crash;
+after recreating the exact stock runtime contract, DMS initialization failed
+with QMI client error `-17`. This identified a mixed QCRIL/QMI ABI generation.
+The next candidate uses the byte-identical FP3 QMI closure and version-10 QCRIL
+database shared by four maintained MSM8998 references, while preserving RED
+`.118` modem firmware and device configuration. The full OTA, VINTF, ELF and
+tree tests pass. Runtime baseband, IMEI, SIM, calls and data validation remains
+required; no radio success is declared from build proof alone.

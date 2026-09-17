@@ -30,6 +30,23 @@ class Red118RadioRuntimeContractTest(unittest.TestCase):
         self.assertRegex(text, r"(?m)^\s*start vendor\.qcrild\s*$")
         self.assertRegex(text, r"(?m)^\s*start vendor\.qcrild2\s*$")
 
+    def test_android15_rootdir_creates_qcril_runtime_state(self) -> None:
+        text = INIT_QCOM.read_text(encoding="utf-8")
+        required = (
+            "mkdir /dev/socket/qmux_radio 0770 radio radio",
+            "chmod 2770 /dev/socket/qmux_radio",
+            "mkdir /data/vendor/radio 0770 system radio",
+            "write /data/vendor/radio/copy_complete 0",
+            "copy /vendor/radio/qcril_database/qcril.db "
+            "/data/vendor/radio/qcril_prebuilt.db",
+            "write /data/vendor/radio/prebuilt_db_support 1",
+            "write /data/vendor/radio/db_check_done 0",
+            "on property:ro.vendor.ril.mbn_copy_completed=1",
+            "write /data/vendor/radio/copy_complete 1",
+        )
+        for directive in required:
+            self.assertIn(directive, text)
+
     def test_android15_rootdir_does_not_start_tsts_or_legacy_rild(self) -> None:
         text = INIT_QCOM.read_text(encoding="utf-8")
         forbidden = (

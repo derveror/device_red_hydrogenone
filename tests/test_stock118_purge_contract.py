@@ -61,10 +61,10 @@ class Stock118PurgeContractTest(unittest.TestCase):
             for line in (ROOT / "proprietary-files.txt").read_text(encoding="utf-8").splitlines()
             if line.strip() and not line.lstrip().startswith("#")
         ]
-        # The RED .118 selection contains 675 paths. The Android 15 radio
-        # compatibility closure adds 16 new QCRIL dependencies; the six
-        # replaced QCRIL paths do not change the count.
-        self.assertEqual(len(entries), 691)
+        # The previous Android 15 radio selection contained 691 extraction
+        # records. The coherent FP3 QMI closure adds nine pinned replacements
+        # and the twelve-file QCRIL database/runtime migration set.
+        self.assertEqual(len(entries), 712)
         self.assertEqual(len(entries), len(set(entries)))
 
     def test_vendor_hidl_runtime_contract_is_pinned_to_red118(self) -> None:

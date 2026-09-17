@@ -10,7 +10,7 @@ LOCK = ROOT / "docs" / "reference" / "cross-tree-lock.json"
 EVIDENCE = ROOT / "docs" / "stock" / "h1a1000-r118" / "cross-tree-copy-contract.json"
 WORKFLOW = ROOT / ".github" / "workflows" / "verify-analysis.yml"
 KERNEL_COMMIT = "2fb7457475a6fb2de07ea603717dac6a83eecb1a"
-VENDOR_COMMIT = "8f69f96712bc8a2f683e59fbfb2379847970546b"
+VENDOR_COMMIT = "0c0351fcfc0a00edece8147403675d3575185e7f"
 
 
 class CrossTreeLockContractTest(unittest.TestCase):

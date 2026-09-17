@@ -2,114 +2,88 @@
 
 Read this file first after interruption.
 
-## Current checkpoints
+## Repository authority
 
 - Device: `derveror/device_red_hydrogenone`, branch
-  `118-lineage-22.2-kernel-302`; the radio/camera runtime restoration has passed
-  its complete build and artifact gates and is published on the named branch.
+  `118-lineage-22.2-kernel-302`.
 - Vendor: `derveror/proprietary_vendor_red_hydrogenone`, branch
   `lineage-22.2-kernel-302`, commit
-  `ec16aa36d6a5173655c45636183193260da12c06`.
-- Kernel: `derveror/android_kernel_red_msm8998`, commit
-  `bc1283e4bf00425cf60f43d549f49ff26bf7474e`.
+  `0c0351fcfc0a00edece8147403675d3575185e7f`.
+- Kernel: `derveror/android_kernel_red_msm8998`, branch `lineage-22.2`, commit
+  `2fb7457475a6fb2de07ea603717dac6a83eecb1a`.
 - Stock authority: `H1A1000.082ho.01.00.10r.118`.
 - Stock archive SHA-256:
   `7277a1accf9595bb727f2189863cf5f6249dd99322e2953432bca6e448365f1e`.
 
+Do not create new branches. Do not change the kernel branch unless a diagnosed
+kernel defect requires it. Never issue a reboot, flash or sideload command
+without a new explicit user approval. Only the user can enter Lineage Recovery
+reliably using the hardware buttons; never run `adb reboot recovery` or
+`fastboot reboot recovery`.
+
 ## Fixed architecture decisions
 
 - Target LineageOS 22.2 / Android 15 / API 35.
-- Kernel build input is `kernel/red/msm8998`, Linux 4.4.302.
+- Kernel input is `kernel/red/msm8998`, Linux `4.4.302+`.
 - Exact RED DTBs: TM, TM CSP, SIM and JDI.
-- No RED `msm8998-common` repositories.
+- No RED `msm8998-common` repositories and no prebuilt kernel.
 - SmartPort excluded; standard USB/Bluetooth/charging and Leia/display retained.
-- Device tree owns open configuration and source wrappers.
-- Vendor tree owns 664 selected proprietary files, including the exact `.118`
-  `libssd.so` required by the SSD QSEE listener and the physically verified
-  RED `.118` QTI Keymaster and SSC sensor stacks.
-- Stock HIDL base libraries are source-owned, with narrow compatibility fixups
-  for verified `.118` consumers.
+- Device tree owns open configuration and source wrappers; vendor tree owns
+  proprietary runtime payload.
+- RED `.118` controls device-specific firmware and configuration. Mata, Cheryl,
+  OnePlus and Nubia are compatibility references, not device identity sources.
 
-## Current runtime checkpoint
+## Confirmed physical runtime state
 
-- The source-built Linux `4.4.302+` kernel boots Lineage Recovery and LineageOS
-  22.2 reaches the setup/system UI on the physical H1A1000; touchscreen input is
-  confirmed working.
-- The installed `bc1283e4` build boots to Android with touchscreen, camera,
-  flashlight and USB debugging working. Bluetooth remains unavailable. Wi-Fi
-  reaches the Android framework but reports `WifiNative Failure` before the
-  permanent `cnss-daemon` restoration described below.
-- The new uninstalled candidate restores the exact Bluetooth Cherokee property
-  and source `libbt-vendor`, the stock persist-backed WLAN MAC link, the RED
-  camera power ABI, and a byte-verified 185-file stock `.118` production camera
-  closure. SmartPort remains excluded.
-- The installed candidate includes the exact RED `.118` QRTR/TFTP transport
-  (`qrtr-ns`, `tftp_server`, `libqsocket.so`, `libqrtr.so`). The `bc1283e4`
-  kernel accepts the matching external `wlan.ko`; the remaining failure was the
-  missing RED `.118` userspace WLFW QMI client.
-- Dynamic debug reports `0xffffffe183b71df1` versus module `0x13d71df1`.
-  The exact LLD vmlinux stores raw `0x13d71df1` with no relocation for that
-  kcrctab entry, proving that unconditional KASLR subtraction corrupts it.
-- Current kernel commit `bc1283e4bf00425cf60f43d549f49ff26bf7474e`
-  accepts both the raw LLD CRC and the standard relocated ARM64 form. Its
-  source tests and normal LLD boot-image gates pass and it is installed.
-- The current vendor selection contains 664 files and 509 proprietary ELF
-  modules; all 509 have checkelf enabled and zero exceptions. Extraction now
-  replays the complete Android 15 compatibility pipeline automatically.
-- The earlier superseded candidate embeds kernel `f3819ee`. Its historical
-  artifacts are:
-  - OTA `lineage-22.2-20260915-UNOFFICIAL-hydrogenone.zip`, 851,038,702 bytes,
-    SHA-256 `bcb028f8137fbd370354ac2e65fe172c9f017299a6efa343de247b25dc21f51f`;
-  - production `boot.img`, 32,403,456 bytes, SHA-256
-    `7f62ec5933809d2031b30b9530e3dadd43d7160641c51d624b299e7efde56e30`;
-  - `vendor.img`, 333,463,784 bytes, SHA-256
-    `6745d19884af9eaf5ebd2274304eabbaaaab8ac6521c625bdd632f8a320f3d3a`.
-- The installed `a70742ff` build artifacts are:
-  - OTA `lineage-22.2-20260915-UNOFFICIAL-hydrogenone.zip`, 851,026,784 bytes,
-    SHA-256 `3b54b9dfa3b16291a9b84cea390155f94b3b4b8b50ed3df1b40386addc49b4f1`;
-  - `boot.img`, 32,403,456 bytes, SHA-256
-    `c67f079d1ece6a39a6d436d100a50d943e51a053f648892c3f1da265598a6132`;
-  - `vendor.img`, 333,467,880 bytes, SHA-256
-    `ed83894f4ddb10b51c65791d1e9f8609d6ca1d3ac4524603a32df6879f300f0b`.
-- The `bc1283e4` kernel change does not touch DTS, defconfig, DTB order,
-  display, touchscreen, recovery or boot-image layout. It restores only the
-  module-CRC comparison so raw and relocated kcrctab formats both work.
-- The current `bc1283e4` boot-image build passes the 15,655,357-byte kernel
-  payload limit, exact four-DTB order and exact `wlan.ko` CRC gate.
-- The full `bc1283e4` A/B OTA build completed with `mka bacon -j8` and VINTF
-  `compatible`:
-  - OTA `lineage-22.2-20260916-UNOFFICIAL-hydrogenone.zip`, 851,029,208 bytes,
-    SHA-256 `d3a582d50980d8d9e9eb1350f8f9ffb535a8d2f4b821209c3962e768de9581dc`;
-  - `boot.img`, 32,403,456 bytes, SHA-256
-    `1234df9d5112e481a354177467bb513e41c16c7bddf3094677d6acee1a96d854`;
-  - kernel payload, 15,655,357 bytes, SHA-256
-    `9d066fb204fbce603692fcfb6e3512866da5a163e00dd3814ae2867d9768c150`;
-  - packaged `wlan.ko`, 5,660,568 bytes, SHA-256
-    `a8126f3fb6c58516a3263a63454f67068035c643682a8f26a630d933a8516c72`.
-- Live diagnosis of that installed build proved the remaining Wi-Fi boundary:
-  the exact stock `.118` `cnss-daemon` completed the WLFW QMI board-data and
-  calibration handshake, after which ICNSS reported `FW_READY` and created
-  `wlan0` plus `p2p0`. This rules out kernel size, DT selection and module ABI
-  as the cause of the observed `WifiNative Failure`.
-- Vendor commit `ec16aa36d6a5173655c45636183193260da12c06`
-  permanently restores that exact daemon and the stock-equivalent `late_start`
-  service. `cnss_diag` remains excluded.
-- The resulting uninstalled candidate was built with `make bacon -j7`, passed
-  VINTF compatibility and contains Android security patch level `2026-09`:
-  - OTA `lineage-22.2-20260916-UNOFFICIAL-hydrogenone.zip`, 851,071,144 bytes,
-    SHA-256 `12a8cf73d60a47fe709e1ddd612ac46b3edced27c4e0376561217f3983e98ef3`;
-  - `boot.img`, 32,403,456 bytes, SHA-256
-    `01084bfa71d167d6e7ec0d70fa970d4092e48857d6eaded4050ec2fd8ad7ef52`;
-  - `vendor.img`, 333,541,608 bytes, SHA-256
-    `51df08a98f60f498a4c816704046d1e6e380a754a6d164d9e44397789514a91d`;
-  - kernel payload remains 15,655,357 bytes, leaving 1,121,859 bytes below
-    the observed 16 MiB RED ABL boundary.
-- This candidate has not been installed. Full Wi-Fi UI and association remain
-  a physical runtime gate after a user-approved sideload; Bluetooth remains a
-  separate unresolved runtime issue.
-- Only the user can enter Lineage Recovery physically; never issue
-  `adb reboot recovery` or `fastboot reboot recovery` on this device.
-- No command may flash or reboot the phone without a new explicit user request.
-  The full build and exact kernel/module/DTB/boot verification gate is now
-  complete. The next gate is a user-controlled recovery install and physical
-  runtime collection; build success alone does not prove Wi-Fi or Bluetooth.
+- Lineage Recovery and LineageOS boot with the source-built kernel.
+- Touchscreen, USB debugging, flashlight and normal Android boot work.
+- Wi-Fi works on 2.4 and 5 GHz after the WLFW transport and kernel CRC fixes.
+- Front/rear camera preview and still JPEG capture work.
+- Bluetooth remains unresolved.
+- The previously installed radio candidate exposes IRadio 1.4 and RadioConfig
+  1.1, but baseband remains unknown and IMEI/SIM are absent.
+
+## Radio diagnosis completed
+
+The missing baseband/IMEI is not the original Android 15 unsupported-HAL error:
+the compatible interfaces are now published. Both `vendor.qcrild` processes
+instead crashed in `QtiBusSocketTransport::clientLoop()` because the Android 15
+init tree did not create `/dev/socket/qmux_radio`.
+
+A reversible live test created `/dev/socket/qmux_radio` as `radio:radio`, mode
+`2770`, and `/data/vendor/radio` as `system:radio`, mode `0770`, with the stock
+SELinux contexts. `/dev/socket/qmux_radio/ril_ipc` appeared and both QCRIL
+instances stayed stable for more than 120 seconds. This proves the missing init
+runtime contract caused the crash loop.
+
+After QtiBus stabilized, QCRIL failed DMS initialization with
+`qmi_client_init_instance returned (-17)`. Qualcomm defines `-17` as
+`QMI_CLIENT_PARAM_ERR`. The Android 15 QCRIL had been mixed with the older RED
+QMI client/IDL generation.
+
+All four maintained MSM8998 reference vendor trees carry byte-identical FP3
+6.A.025.0 QMI libraries and the same version-10 QCRIL database. Vendor commit
+`0c0351fcfc0a00edece8147403675d3575185e7f` now packages that coherent closure,
+the database and upgrades 0 through 10. The retained RED 64-bit IMS-private IDL
+is linked to stock `lib-imsrcsbaseimpl.so`, its verified symbol provider; no
+undefined-symbol bypass is used. Device init permanently creates the QtiBus
+and radio-data state and reproduces the database/MBN-copy flags.
+
+## Current candidate
+
+The corrected candidate completed `mka bacon -j7`; VINTF is compatible, all 112
+vendor tests, all 179 device unit tests and the full-tree audit pass. The
+installed output contains the exact expected QMI hashes, all QCRIL database
+upgrades, the IMS provider bridge and the new init contract.
+
+- OTA: `lineage-22.2-20260917-UNOFFICIAL-hydrogenone.zip`, 858,334,655 bytes,
+  SHA-256 `6a78e95d96a3d0e1c9b8fd9cdb6fb78b49e89edb04d1c75f0dcb6b977a920224`.
+- `boot.img`: 32,403,456 bytes, SHA-256
+  `c89def7c5a2f8d7296966d9c56dcb38ce279b08928111eca2eccc36d54cecf90`.
+- `vendor.img`: 369,557,736 bytes, SHA-256
+  `137409e2129fe179c65ca847287231af0e36e028014aca47d7f3f416a4425773`.
+
+This candidate has not been installed. Do not claim the radio fixed from build
+evidence. The next gate, only after explicit user approval, is recovery
+sideload followed by baseband, IMEI, SIM, calls/data and Wi-Fi/camera regression
+checks.

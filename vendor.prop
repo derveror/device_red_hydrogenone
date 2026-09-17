@@ -20,6 +20,10 @@ vendor.usb.rndis.func.name=rndis
 # Radio - RED .118 canonical MPSS.AT modem + DSDS selects qcrild/qcrild2.
 # Legacy vendor.rild.libpath is intentionally not advertised by this qcrild path.
 persist.radio.multisim.config=dsds
+ro.telephony.default_network=22,22
+persist.vendor.dpmhalservice.enable=1
+persist.vendor.data.mode=concurrent
+ro.vendor.use_data_netmgrd=true
 persist.vendor.radio.apm_sim_not_pwdn=1
 persist.vendor.radio.custom_ecc=1
 persist.vendor.radio.rat_on=combine

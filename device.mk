@@ -101,7 +101,9 @@ PRODUCT_PACKAGES += \
     android.hardware.radio.c_shim@1.0 \
     android.hardware.radio.c_shim@1.1 \
     android.hardware.radio.c_shim@1.2 \
-    android.hardware.radio.config@1.1-service.wrapper
+    android.hardware.radio.config@1.1-service.wrapper \
+    IPACM_cfg.xml \
+    ipacm
 
 # Camera provider wrapper; camera HAL payload remains vendor-tree owned.
 PRODUCT_PACKAGES += \

@@ -61,11 +61,15 @@ class Stock118PurgeContractTest(unittest.TestCase):
             for line in (ROOT / "proprietary-files.txt").read_text(encoding="utf-8").splitlines()
             if line.strip() and not line.lstrip().startswith("#")
         ]
-        # The previous Android 15 radio selection contained 691 extraction
-        # records. The coherent FP3 QMI closure adds nine pinned replacements
-        # and the twelve-file QCRIL database/runtime migration set.
-        self.assertEqual(len(entries), 712)
-        self.assertEqual(len(entries), len(set(entries)))
+        # The complete FP3 radio generation includes QCRIL, QMI, netmgr and
+        # DPM. The former unpinned RED copies of nine replaced QMI paths are
+        # removed so every installed destination has exactly one source.
+        destinations = [
+            entry.split(";", 1)[0].split(":", 1)[0].lstrip("-").split("|", 1)[0]
+            for entry in entries
+        ]
+        self.assertEqual(len(entries), 710)
+        self.assertEqual(len(destinations), len(set(destinations)))
 
     def test_vendor_hidl_runtime_contract_is_pinned_to_red118(self) -> None:
         contract = json.loads(VENDOR_HIDL_CONTRACT.read_text(encoding="utf-8"))

@@ -1,0 +1,2 @@
+# DPM - match the FP3 6.A.025.0 system/vendor data-plane generation.
+persist.vendor.dpm.feature=11

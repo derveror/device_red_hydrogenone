@@ -68,7 +68,7 @@ class Stock118PurgeContractTest(unittest.TestCase):
             entry.split(";", 1)[0].split(":", 1)[0].lstrip("-").split("|", 1)[0]
             for entry in entries
         ]
-        self.assertEqual(len(entries), 710)
+        self.assertEqual(len(entries), 725)
         self.assertEqual(len(destinations), len(set(destinations)))
 
     def test_vendor_hidl_runtime_contract_is_pinned_to_red118(self) -> None:

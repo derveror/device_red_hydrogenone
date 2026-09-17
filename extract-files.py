@@ -24,8 +24,16 @@ namespace_imports = [
     'vendor/qcom/opensource/dataservices',
 ]
 
+
+def lib_fixup_vendor_suffix(lib: str, partition: str, *args, **kwargs):
+    return f'{lib}_{partition}' if partition == 'vendor' else None
+
+
 lib_fixups: lib_fixups_user_type = {
     **lib_fixups,
+    (
+        'com.qualcomm.qti.dpm.api@1.0',
+    ): lib_fixup_vendor_suffix,
     (
         'android.hardware.radio.c_shim@1.0',
         'android.hardware.radio.c_shim@1.1',

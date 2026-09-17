@@ -23,6 +23,7 @@ EXPECTED_SOURCE_FQINSTANCES = {
     "android.hardware.nfc@1.2::INfc/default",
     "android.hardware.sensors@1.0::ISensors/default",
     "android.hardware.soundtrigger@2.2::ISoundTriggerHw/default",
+    "com.qualcomm.qti.dpm.api@1.0::IdpmQmi/dpmQmiService",
 }
 
 # These are supplied by vendor/red/hydrogenone VINTF fragments and therefore

@@ -119,6 +119,7 @@ PRODUCT_PRIVATE_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/private
 PRODUCT_PUBLIC_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/public
 
 # Properties
+TARGET_SYSTEM_EXT_PROP += $(DEVICE_PATH)/system_ext.prop
 TARGET_VENDOR_PROP += $(DEVICE_PATH)/vendor.prop
 
 # Stock .118 vendor patch level

@@ -105,6 +105,17 @@ PRODUCT_PACKAGES += \
     IPACM_cfg.xml \
     ipacm
 
+# IMS/VoLTE - Android 15 framework libraries required by the Qualcomm MMTEL
+# service shared by the maintained mata, cheryl, Nubia, and OnePlus MSM8998
+# trees. The proprietary service frontend remains vendor-tree owned.
+PRODUCT_PACKAGES += \
+    ims-ext-common \
+    ims_ext_common.xml \
+    qti-telephony-hidl-wrapper \
+    qti_telephony_hidl_wrapper.xml \
+    qti-telephony-utils \
+    qti_telephony_utils.xml
+
 # Camera provider wrapper; camera HAL payload remains vendor-tree owned.
 PRODUCT_PACKAGES += \
     android.hardware.camera.provider@2.4-impl:32 \

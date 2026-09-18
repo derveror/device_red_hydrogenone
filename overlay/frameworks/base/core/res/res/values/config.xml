@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <bool name="config_showNavigationBar">true</bool>
+
+    <!-- RED stock 118 advertises cellular IMS voice and video, but does not
+         expose Wi-Fi calling. The matching persist.dbg properties retain the
+         stock policy when a carrier bundle supplies stricter defaults. -->
+    <bool name="config_device_volte_available">true</bool>
+    <bool name="config_device_vt_available">true</bool>
+    <bool name="config_device_wfc_ims_available">false</bool>
 </resources>

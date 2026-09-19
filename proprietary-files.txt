@@ -3,6 +3,15 @@
 ## Target: LineageOS 22.2 / Android 15
 
 # P0 foundation / security / display / power
+vendor/etc/acdbdata/MTP/MTP_Bluetooth_cal.acdb
+vendor/etc/acdbdata/MTP/MTP_General_cal.acdb
+vendor/etc/acdbdata/MTP/MTP_Global_cal.acdb
+vendor/etc/acdbdata/MTP/MTP_Handset_cal.acdb
+vendor/etc/acdbdata/MTP/MTP_Hdmi_cal.acdb
+vendor/etc/acdbdata/MTP/MTP_Headset_cal.acdb
+vendor/etc/acdbdata/MTP/MTP_Speaker_cal.acdb
+vendor/etc/acdbdata/MTP/MTP_workspaceFile.qwsp
+vendor/etc/audio_tuning_mixer.txt
 vendor/bin/adsprpcd
 vendor/bin/cnss-daemon
 vendor/bin/irsc_util
@@ -34,6 +43,13 @@ vendor/firmware/a540_zap.b01
 vendor/firmware/a540_zap.b02
 vendor/firmware/a540_zap.elf
 vendor/firmware/a540_zap.mdt
+vendor/firmware/ipa_fws.b00
+vendor/firmware/ipa_fws.b01
+vendor/firmware/ipa_fws.b02
+vendor/firmware/ipa_fws.b03
+vendor/firmware/ipa_fws.b04
+vendor/firmware/ipa_fws.elf
+vendor/firmware/ipa_fws.mdt
 vendor/lib/egl/eglSubDriverAndroid.so
 vendor/lib/egl/libEGL_adreno.so
 vendor/lib/egl/libGLESv1_CM_adreno.so
@@ -47,8 +63,13 @@ vendor/lib/libC2D2.so
 vendor/lib/libCB.so
 vendor/lib/libOpenCL.so
 vendor/lib/libQSEEComAPI.so
+vendor/lib/libacdb-fts.so
+vendor/lib/libacdbloader.so
+vendor/lib/libacdbrtac.so
 vendor/lib/libadreno_utils.so
+vendor/lib/libadiertac.so
 vendor/lib/libadsprpc.so
+vendor/lib/libaudcal.so
 vendor/lib/libc2d30_bltlib.so
 vendor/lib/libfastcvopt.so
 vendor/lib/libgsl.so
@@ -75,9 +96,14 @@ vendor/lib64/libC2D2.so
 vendor/lib64/libCB.so
 vendor/lib64/libOpenCL.so
 vendor/lib64/libQSEEComAPI.so
+vendor/lib64/libacdb-fts.so
+vendor/lib64/libacdbloader.so
+vendor/lib64/libacdbrtac.so
 vendor/lib64/libadreno_utils.so
+vendor/lib64/libadiertac.so
 vendor/lib64/libadsp_default_listener.so
 vendor/lib64/libadsprpc.so
+vendor/lib64/libaudcal.so
 vendor/lib64/libc2d30_bltlib.so
 vendor/lib64/libdiag.so
 vendor/lib64/libdrmfs.so
@@ -648,6 +674,7 @@ vendor/lib64/vendor.qti.latency@2.0.so
 # Radio - Android 15 compatibility stack from FP3 6.A.025.0. This exact
 # QCRIL, DPM and mobile-data generation is shared by the maintained LineageOS
 # 22.2 msm8998 reference trees.
+vendor/etc/data/dsi_config.xml|27a9616809d2e2355640d5e7cdb7268eba9f6a0d
 system_ext/bin/dpmd|dc94ffe90c6658b0bc99c64f68517c4048d0321a
 system_ext/etc/dpm/dpm.conf|95e27da8c989e96c6faea6f0697bce11955b62a5
 system_ext/etc/init/dpmd.rc|738b638ff04cda368e22c03e16baf90ba157a6fc

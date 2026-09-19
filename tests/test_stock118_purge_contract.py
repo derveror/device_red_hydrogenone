@@ -62,14 +62,17 @@ class Stock118PurgeContractTest(unittest.TestCase):
             if line.strip() and not line.lstrip().startswith("#")
         ]
         # The complete FP3 radio generation includes QCRIL, QMI, netmgr and
-        # DPM and the four-file radio-audio bridge. The former unpinned RED
-        # copies of nine replaced QMI paths are removed so every installed
-        # destination has exactly one source.
+        # DPM and the four-file radio-audio bridge. The 19-file stock .118 MTP
+        # ACDB runtime supplies both loader ABIs, their dependency closure,
+        # mixer tuning, and the calibration database. The former unpinned RED
+        # copies of nine replaced QMI paths are removed. The eight previously
+        # vendor-only data-plane paths are also part of the canonical device
+        # extraction input so regeneration cannot silently drop mobile data.
         destinations = [
             entry.split(";", 1)[0].split(":", 1)[0].lstrip("-").split("|", 1)[0]
             for entry in entries
         ]
-        self.assertEqual(len(entries), 733)
+        self.assertEqual(len(entries), 760)
         self.assertEqual(len(destinations), len(set(destinations)))
 
     def test_vendor_hidl_runtime_contract_is_pinned_to_red118(self) -> None:

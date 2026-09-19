@@ -8,6 +8,21 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
+QTI_RADIO_AUDIO_BRIDGE = {
+    "system_ext/app/QtiTelephonyService/QtiTelephonyService.apk": (
+        "341ac4f8b754883df97f2e9920f1e9a255a6a160"
+    ),
+    "system_ext/etc/permissions/qcrilhook.xml": (
+        "30397e293b2c40e6b7a1d11c2a615cdd05de625a"
+    ),
+    "system_ext/framework/qcrilhook.jar": (
+        "2851c62bf5d823c4228bfc6c56613934517ffdee"
+    ),
+    "system_ext/priv-app/qcrilmsgtunnel/qcrilmsgtunnel.apk": (
+        "87719275d1e87dec4b3e9f1a8e7373c7937c9dd8"
+    ),
+}
+
 
 def make_variable_tokens(text: str, variable: str) -> set[str]:
     values: set[str] = set()
@@ -26,6 +41,18 @@ def make_variable_tokens(text: str, variable: str) -> set[str]:
 
 
 class ImsMmtelRuntimeContractTest(unittest.TestCase):
+    def test_fp3_qti_radio_audio_bridge_is_pinned_for_extraction(self) -> None:
+        proprietary_files = (ROOT / "proprietary-files.txt").read_text(
+            encoding="utf-8"
+        )
+        entries = {
+            line.split("|", 1)[0]: line.split("|", 1)[1]
+            for line in proprietary_files.splitlines()
+            if line and not line.startswith("#") and "|" in line
+        }
+        for relative, sha1 in QTI_RADIO_AUDIO_BRIDGE.items():
+            self.assertEqual(entries.get(relative), sha1, relative)
+
     def test_android_ims_feature_is_declared(self) -> None:
         device_makefile = (ROOT / "device.mk").read_text(encoding="utf-8")
         self.assertIn(

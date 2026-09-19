@@ -1,6 +1,6 @@
 # Action 0005 — Audit clean-checkout dependency acquisition
 
-**Target:** clean LineageOS 22.2 checkout leading to `lunch lineage_hydrogenone-userdebug` and `m nothing`.
+**Target:** clean LineageOS 22.2 checkout leading to `lunch lineage_hydrogenone-bp1a-userdebug` and `m nothing`.
 
 ## Device dependency file observed
 

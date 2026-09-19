@@ -37,7 +37,7 @@ bash device/red/hydrogenone/tools/build/run_m_nothing_preflight.sh --validate-on
 bash device/red/hydrogenone/tools/build/run_m_nothing_preflight.sh
 ```
 
-which internally runs only `envsetup`, `lunch lineage_hydrogenone-userdebug`, and `m nothing` and captures complete logs.
+which internally runs only `envsetup`, `lunch lineage_hydrogenone-bp1a-userdebug`, and `m nothing` and captures complete logs.
 
 The later `bootimage`, `vendorimage`, `systemimage`, target-files and OTA gates are explicitly blocked until `m nothing` is GREEN.
 

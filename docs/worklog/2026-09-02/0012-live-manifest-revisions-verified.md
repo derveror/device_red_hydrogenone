@@ -60,4 +60,4 @@ This verifies source acquisition metadata only; it does not replace an actual `r
 
 ## Next action
 
-Create and test a single workspace preflight/build-log script that, from a complete LineageOS 22.2 checkout, verifies the exact device/vendor revision contract, sources `build/envsetup.sh`, lunches `lineage_hydrogenone-userdebug`, runs `m nothing`, and preserves the complete terminal output for deterministic failure analysis.
+Create and test a single workspace preflight/build-log script that, from a complete LineageOS 22.2 checkout, verifies the exact device/vendor revision contract, sources `build/envsetup.sh`, lunches `lineage_hydrogenone-bp1a-userdebug`, runs `m nothing`, and preserves the complete terminal output for deterministic failure analysis.

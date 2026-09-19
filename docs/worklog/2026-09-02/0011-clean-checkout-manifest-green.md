@@ -52,4 +52,4 @@ The repository now contains a reproducible clean-checkout manifest template and 
 
 ## Next action
 
-Verify the four manifest repository/revision pairs against live GitHub refs, then prepare the minimal clean-workspace bootstrap/build-log capture path leading to the first real `lunch lineage_hydrogenone-userdebug` and `m nothing` on a complete LineageOS 22.2 workspace.
+Verify the four manifest repository/revision pairs against live GitHub refs, then prepare the minimal clean-workspace bootstrap/build-log capture path leading to the first real `lunch lineage_hydrogenone-bp1a-userdebug` and `m nothing` on a complete LineageOS 22.2 workspace.

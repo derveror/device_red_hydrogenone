@@ -103,6 +103,10 @@ lunch lineage_hydrogenone-bp1a-userdebug
 m nothing
 ```
 
+`bp1a` is mandatory for Hydrogen One. It selects platform SPL `2026-09-01`;
+do not substitute `ap4a`, which produces SPL `2025-01-05` and is rejected by
+the installed Lineage Recovery as an SPL downgrade.
+
 and writes:
 
 ```text

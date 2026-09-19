@@ -167,6 +167,13 @@ The explicit `bp1a` release component is required by the current LineageOS 22.2
 build environment. The device product declares `user`, `userdebug` and `eng`
 variants with that release token.
 
+This is a hard build invariant, not a selectable release flavor. Hydrogen One
+`userdebug` builds always use `lineage_hydrogenone-bp1a-userdebug`, whose
+platform SPL is `2026-09-01`. Do not substitute `ap4a`: it emits SPL
+`2025-01-05`, and the installed Lineage Recovery aborts the OTA as an
+`SPL downgrade`. Check `PLATFORM_SECURITY_PATCH` after `lunch` and
+`post-security-patch-level` in the finished OTA before sideload.
+
 After `m nothing` is clean, run the image gates explicitly:
 
 ```bash

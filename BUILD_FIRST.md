@@ -43,7 +43,7 @@ The script performs exactly:
 
 ```bash
 source build/envsetup.sh
-lunch lineage_hydrogenone-userdebug
+lunch lineage_hydrogenone-bp1a-userdebug
 m nothing
 ```
 
@@ -59,8 +59,15 @@ Do not use the historical `test/lineage-22.2-bringup`, `work`, or generated
 `codex/*` branches for this gate. Those snapshots contain either a late
 `PRODUCT_EXTRA_VNDK_VERSIONS` assignment or a VNDK-28 request, both of which
 fail before product discovery on LineageOS 22.2. Use the device branch and
-exact vendor revision listed above; no extra release component such as
-`bp1a` is required for the canonical lunch command.
+exact vendor revision listed above.
+
+The release component is not optional: every Hydrogen One build must use
+`lineage_hydrogenone-bp1a-userdebug`. The `bp1a` configuration carries the
+project SPL `2026-09-01`. Building with `ap4a` instead produces SPL
+`2025-01-05`, and the installed Lineage Recovery rejects that OTA as an
+`SPL downgrade`. Verify `PLATFORM_SECURITY_PATCH=2026-09-01` before starting
+`m bacon` and verify the same value in the finished OTA metadata before
+sideload.
 
 ## Later gates
 

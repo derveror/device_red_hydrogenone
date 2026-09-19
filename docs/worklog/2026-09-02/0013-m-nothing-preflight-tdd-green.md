@@ -57,7 +57,7 @@ The real first build gate is exactly:
 
 ```text
 source build/envsetup.sh
-lunch lineage_hydrogenone-userdebug
+lunch lineage_hydrogenone-bp1a-userdebug
 m nothing
 ```
 

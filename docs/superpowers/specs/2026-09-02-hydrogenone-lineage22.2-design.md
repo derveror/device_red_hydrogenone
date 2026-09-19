@@ -382,7 +382,11 @@ m target-files-package
 m otapackage
 ```
 
-The exact lunch release token is taken from the active LineageOS 22.2 product configuration; if the branch uses another release token, `AndroidProducts.mk` is updated to the branch-supported value rather than retaining a stale token.
+The Hydrogen One release token is permanently pinned to `bp1a`; it is not
+selected dynamically from another LineageOS release configuration. This keeps
+the platform SPL at `2026-09-01`. An `ap4a` build would advertise
+`2025-01-05` and be rejected by the installed Lineage Recovery as an SPL
+downgrade.
 
 Each gate includes the following checks where applicable:
 

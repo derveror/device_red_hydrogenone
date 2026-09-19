@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 import unittest
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 
@@ -25,6 +26,42 @@ def make_variable_tokens(text: str, variable: str) -> set[str]:
 
 
 class ImsMmtelRuntimeContractTest(unittest.TestCase):
+    def test_android_ims_feature_is_declared(self) -> None:
+        device_makefile = (ROOT / "device.mk").read_text(encoding="utf-8")
+        self.assertIn(
+            "frameworks/native/data/etc/android.hardware.telephony.ims.xml:"
+            "$(TARGET_COPY_OUT_VENDOR)/etc/permissions/"
+            "android.hardware.telephony.ims.xml",
+            device_makefile,
+        )
+
+    def test_ims_privileged_permissions_are_allowlisted(self) -> None:
+        relative = "configs/system_ext-privapp-permissions-qti.xml"
+        device_makefile = (ROOT / "device.mk").read_text(encoding="utf-8")
+        self.assertIn(
+            f"$(LOCAL_PATH)/{relative}:$(TARGET_COPY_OUT_SYSTEM_EXT)/"
+            "etc/permissions/privapp-permissions-qti.xml",
+            device_makefile,
+        )
+
+        permissions = ET.parse(ROOT / relative).getroot()
+        ims_entry = permissions.find(
+            "./privapp-permissions[@package='org.codeaurora.ims']"
+        )
+        self.assertIsNotNone(ims_entry)
+        ims_permissions = [] if ims_entry is None else ims_entry.findall("permission")
+        self.assertEqual(
+            {
+                "android.permission.INTERACT_ACROSS_USERS",
+                "android.permission.MODIFY_PHONE_STATE",
+                "android.permission.READ_PRECISE_PHONE_STATE",
+                "android.permission.READ_PRIVILEGED_PHONE_STATE",
+                "android.permission.SUBSTITUTE_NOTIFICATION_APP_NAME",
+                "android.permission.WRITE_SECURE_SETTINGS",
+            },
+            {permission.attrib["name"] for permission in ims_permissions},
+        )
+
     def test_qti_ims_java_contract_is_packaged(self) -> None:
         packages = make_variable_tokens(
             (ROOT / "device.mk").read_text(encoding="utf-8"), "PRODUCT_PACKAGES"

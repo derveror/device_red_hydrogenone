@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Qualcomm IMS privileged permissions required by the maintained Android 15
+     MMTEL frontend.  The grants match the RED 118 service contract and the
+     maintained mata, cheryl, OnePlus, and Nubia MSM8998 device trees.
+-->
+<permissions>
+    <privapp-permissions package="org.codeaurora.ims">
+        <permission name="android.permission.INTERACT_ACROSS_USERS"/>
+        <permission name="android.permission.MODIFY_PHONE_STATE"/>
+        <permission name="android.permission.READ_PRECISE_PHONE_STATE"/>
+        <permission name="android.permission.READ_PRIVILEGED_PHONE_STATE"/>
+        <permission name="android.permission.SUBSTITUTE_NOTIFICATION_APP_NAME"/>
+        <permission name="android.permission.WRITE_SECURE_SETTINGS"/>
+    </privapp-permissions>
+</permissions>

@@ -76,7 +76,9 @@ on post-fs-data
     mkdir /data/vendor/wifi/wpa/sockets 0770 wifi wifi
 
 on early-boot
-    # The RED .118 sensor HAL is backed by the SLPI sensor DSP.
+    # RED .118 boots all application DSPs before their class-main clients.
+    write /sys/kernel/boot_adsp/boot 1
+    write /sys/kernel/boot_cdsp/boot 1
     write /sys/kernel/boot_slpi/boot 1
 
 on boot

@@ -189,6 +189,32 @@ class Android15RootdirContractTest(unittest.TestCase):
             r"(?m)^/dev/subsys_\*\s+0640\s+system\s+system$",
         )
 
+    def test_red118_audio_dsp_is_booted_during_early_boot(self) -> None:
+        early_boot_commands = [
+            command
+            for trigger, commands in action_blocks(self.qcom)
+            if trigger == "early-boot"
+            for command in commands
+        ]
+        self.assertEqual(
+            early_boot_commands[:3],
+            [
+                "write /sys/kernel/boot_adsp/boot 1",
+                "write /sys/kernel/boot_cdsp/boot 1",
+                "write /sys/kernel/boot_slpi/boot 1",
+            ],
+        )
+
+    def test_adsprpcd_can_open_red118_fast_rpc_devices(self) -> None:
+        self.assertRegex(
+            self.ueventd,
+            r"(?m)^/dev/adsprpc-smd\s+0664\s+system\s+system$",
+        )
+        self.assertRegex(
+            self.ueventd,
+            r"(?m)^/dev/adsprpc-smd-secure\s+0644\s+system\s+system$",
+        )
+
     def test_red118_securefs_is_mounted_before_qseecomd(self) -> None:
         fs_commands = [
             command

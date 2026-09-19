@@ -22,6 +22,10 @@
 /dev/adsprpc-smd          0664   system     system
 /dev/adsprpc-smd-secure   0644   system     system
 
+# Stock RED .118 audio calibration interfaces.
+/dev/msm_audio_cal        0660   system     audio
+/dev/msm_rtac             0660   system     audio
+
 # SSR devices
 /dev/subsys_*             0640   system     system
 

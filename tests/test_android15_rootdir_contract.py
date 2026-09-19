@@ -215,6 +215,14 @@ class Android15RootdirContractTest(unittest.TestCase):
             r"(?m)^/dev/adsprpc-smd-secure\s+0644\s+system\s+system$",
         )
 
+    def test_audio_hal_can_open_red118_calibration_devices(self) -> None:
+        for device in ("msm_audio_cal", "msm_rtac"):
+            with self.subTest(device=device):
+                self.assertRegex(
+                    self.ueventd,
+                    rf"(?m)^/dev/{device}\s+0660\s+system\s+audio$",
+                )
+
     def test_red118_securefs_is_mounted_before_qseecomd(self) -> None:
         fs_commands = [
             command
